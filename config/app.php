@@ -27,7 +27,7 @@ return [
     | or any other location as required by the application or its packages.
     */
 
-    'version' => env('APP_VERSION', '1.0.0'),
+    'version' => env('APP_VERSION', '2.0.0'),
 
     /*
     |--------------------------------------------------------------------------
@@ -195,18 +195,11 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
-         * Package Service Providers...
-         */
-        Intervention\Image\ImageServiceProvider::class,
-
-        /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
 
     ],
 
@@ -223,7 +216,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        'Image' => Intervention\Image\Facades\Image::class,
+        'Image' => Intervention\Image\Laravel\Facades\Image::class,
     ])->toArray(),
 
 ];

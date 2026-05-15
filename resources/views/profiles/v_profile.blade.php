@@ -1,228 +1,197 @@
 @extends('layouts.v_backend')
 
-@section('title')
-    Profil
-@endsection
-
-@push('scripts')
-    <link rel="stylesheet" href="{{ asset('assets/extensions/filepond/filepond.css') }}">
-@endpush
+@section('title', 'Profil')
 
 @section('content')
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>{{ __('text.profile') }}</h3>
-                <p class="text-subtitle text-muted">Perbaharuai data Anda</p>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('dashboard.index') }}">Dashboard</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            {{ __('text.profile') }}
-                        </li>
-                    </ol>
-                </nav>
-            </div>
+
+<div class="mb-6">
+    <h2 class="text-xl font-bold text-bark">{{ __('text.profile') }}</h2>
+    <p class="text-bark-muted text-sm mt-0.5">Perbarui data Anda</p>
+</div>
+
+@if (session('pesan'))
+    <div class="alert-success mb-5">
+        <i class="bi bi-check-circle-fill text-lg flex-shrink-0"></i>
+        <p class="font-semibold">{{ session('pesan') }}</p>
+    </div>
+@endif
+@if ($errors->any())
+    <div class="alert-danger mb-5">
+        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
+        <div>@foreach ($errors->all() as $err)<p>{{ $err }}</p>@endforeach</div>
+    </div>
+@endif
+
+<div class="max-w-2xl">
+
+    {{-- User card header --}}
+    <div class="be-card p-6 mb-6 flex items-center gap-4">
+        <div class="w-16 h-16 rounded-2xl overflow-hidden bg-sage-100 flex-shrink-0">
+            @if (Auth::user()->avatar)
+                <img src="{{ asset('/upload/avatars/' . Auth::user()->avatar) }}"
+                     class="w-full h-full object-cover" alt="">
+            @else
+                <div class="w-full h-full flex items-center justify-center">
+                    <i class="bi bi-person-fill text-sage text-2xl"></i>
+                </div>
+            @endif
+        </div>
+        <div>
+            <p class="font-bold text-bark text-lg">{{ Auth::user()->name }}</p>
+            <p class="text-bark-muted text-sm">{{ Auth::user()->email }}</p>
         </div>
     </div>
 
-    @if (session('pesan'))
-        <div class="alert alert-light-success color-success">
-            <i class="bi bi-check-circle"></i> {{ session('pesan') }}
+    {{-- Tabs --}}
+    <div class="be-card overflow-hidden">
+
+        {{-- Tab buttons --}}
+        <div class="flex border-b border-cream-dark overflow-x-auto">
+            <button data-tab="tab-profile" onclick="switchTab('tab-profile')"
+                    class="tab-btn px-5 py-3.5 text-sm font-bold border-b-2 border-sage text-sage whitespace-nowrap transition-colors">
+                <i class="bi bi-person-badge mr-1"></i> Profil
+            </button>
+            <button data-tab="tab-avatar" onclick="switchTab('tab-avatar')"
+                    class="tab-btn px-5 py-3.5 text-sm font-bold border-b-2 border-transparent text-bark-muted whitespace-nowrap hover:text-bark transition-colors">
+                <i class="bi bi-person-bounding-box mr-1"></i> Avatar
+            </button>
+            <button data-tab="tab-account" onclick="switchTab('tab-account')"
+                    class="tab-btn px-5 py-3.5 text-sm font-bold border-b-2 border-transparent text-bark-muted whitespace-nowrap hover:text-bark transition-colors">
+                <i class="bi bi-gear-fill mr-1"></i> Akun
+            </button>
+            <button data-tab="tab-password" onclick="switchTab('tab-password')"
+                    class="tab-btn px-5 py-3.5 text-sm font-bold border-b-2 border-transparent text-bark-muted whitespace-nowrap hover:text-bark transition-colors">
+                <i class="bi bi-shield-lock mr-1"></i> Kata Sandi
+            </button>
         </div>
-    @endif
 
-    @if ($errors->any())
-        <div class="alert alert-light-danger color-danger">
-            <i class="bi bi-exclamation-circle"></i>
-            @foreach ($errors->all() as $err)
-                {{ $err }}<br>
-            @endforeach
-        </div>
-    @endif
-    <section id="basic-horizontal-layouts">
-        <div class="col-md-6 col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">{{ Auth::user()->name }}</h5>
-                </div>
-
-                <div class="card-body">
-                    <ul class="nav nav-tabs" id="myTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link active" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab"
-                                aria-controls="profile" aria-selected="false"><i class="bi bi-person-badge"></i>
-                                Profil
-                            </a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="avatar-tab" data-bs-toggle="tab" href="#avatar" role="tab"
-                                aria-controls="avatar" aria-selected="false"><i class="bi bi-person-bounding-box"></i>
-                                Avatar
-                            </a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="user-tab" data-bs-toggle="tab" href="#user" role="tab"
-                                aria-controls="user" aria-selected="false"><i class="bi bi-gear-fill"></i>
-                                Akun
-                            </a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="user-tab" data-bs-toggle="tab" href="#password" role="tab"
-                                aria-controls="password" aria-selected="false"><i class="bi bi-shield-lock"></i> Kata
-                                Sandi</a>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content" id="myTabContent">
-
-
-                        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                            <p class="mt-5">
-                            <form role="form" action="{{ route('profile.update') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-
-                                <div class="form-body">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label>{{ __('text.address') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="text" id="alamat" class="form-control" name="alamat"
-                                                value="{{ $profile->alamat ?? '' }}" placeholder="{{ __('text.address') }}"
-                                                required />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label>{{ __('text.telp') }} / No. Whatsapp</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="text" id="telp" class="form-control" name="telp"
-                                                value="{{ $profile->telp ?? '' }}" placeholder="{{ __('text.telp') }}"
-                                                required />
-                                        </div>
-                                        <div class="col-sm-12 d-flex justify-content-start">
-                                            <button type="submit" class="btn btn-primary me-1 mb-1">
-                                                {{ __('text.submit') }}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                            </p>
-                        </div>
-
-                        <div class="tab-pane fade" id="avatar" role="tabpanel" aria-labelledby="avatar-tab">
-                            <p class="mt-5">
-                                @if (Auth::user()->avatar)
-                                    <img src="{{ asset('/upload/avatars/' . Auth::user()->avatar) }}" height="150"
-                                        class="avatar avatar-xl" />
-                                @else
-                                    <img src="{{ asset('/assets/images/no-image.png') }}" height="150"
-                                        class="avatar avatar-xl" />
-                                @endif
-
-                            <form role="form" enctype="multipart/form-data"
-                                action="{{ route('profile.update.avatar') }}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <label for="avatar" class="form-label">Ubah avatar <small
-                                            class="text-muted "><i>(Ukuran file Avatar: 150px x 150px)</i></small></label>
-                                    <input type="file" class="form-control form-control-sm" id="avatar"
-                                        name="avatar">
-                                </div>
-
-                                <div class="col-sm-12 d-flex justify-content-start">
-                                    <button type="submit" class="btn btn-primary me-1 mb-1">
-                                        {{ __('text.submit') }}
-                                    </button>
-                                </div>
-                            </form>
-                            </p>
-
-                        </div>
-
-                        <div class="tab-pane fade" id="user" role="tabpanel" aria-labelledby="user-tab">
-                            <p class="mt-5">
-                            <form role="form" action="{{ route('profile.update.user') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-
-                                <div class="form-body">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label>{{ __('text.name') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="text" id="name" class="form-control" name="name"
-                                                value="{{ $user->name }}" placeholder="{{ __('text.name') }}" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label>{{ __('text.email') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="email" id="email" class="form-control" name="email"
-                                                value="{{ $user->email }}" placeholder="{{ __('text.email') }}" />
-                                        </div>
-                                        <div class="col-sm-12 d-flex justify-content-start">
-                                            <button type="submit" class="btn btn-primary me-1 mb-1">
-                                                {{ __('text.submit') }}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                            </p>
-                        </div>
-
-                        <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab">
-                            <p class="mt-5">
-                            <form role="form" action="{{ route('profile.password.change') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-
-                                <div class="form-body">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label>{{ __('text.password_new') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="password" id="password_new" class="form-control"
-                                                name="password_new" placeholder="{{ __('text.password_new') }}"
-                                                required />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label>{{ __('text.password_new_confirmation') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="password" id="password_new_confirmation" class="form-control"
-                                                name="password_new_confirmation"
-                                                placeholder="{{ __('text.password_new_confirmation') }}" />
-                                        </div>
-                                        <div class="col-sm-12 d-flex justify-content-start">
-                                            <button type="submit" class="btn btn-primary me-1 mb-1">
-                                                {{ __('text.submit') }}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                            </p>
-                        </div>
-
+        {{-- Tab: Profil --}}
+        <div id="tab-profile" class="tab-pane p-6">
+            <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="space-y-5">
+                    <div>
+                        <label class="form-label">{{ __('text.address') }}</label>
+                        <input type="text" name="alamat" value="{{ $profile->alamat ?? '' }}"
+                               placeholder="{{ __('text.address') }}"
+                               class="input-field" required>
+                    </div>
+                    <div>
+                        <label class="form-label">{{ __('text.telp') }} / No. WhatsApp</label>
+                        <input type="text" name="telepon" value="{{ $profile->telepon ?? '' }}"
+                               placeholder="{{ __('text.telp') }}"
+                               class="input-field" required>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn-create">
+                            <i class="bi bi-check-lg"></i> {{ __('text.save') }}
+                        </button>
                     </div>
                 </div>
+            </form>
+        </div>
+
+        {{-- Tab: Avatar --}}
+        <div id="tab-avatar" class="tab-pane hidden p-6">
+            <div class="mb-6">
+                <div class="w-24 h-24 rounded-2xl overflow-hidden bg-sage-100">
+                    @if (Auth::user()->avatar)
+                        <img src="{{ asset('/upload/avatars/' . Auth::user()->avatar) }}"
+                             class="w-full h-full object-cover" alt="">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center">
+                            <i class="bi bi-person-fill text-sage text-3xl"></i>
+                        </div>
+                    @endif
+                </div>
             </div>
+            <form action="{{ route('profile.update.avatar') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="space-y-5">
+                    <div>
+                        <label class="form-label">Ubah Avatar</label>
+                        <input type="file" name="avatar"
+                               class="w-full text-sm text-bark-muted file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sage/10 file:text-sage cursor-pointer">
+                        <p class="text-xs text-bark-muted mt-1.5">Ukuran avatar: 150×150px</p>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn-create">
+                            <i class="bi bi-check-lg"></i> {{ __('text.save') }}
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
+
+        {{-- Tab: Akun --}}
+        <div id="tab-account" class="tab-pane hidden p-6">
+            <form action="{{ route('profile.update.user') }}" method="POST">
+                @csrf
+                <div class="space-y-5">
+                    <div>
+                        <label class="form-label">{{ __('text.name') }}</label>
+                        <input type="text" name="name" value="{{ $user->name }}"
+                               placeholder="{{ __('text.name') }}"
+                               class="input-field">
+                    </div>
+                    <div>
+                        <label class="form-label">{{ __('text.email') }}</label>
+                        <input type="email" name="email" value="{{ $user->email }}"
+                               placeholder="{{ __('text.email') }}"
+                               class="input-field">
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn-create">
+                            <i class="bi bi-check-lg"></i> {{ __('text.save') }}
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
-    </section>
-@endsection
+
+        {{-- Tab: Kata Sandi --}}
+        <div id="tab-password" class="tab-pane hidden p-6">
+            <form action="{{ route('profile.password.change') }}" method="POST">
+                @csrf
+                <div class="space-y-5">
+                    <div>
+                        <label class="form-label">{{ __('text.password_new') }}</label>
+                        <input type="password" name="password_new"
+                               placeholder="{{ __('text.password_new') }}"
+                               class="input-field" required>
+                    </div>
+                    <div>
+                        <label class="form-label">{{ __('text.password_new_confirmation') }}</label>
+                        <input type="password" name="password_new_confirmation"
+                               placeholder="{{ __('text.password_new_confirmation') }}"
+                               class="input-field" required>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn-create">
+                            <i class="bi bi-shield-lock"></i> Ubah Kata Sandi
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
 
 @push('scripts')
-    <script src="{{ asset('assets/extensions/filepond/filepond.js') }}"></script>
-    <script src="{{ asset('assets/js/filepond.js') }}"></script>
+<script>
+function switchTab(id) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('border-sage', 'text-sage');
+        b.classList.add('border-transparent', 'text-bark-muted');
+    });
+    document.getElementById(id).classList.remove('hidden');
+    const btn = document.querySelector(`[data-tab="${id}"]`);
+    btn.classList.add('border-sage', 'text-sage');
+    btn.classList.remove('border-transparent', 'text-bark-muted');
+}
+</script>
 @endpush
+
+@endsection

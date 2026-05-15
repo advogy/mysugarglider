@@ -1,38 +1,39 @@
 @extends('layouts.v_auth')
 
-@section('title')
-    Verifikasi Email
-@endsection
+@section('title', 'Verifikasi Email')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/style-auth.css') }}" type="text/css" />
-@endpush
+@section('form')
 
-@section('content')
-    <h2 class="auth-subtitle">{{ __('text.welcome') }},</h2>
-    <h1 class="auth-title">{{ Auth::user()->name }}</h1>
-    <p class="auth-subtitle mb-4">{{ __('text.verification_cek') }}</p>
-    <p class="auth-subtitle mb-2">{{ __('text.verification_not_receive') }}</p>
+<div class="mb-8">
+    <h1 class="text-3xl font-display font-bold text-bark mb-2">
+        Halo, {{ Auth::user()->name }}!
+    </h1>
+    <p class="text-bark-muted text-sm">{{ __('text.verification_cek') }}</p>
+</div>
 
-    @if (session('resent'))
-        <div class="alert alert-success" role="alert">
-            {{ __('text.verification_sent') }}
-        </div>
-    @endif
+@if (session('resent'))
+    <div class="alert-success mb-5">
+        <i class="bi bi-check-circle-fill text-lg flex-shrink-0"></i>
+        <p class="font-semibold">{{ __('text.verification_sent') }}</p>
+    </div>
+@endif
 
-    <form role="form" action="{{ route('verification.resend') }}" method="POST" enctype="multipart/form-data">
+<p class="text-bark-muted text-sm mb-6">{{ __('text.verification_not_receive') }}</p>
+
+<form action="{{ route('verification.resend') }}" method="POST">
+    @csrf
+    <button type="submit" class="btn-primary w-full justify-center py-3.5">
+        <i class="bi bi-envelope"></i> {{ __('text.verification_request') }}
+    </button>
+</form>
+
+<div class="text-center mt-8">
+    <form action="{{ route('logout') }}" method="POST" class="inline">
         @csrf
-        <button type="submit" class="btn btn-primary btn-lg">{{ __('text.verification_request') }}</button>
-    </form>
-
-    <p class="mt-10">
-        <a class="mt-7 text-lg fs-4 font-bold" href="{{ route('logout') }}"
-            onclick="event.preventDefault();
-                    document.getElementById('logout-form').submit();">
+        <button type="submit" class="text-sm text-bark-muted hover:text-bark font-semibold underline underline-offset-2 transition-colors">
             {{ __('text.logout') }}
-        </a>
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
+        </button>
     </form>
-    </p>
+</div>
+
 @endsection

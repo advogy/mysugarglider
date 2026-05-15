@@ -13,6 +13,12 @@ class AdoptionRequestModel extends Model
     protected $table = "adoption_requests";
     protected $primaryKey = 'id';
     protected $fillable = [
-        'adoption_id', 'harga', 'status', 'keterangan', 'user_id', 'shelter_id'
+        'adoption_id', 'harga', 'status', 'keterangan', 'user_id', 'shelter_id',
+        'bukti_transfer', 'paid_at', 'confirmed_at',
+    ];
+
+    protected $casts = [
+        'paid_at'      => 'datetime',
+        'confirmed_at' => 'datetime',
     ];
 }

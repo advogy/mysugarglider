@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\CollectionRequest;
+use App\Enums\CollectionStatus;
+use App\Enums\AdoptionStatus;
 use App\Models\ProfileModel;
 use App\Models\CollectionModel;
 use App\Models\ShelterModel;
@@ -12,25 +15,37 @@ use App\Models\AdoptionModel;
 
 class CollectionController extends Controller
 {
-    function index()
+    function index(Request $request)
     {
+        $search = trim($request->get('q', ''));
+
+        $query = CollectionModel::join('sugargliders as sg', 'collections.sugarglider_id', '=', 'sg.id')
+            ->join('shelters as st', 'collections.shelter_id', '=', 'st.id')
+            ->select(
+                'collections.id as id',
+                'collections.sugarglider_id as sgId',
+                'collections.shelter_id as stId',
+                'collections.status as sgStatus',
+                'sg.nama as sgNama',
+                'sg.kode as sgKode',
+                'sg.kelamin as sgKelamin',
+                'sg.jenis as sgJenis',
+                'sg.gambar as sgGambar',
+                'st.nama as stNama',
+            )
+            ->whereIn('collections.status', [CollectionStatus::PUBLIK->value, CollectionStatus::ADOPSI->value]);
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('sg.nama', 'like', "%{$search}%")
+                  ->orWhere('sg.jenis', 'like', "%{$search}%")
+                  ->orWhere('st.nama', 'like', "%{$search}%");
+            });
+        }
+
         $data = [
-            'collections' =>
-            CollectionModel::join('sugargliders as sg', 'collections.sugarglider_id', '=', 'sg.id')
-                ->join('shelters as st', 'collections.shelter_id', '=', 'st.id')
-                ->select(
-                    'collections.id as id',
-                    'collections.sugarglider_id as sgId',
-                    'collections.shelter_id as stId',
-                    'collections.status as sgStatus',
-                    'sg.nama as sgNama',
-                    'sg.kode as sgKode',
-                    'sg.kelamin as sgKelamin',
-                    'sg.jenis as sgJenis',
-                    'st.nama as stNama',
-                )
-                ->whereIn('collections.status', [2, 3])
-                ->paginate(20)
+            'collections' => $query->paginate(20)->appends($request->query()),
+            'search'      => $search,
         ];
 
         return view('collections.v_collection_index', $data);
@@ -56,7 +71,7 @@ class CollectionController extends Controller
                         'sg.nama as sgNama',
                         'st.nama as stNama',
                     )
-                    ->whereIn('collections.status', [2, 3])
+                    ->whereIn('collections.status', [CollectionStatus::PUBLIK->value, CollectionStatus::ADOPSI->value])
                     ->where('collections.user_id', Auth::id())
                     ->paginate(10)
             ];
@@ -76,7 +91,7 @@ class CollectionController extends Controller
         return view('collections.v_backend_collection_create', $data);
     }
 
-    function store(Request $request)
+    function store(CollectionRequest $request)
     {
         CollectionModel::create([
             'shelter_id'        => $request->shelter_id,
@@ -104,16 +119,16 @@ class CollectionController extends Controller
         return view('collections.v_backend_collection_edit', $data);
     }
 
-    function update(Request $request)
+    function update(CollectionRequest $request)
     {
         $collection = CollectionModel::find($request->id);
-        $collection->shelter_id     = Request()->shelter_id;
-        $collection->sugarglider_id = Request()->sugarglider_id;
-        $collection->status         = Request()->status;
+        $collection->shelter_id     = $request->shelter_id;
+        $collection->sugarglider_id = $request->sugarglider_id;
+        $collection->status         = $request->status;
 
-        if ($collection->status == 0) {
+        if ($collection->status == CollectionStatus::NONAKTIF->value) {
             $adoption           = AdoptionModel::where('collection_id', $request->id)->first();
-            $adoption->status   = 0;
+            $adoption->status   = AdoptionStatus::NONAKTIF->value;
             $adoption->save();
         }
 
@@ -125,6 +140,7 @@ class CollectionController extends Controller
     function destroy(Request $request)
     {
         $collection = CollectionModel::findOrFail($request->id);
+        $this->authorize('delete', $collection);
         $collection->delete();
 
         return redirect()->route('collection.index')->with('pesan', 'Data berhasil dihapus.');

@@ -3,11 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Support\Facades\Hash;
-use Session;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
@@ -34,7 +30,6 @@ class LoginController extends Controller
      *
      * @var string
      */
-    //protected $redirectTo = RouteServiceProvider::HOME;
     protected $redirectTo = '/dashboard';
 
     /**
@@ -80,21 +75,6 @@ class LoginController extends Controller
      * Change, forget, reset
      *
      */
-    public function password_change(Request $request)
-    {
-        $request->validate([
-            'password_new'              =>  'required',
-            'password_new_confirmation' =>  'required|same:password_new',
-        ]);
-
-        $user = User::find(Auth::id());
-        $user->password = Hash::make(Request()->password_new);
-        $user->save();
-        Auth::logout();
-
-        return redirect()->route('login')->with('pesan_password', 'Password berhasil diubah. Silakan masuk kembali.');
-    }
-
     public function password_forget()
     {
         return view('auth.passwords.v_forget');
@@ -135,7 +115,7 @@ class LoginController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->forceFill([
-                    'password' => Hash::make($password)
+                    'password' => $password
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();

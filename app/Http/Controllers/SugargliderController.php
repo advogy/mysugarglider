@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
+use App\Http\Requests\SugargliderRequest;
 use App\Models\SugargliderModel;
 use App\Models\ProfileModel;
 use App\Models\ShelterModel;
@@ -47,25 +48,13 @@ class SugargliderController extends Controller
         return view('sugargliders.v_backend_sugarglider_create', $data);
     }
 
-    function store(Request $request)
+    function store(SugargliderRequest $request)
     {
         if ($request->hasFile('gambar')) {
-
-            // Only allow .jpg, .bmp and .png file types.
-            $request->validate([
-                'gambar' => 'mimes:jpg,jpeg,bmp,png'
-            ]);
-
             $image = $request->file('gambar');
             $imagename = 'sg-' . $request->kode . '.' . $image->extension();
 
-            Image::make($image)->fit(
-                500,
-                500,
-                function ($constraint) {
-                    $constraint->upsize();
-                }
-            )->save(public_path('upload/sugargliders/' . $imagename));
+            Image::read($image)->coverDown(500, 500)->save(public_path('upload/sugargliders/' . $imagename));
         } else {
             $imagename = null;
         }
@@ -74,7 +63,7 @@ class SugargliderController extends Controller
             'kode'              => $request->kode,
             'nama'              => $request->nama,
             'kelamin'           => $request->kelamin,
-            'oop'               => $request->oop,
+            'tgl_lahir'         => $request->tgl_lahir,
             'warna'             => $request->warna,
             'jenis'             => $request->jenis,
             'genetika'          => $request->genetika,
@@ -84,7 +73,6 @@ class SugargliderController extends Controller
             'gambar'            => $imagename,
             'keterangan'        => $request->keterangan,
             'user_id'           => Auth::id(),
-            'adopsi'            => $request->adopsi,
         ]);
 
         return redirect()->route('sugarglider.index')->with('pesan', 'Data berhasil ditambahkan.');
@@ -118,7 +106,7 @@ class SugargliderController extends Controller
                     'sugargliders.kode as sgKode',
                     'sugargliders.nama as sgNama',
                     'sugargliders.kelamin as sgKelamin',
-                    'sugargliders.oop as sgOOP',
+                    'sugargliders.tgl_lahir as sgTglLahir',
                     'sugargliders.warna as sgWarna',
                     'sugargliders.jenis as sgJenis',
                     'sugargliders.genetika as sgGenetika',
@@ -162,39 +150,27 @@ class SugargliderController extends Controller
         return view('sugargliders.v_backend_sugarglider_edit', $data);
     }
 
-    function update(Request $request)
+    function update(SugargliderRequest $request)
     {
         $sugarglider = SugargliderModel::find($request->id);
 
-        $sugarglider->kode              = Request()->kode;
-        $sugarglider->nama              = Request()->nama;
-        $sugarglider->kelamin           = Request()->kelamin;
-        $sugarglider->oop               = Request()->oop;
-        $sugarglider->warna             = Request()->warna;
-        $sugarglider->jenis             = Request()->jenis;
-        $sugarglider->genetika          = Request()->genetika;
-        $sugarglider->fenotype          = Request()->fenotype;
-        $sugarglider->indukan_betina    = Request()->indukan_betina;
-        $sugarglider->indukan_jantan    = Request()->indukan_jantan;
-        $sugarglider->keterangan        = Request()->keterangan;
+        $sugarglider->kode              = $request->kode;
+        $sugarglider->nama              = $request->nama;
+        $sugarglider->kelamin           = $request->kelamin;
+        $sugarglider->tgl_lahir         = $request->tgl_lahir;
+        $sugarglider->warna             = $request->warna;
+        $sugarglider->jenis             = $request->jenis;
+        $sugarglider->genetika          = $request->genetika;
+        $sugarglider->fenotype          = $request->fenotype;
+        $sugarglider->indukan_betina    = $request->indukan_betina;
+        $sugarglider->indukan_jantan    = $request->indukan_jantan;
+        $sugarglider->keterangan        = $request->keterangan;
 
         if ($request->hasFile('gambar')) {
-
-            // Only allow .jpg, .bmp and .png file types.
-            $request->validate([
-                'gambar' => 'mimes:jpg,jpeg,bmp,png'
-            ]);
-
             $image = $request->file('gambar');
             $imagename = 'sg-' . $request->kode . '.' . $image->extension();
 
-            Image::make($image)->fit(
-                500,
-                500,
-                function ($constraint) {
-                    $constraint->upsize();
-                }
-            )->save(public_path('upload/sugargliders/' . $imagename));
+            Image::read($image)->coverDown(500, 500)->save(public_path('upload/sugargliders/' . $imagename));
 
             $sugarglider->gambar = $imagename;
         }
@@ -207,6 +183,7 @@ class SugargliderController extends Controller
     function destroy(Request $request)
     {
         $sugarglider = SugargliderModel::findOrFail($request->id);
+        $this->authorize('delete', $sugarglider);
         $sugarglider->delete();
 
         return redirect()->route('sugarglider.index')->with('pesan', 'Data berhasil dihapus.');

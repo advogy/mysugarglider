@@ -7,14 +7,11 @@ return [
     | Image Driver
     |--------------------------------------------------------------------------
     |
-    | Intervention Image supports "GD Library" and "Imagick" to process images
-    | internally. You may choose one of them according to your PHP
-    | configuration. By default PHP's "GD Library" implementation is used.
-    |
-    | Supported: "gd", "imagick"
+    | Intervention Image v3 menggunakan class driver penuh sebagai identifier.
+    | Pilihan: Gd\Driver atau Imagick\Driver
     |
     */
 
-    'driver' => 'gd'
+    'driver' => \Intervention\Image\Drivers\Gd\Driver::class,
 
 ];

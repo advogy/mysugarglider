@@ -6,33 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('collections', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('shelter_id');
-            $table->foreign('shelter_id')->references('id')->on('shelters')->onDelete('cascade');
-            $table->unsignedBigInteger('sugarglider_id');
-            $table->foreign('sugarglider_id')->references('id')->on('sugargliders')->onDelete('cascade');
-            $table->unsignedBigInteger('user_id');
-            $table->index('user_id');
-            $table->integer('status');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('shelter_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('sugarglider_id')->constrained()->cascadeOnDelete();
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('collections');
     }

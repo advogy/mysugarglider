@@ -1,190 +1,159 @@
 @extends('layouts.v_main')
 
-@section('title')
-    Detail {{ $collection->sgNama }}
-@endsection
+@section('title', 'Detail — ' . ($collection ? $collection->sgNama : 'Sugar Glider'))
 
 @section('content')
-    <main id="main">
+<div class="page-sg-detail">
 
-        <!-- ======= Breadcrumbs Section ======= -->
-        <section class="breadcrumbs">
-            <div class="container">
+<header class="premium-page-header">
+    <div class="header-blob-1"></div>
+    <h1 class="page-title">{{ $collection ? $collection->sgNama : 'Data Tidak Ditemukan' }}</h1>
+    <p class="page-subtitle">Detail Profil Sugar Glider</p>
+</header>
 
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2>Detail Data Sugar Glider</h2>
-                    <ol>
-                        <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ route('collections') }}">Koleksi</a></li>
-                        <li>{{ $collection->sgKode }}</li>
-                    </ol>
+@if (!$collection)
+<div class="text-center py-24 bg-white">
+    <h3 class="text-2xl font-bold text-[#1A1A1A] mb-2">Sugar Glider Tidak Ditemukan</h3>
+    <a href="{{ route('collections') }}" class="text-[#118AB2] font-bold hover:underline">Kembali ke Koleksi</a>
+</div>
+@else
+
+<div class="bg-white pb-20">
+    <div class="detail-container">
+        
+        {{-- Profile Panel --}}
+        <div>
+            <div class="profile-card">
+                <div class="profile-img-wrapper">
+                    @if ($collection->sgGambar)
+                        <img src="{{ asset('/upload/sugargliders/' . $collection->sgGambar) }}" alt="{{ $collection->sgNama }}" class="profile-img">
+                    @else
+                        <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}" class="profile-img img-dim">
+                    @endif
                 </div>
-
-            </div>
-        </section><!-- End Breadcrumbs Section -->
-
-        <section id="inner-page collection" class="collection">
-            <div class="container">
-                <div class="collection-wrap">
-                    <div class="collection-item">
-                        @if ($collection->sgGambar)
-                            <a href="{{ asset('/upload/sugargliders/' . $collection->sgGambar) }}" class="galelry-lightbox">
-                                <img src="{{ asset('/upload/sugargliders/' . $collection->sgGambar) }}"
-                                    class="collection-img" alt="{{ $collection->sgNama }}">
+                <div class="profile-info">
+                    <h2 class="profile-name">{{ $collection->sgNama }}</h2>
+                    <p class="profile-code">{{ $collection->sgKode }}</p>
+                    
+                    @if ($collection->clUser != '0' && $collection->stNama)
+                        <div class="mb-4">
+                            <a href="{{ route('shelter.show', $collection->stId) }}" class="tag-shelter">
+                                <i class="bi bi-shop"></i> {{ $collection->stNama }}
                             </a>
-                        @endif
+                        </div>
+                    @endif
 
-                        <h2>{{ $collection->sgNama }}</h2>
-                        <h4>
-                            @if ($collection->clUser != '0')
-                                <a href="{{ route('shelter.show', $collection->stId) }}">{{ $collection->stNama }}</a>
-                                | {{ $collection->sgKode }}
+                    @if ($collection->sgKeterangan)
+                        <p class="text-[#666] text-[0.9rem] italic mb-4">"{{ $collection->sgKeterangan }}"</p>
+                    @endif
+
+                    @if ($collection->clUser != '0' && $collection->clStatus == '3')
+                        <div class="mt-6 pt-6 border-t border-gray-100">
+                            <div class="tag-adopsi mb-4">Tersedia Adopsi</div>
+                            @guest
+                                <a href="{{ route('login') }}" class="btn-blue">Masuk untuk Mengajukan</a>
+                            @else
+                                <a href="{{ route('adoption.list') }}" class="btn-blue"><i class="bi bi-heart-fill"></i> Ajukan Adopsi</a>
+                            @endguest
+                        </div>
+                    @endif
+                </div>
+            </div>
+            
+            @if ($keturunans->isNotEmpty())
+            <div class="info-card mt-8">
+                <h3 class="info-title"><i class="bi bi-diagram-3-fill text-green-sg"></i> Keturunan</h3>
+                <div class="space-y-3">
+                    @foreach ($keturunans as $kt)
+                        <a href="{{ route('sugarglider.show', $kt->id) }}" class="block p-4 rounded-xl hover:bg-gray-50 transition-colors border border-gray-100">
+                            <div class="font-bold text-[#1A1A1A] text-[1.1rem]">{{ $kt->nama }}</div>
+                            <div class="text-[#999] text-sm">{{ $kt->jenis }}</div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+        </div>
+
+        {{-- Details Panel --}}
+        <div>
+            <div class="info-card">
+                <h3 class="info-title"><i class="bi bi-info-circle-fill text-blue-sg"></i> Informasi Profil</h3>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Jenis Kelamin</div>
+                        <div class="info-value">
+                            @if ($collection->sgKelamin == '0')
+                                <span class="text-female">♀ Betina</span>
+                            @else
+                                <span class="text-male">♂ Jantan</span>
                             @endif
-
-                        </h4>
-                        <p>
-                            <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                            {{ $collection->sgKeterangan }}
-                            <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                        </p>
-
-
-                        <div class="collection">
-                            <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-6">
-                                    <h3>PROFIL</h3>
-                                    <div class="table-responsive">
-                                        <table class="table table-hover ">
-                                            <tbody>
-                                                <tr>
-                                                    <th scope="row">Jenis Kelamin</th>
-                                                    <td>
-                                                        @if ($collection->sgKelamin == '0')
-                                                            {{ __('text.female') }}
-                                                        @else
-                                                            {{ __('text.male') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">OOP</th>
-                                                    <td>{{ $collection->sgOOP }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">Usia Sekarang</th>
-                                                    <td>{{ Carbon\Carbon::parse($collection->sgOOP)->diff(Carbon\Carbon::now())->format('%y tahun %m bulan %d hari') }}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">Warna</th>
-                                                    <td>{{ $collection->sgWarna }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">Jenis</th>
-                                                    <td>{{ $collection->sgJenis }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">Genetika</th>
-                                                    <td>{{ $collection->sgGenetika }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">Fenotype</th>
-                                                    <td>{{ $collection->sgFenotype }}</td>
-                                                </tr>
-                                                @if ($collection->clUser != '0')
-                                                    <tr>
-                                                        <th scope="row">Dapat Diadopsi?</th>
-                                                        <td>
-                                                            @if ($collection->clStatus == '2')
-                                                                {{ __('text.not_adopted') }}
-                                                            @elseif ($collection->clStatus == '3')
-                                                                Ya <br>
-                                                                <small>Silakan hubungi
-                                                                    <a
-                                                                        href="{{ route('shelter.show', $collection->stId) }}">
-                                                                        {{ $collection->stNama }}
-                                                                    </a> atau
-                                                                    @if (Auth::check())
-                                                                        <a href="{{ route('adoption.list') }}">masuk</a>
-                                                                    @else
-                                                                        <a href="{{ route('login') }}">masuk</a>
-                                                                    @endif
-                                                                    untuk mulai mengajukan permohonan adopsi.
-                                                                </small>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                @endif
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-12 col-md-12 col-lg-6">
-                                    <h3>SILSILAH</h3>
-                                    <div class="table-responsive">
-                                        <table class="table table-hover ">
-                                            <tbody>
-
-                                                <tr>
-                                                    <th scope="row">Indukan Jantan</th>
-                                                    <td>
-                                                        @if ($collection->sgIndukanJantan == 0)
-                                                            {{ __('text.unknown') }}
-                                                        @else
-                                                            <a
-                                                                href="{{ route('sugarglider.show', $collection->sgIndukanJantan) }}">
-                                                                {{ $indukan->jantan }}
-                                                            </a>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">Indukan Betina</th>
-                                                    <td>
-                                                        @if ($collection->sgIndukanBetina == 0)
-                                                            {{ __('text.unknown') }}
-                                                        @else
-                                                            <a
-                                                                href="{{ route('sugarglider.show', $collection->sgIndukanBetina) }}">
-                                                                {{ $indukan->betina }}
-                                                            </a>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">Bagan Silsilah Indukan</th>
-                                                    <td>
-                                                        <a href="{{ route('pedigree.show', $collection->sgId) }}">
-                                                            <i class="bi bi-search"></i> Lihat
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-
-                                    <h3>KETURUNAN</h3>
-                                    <ul>
-                                        @foreach ($keturunans as $keturunan)
-                                            <li>
-                                                @if ($keturunan->kelamin === 1)
-                                                    &#9794;
-                                                @else
-                                                    &#9792;
-                                                @endif
-                                                <a href="{{ $keturunan->id }}">{{ $keturunan->nama }}</a>
-                                                ({{ $keturunan->jenis }})
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
                         </div>
                     </div>
+                    <div class="info-item">
+                        <div class="info-label">Usia</div>
+                        <div class="info-value">
+                            @if ($collection->sgTglLahir)
+                                {{ \Carbon\Carbon::parse($collection->sgTglLahir)->diff(\Carbon\Carbon::now())->format('%y thn %m bln') }}
+                            @else
+                                —
+                            @endif
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Morph / Jenis</div>
+                        <div class="info-value font-bold text-green-sg">{{ $collection->sgJenis ?? '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Warna</div>
+                        <div class="info-value">{{ $collection->sgWarna ?? '—' }}</div>
+                    </div>
+                    @if ($collection->sgGenetika)
+                    <div class="info-item col-full">
+                        <div class="info-label">Genetika</div>
+                        <div class="info-value">{{ $collection->sgGenetika }}</div>
+                    </div>
+                    @endif
+                    @if ($collection->sgFenotype)
+                    <div class="info-item col-full no-border">
+                        <div class="info-label">Fenotype</div>
+                        <div class="info-value leading-comfortable">{{ $collection->sgFenotype }}</div>
+                    </div>
+                    @endif
                 </div>
             </div>
-        </section>
-    </main><!-- End #main -->
+
+            <div class="info-card">
+                <h3 class="info-title"><i class="bi bi-bezier2 text-orange-sg"></i> Silsilah Indukan</h3>
+                
+                <div class="grid sm:grid-cols-2 gap-6 mb-8">
+                    <div class="pedigree-box male-box">
+                        <div class="pedigree-label label-male">♂ Indukan Jantan</div>
+                        @if ($collection->sgIndukanJantan && $indukan->mId)
+                            <a href="{{ route('sugarglider.show', $indukan->mId) }}" class="font-extrabold text-xl text-[#1A1A1A] hover:underline">{{ $indukan->jantan }}</a>
+                            <p class="text-[#666] text-sm mt-1">{{ $indukan->mJenis }}</p>
+                        @else
+                            <p class="text-[#999] italic">Tidak diketahui</p>
+                        @endif
+                    </div>
+                    <div class="pedigree-box female-box">
+                        <div class="pedigree-label label-female">♀ Indukan Betina</div>
+                        @if ($collection->sgIndukanBetina && $indukan->fId)
+                            <a href="{{ route('sugarglider.show', $indukan->fId) }}" class="font-extrabold text-xl text-[#1A1A1A] hover:underline">{{ $indukan->betina }}</a>
+                            <p class="text-[#666] text-sm mt-1">{{ $indukan->fJenis }}</p>
+                        @else
+                            <p class="text-[#999] italic">Tidak diketahui</p>
+                        @endif
+                    </div>
+                </div>
+
+                <a href="{{ route('pedigree.show', $collection->sgId) }}" class="btn-blue"><i class="bi bi-diagram-3"></i> Lihat Bagan Silsilah Lengkap</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+@endif
+</div>
 @endsection

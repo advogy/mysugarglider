@@ -1,143 +1,75 @@
 @extends('layouts.v_backend')
 
-@section('title')
-    Tambah Baru Data Kandang
-@endsection
+@section('title', 'Tambah Kandang')
 
 @section('content')
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>{{ __('text.add_new') }}</h3>
-                <p class="text-subtitle text-muted">
-                    {{ __('text.input_data') }}
-                </p>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('dashboard.index') }}">{{ __('text.dashboard') }}</a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('shelter.index') }}">{{ __('text.shelter') }}</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            {{ __('text.add_new') }}
-                        </li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
+
+<div class="flex items-center gap-4 mb-6">
+    <a href="{{ route('shelter.index') }}" class="text-bark-muted hover:text-bark transition-colors">
+        <i class="bi bi-arrow-left text-xl"></i>
+    </a>
+    <div>
+        <h2 class="text-xl font-bold text-bark">{{ __('text.add_new') }}</h2>
+        <p class="text-bark-muted text-sm mt-0.5">{{ __('text.input_data') }}</p>
     </div>
+</div>
 
-    <section id="basic-horizontal-layouts">
-        <div class="row match-height">
-            <div class="col-md-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Data Kandang</h4>
+@if ($errors->any())
+    <div class="alert-danger mb-5">
+        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
+        <div>@foreach ($errors->all() as $err)<p>{{ $err }}</p>@endforeach</div>
+    </div>
+@endif
+
+<div class="be-card max-w-2xl">
+    <div class="p-6 sm:p-8">
+        <form action="{{ route('shelter.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="space-y-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="form-label">{{ __('text.name') }}</label>
+                        <input type="text" name="nama" value="{{ old('nama') }}" class="input-field" required>
                     </div>
-                    <div class="card-content">
-                        <div class="card-body">
-                            <form role="form" action="{{ route('shelter.store') }}" method="POST"
-                                enctype="multipart/form-data" class="form form-horizontal">
-                                @csrf
-                                <div class="form-body">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label for="nama">{{ __('text.name') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="text" id="nama" class="form-control" name="nama"
-                                                value="{{ old('nama') }}" placeholder="{{ __('text.name') }}" required />
-                                        </div>
-
-
-                                        <div class="col-md-4">
-                                            <label for="kode">{{ __('text.code') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="text" id="kode" class="form-control" name="kode"
-                                                value="{{ old('kode') }}" placeholder="{{ __('text.code') }}"
-                                                required />
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <label for="alamat">{{ __('text.address') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="text" id="alamat" class="form-control" name="alamat"
-                                                value="{{ old('alamat') }}" placeholder="{{ __('text.address') }}"
-                                                required />
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <label for="gmaps">{{ __('text.gmaps') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="text" id="gmaps" class="form-control" name="gmaps"
-                                                value="{{ old('gmaps') }}" placeholder="{{ __('text.gmaps') }}" />
-                                            <small class="text-muted ">
-                                                <i>Masukkan kode Google Maps yang bergaris bawah seperti pada contoh.
-                                                    Contoh:
-                                                    https://www.google.com/maps/embed?pb=<u>m18!1m12!1m3!1d699.66425173949...</u></i>
-                                            </small>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <label for="image">{{ __('text.logo') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <input type="file" class="form-control form-control-sm" id="image"
-                                                name="image">
-                                            <small class="text-muted ">
-                                                <i>(Ukuran file logo: 150px x 150px)</i>
-                                            </small>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <label for="keterangan">{{ __('text.description') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-                                            <textarea class="form-control" id="keterangan" rows="3" name="keterangan" value="{{ old('keterangan') }}"
-                                                placeholder="{{ __('text.description') }}"></textarea>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <label for="status">{{ __('text.status') }}</label>
-                                        </div>
-                                        <div class="col-md-8 form-group">
-
-                                            <fieldset class="form-group">
-                                                <select class="form-select" id="status" name="status"
-                                                    value="{{ old('status') }}">
-                                                    <option value="">Pilih Status</option>
-                                                    <option value="1"
-                                                        @if (old('status') == '1') {{ 'selected' }} @endif>
-                                                        {{ __('text.open') }}
-                                                    </option>
-                                                    <option value="0"
-                                                        @if (old('status') == '0') {{ 'selected' }} @endif>
-                                                        {{ __('text.close') }}
-                                                    </option>
-                                                </select>
-                                            </fieldset>
-
-                                        </div>
-
-                                        <div class="col-sm-12 d-flex justify-content-end">
-                                            <button type="submit" class="btn btn-primary me-1 mb-1">
-                                                {{ __('text.submit') }}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                    <div>
+                        <label class="form-label">{{ __('text.code') }}</label>
+                        <input type="text" name="kode" value="{{ old('kode') }}" class="input-field" required>
                     </div>
                 </div>
+                <div>
+                    <label class="form-label">{{ __('text.address') }}</label>
+                    <input type="text" name="alamat" value="{{ old('alamat') }}" class="input-field" required>
+                </div>
+                <div>
+                    <label class="form-label">{{ __('text.gmaps') }}</label>
+                    <input type="text" name="gmaps" value="{{ old('gmaps') }}" class="input-field">
+                    <p class="form-hint">Masukkan kode embed Google Maps. Contoh: <span class="font-mono">https://www.google.com/maps/embed?pb=m18!1m12...</span></p>
+                </div>
+                <div>
+                    <label class="form-label">{{ __('text.status') }}</label>
+                    <select name="status" class="input-field">
+                        <option value="">Pilih Status</option>
+                        <option value="1" @selected(old('status') == '1')>{{ __('text.open') }}</option>
+                        <option value="0" @selected(old('status') == '0')>{{ __('text.close') }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">{{ __('text.description') }}</label>
+                    <textarea name="keterangan" rows="3" class="input-field">{{ old('keterangan') }}</textarea>
+                </div>
+                <div>
+                    <label class="form-label">{{ __('text.logo') }}</label>
+                    <input type="file" name="gambar" class="w-full text-sm text-bark-muted file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sage/10 file:text-sage cursor-pointer">
+                    <p class="form-hint">Ukuran logo: 150×150px</p>
+                </div>
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="btn-create">
+                        <i class="bi bi-check-lg"></i> {{ __('text.submit') }}
+                    </button>
+                </div>
             </div>
-        </div>
-    </section>
+        </form>
+    </div>
+</div>
+
 @endsection

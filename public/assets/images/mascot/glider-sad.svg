@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" fill="none">
+  <!-- Shadow -->
+  <ellipse cx="100" cy="212" rx="45" ry="6" fill="#2D2D2D" opacity="0.08"/>
+
+  <!-- Ekor -->
+  <path d="M100 178 Q108 192 118 202 Q122 205 120 200 Q112 194 110 185 Q106 176 100 178Z" fill="#A8856A"/>
+  <path d="M100 178 Q92 192 82 202 Q78 205 80 200 Q88 194 90 185 Q94 176 100 178Z" fill="#A8856A"/>
+
+  <!-- Kaki depan terlipat (sedih) -->
+  <path d="M72 148 Q66 158 68 165" stroke="#A8856A" stroke-width="5" stroke-linecap="round"/>
+  <path d="M128 148 Q134 158 132 165" stroke="#A8856A" stroke-width="5" stroke-linecap="round"/>
+  <!-- Kaki belakang -->
+  <path d="M78 158 Q74 168 76 174" stroke="#A8856A" stroke-width="4" stroke-linecap="round"/>
+  <path d="M122 158 Q126 168 124 174" stroke="#A8856A" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Tubuh -->
+  <ellipse cx="100" cy="128" rx="38" ry="48" fill="#D4B896"/>
+  <!-- Perut -->
+  <ellipse cx="100" cy="134" rx="23" ry="32" fill="#F0E4D0"/>
+
+  <!-- Stripe punggung -->
+  <path d="M94 82 Q97 79 100 78 Q103 79 106 82 L104 144 Q100 147 96 144Z" fill="#7A5C3A" opacity="0.45"/>
+
+  <!-- Telinga kiri -->
+  <ellipse cx="72" cy="82" rx="11" ry="9" fill="#C4A882"/>
+  <ellipse cx="72" cy="82" rx="6" ry="5.5" fill="#E8C4B8"/>
+  <!-- Telinga kanan -->
+  <ellipse cx="128" cy="82" rx="11" ry="9" fill="#C4A882"/>
+  <ellipse cx="128" cy="82" rx="6" ry="5.5" fill="#E8C4B8"/>
+
+  <!-- Kepala -->
+  <circle cx="100" cy="90" r="28" fill="#D4B896"/>
+
+  <!-- Mata kiri (sedih — sedikit tertutup) -->
+  <circle cx="86" cy="88" r="10" fill="#1A1A1A"/>
+  <circle cx="86" cy="88" r="7.5" fill="#2A2A2A"/>
+  <!-- Kelopak atas tertutup sebagian -->
+  <path d="M76 84 Q86 80 96 84" fill="#D4B896"/>
+  <circle cx="84" cy="86" r="2.5" fill="white" opacity="0.9"/>
+
+  <!-- Mata kanan (sedih) -->
+  <circle cx="114" cy="88" r="10" fill="#1A1A1A"/>
+  <circle cx="114" cy="88" r="7.5" fill="#2A2A2A"/>
+  <path d="M104 84 Q114 80 124 84" fill="#D4B896"/>
+  <circle cx="112" cy="86" r="2.5" fill="white" opacity="0.9"/>
+
+  <!-- Alis sedih -->
+  <path d="M79 80 Q86 77 93 80" stroke="#7A5C3A" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M107 80 Q114 77 121 80" stroke="#7A5C3A" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <!-- Hidung -->
+  <ellipse cx="100" cy="99" rx="4.5" ry="3" fill="#E8A090"/>
+
+  <!-- Mulut sedih -->
+  <path d="M94 107 Q100 103 106 107" stroke="#C07060" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Air mata kiri -->
+  <ellipse cx="80" cy="97" rx="2" ry="3" fill="#93C5FD" opacity="0.7"/>
+  <!-- Air mata kanan -->
+  <ellipse cx="120" cy="97" rx="2" ry="3" fill="#93C5FD" opacity="0.7"/>
+
+  <!-- Pipi -->
+  <ellipse cx="78" cy="96" rx="6" ry="3.5" fill="#F4A0A0" opacity="0.3"/>
+  <ellipse cx="122" cy="96" rx="6" ry="3.5" fill="#F4A0A0" opacity="0.3"/>
+</svg>

@@ -4,17 +4,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
+use App\Http\Requests\ShelterRequest;
+use App\Enums\CollectionStatus;
 use App\Models\ShelterModel;
 use App\Models\ProfileModel;
 use App\Models\SugargliderModel;
 
 class ShelterController extends Controller
 {
-    function index()
+    function index(Request $request)
     {
+        $search = trim($request->get('q', ''));
+
+        $query = ShelterModel::withCount(['collections as sg_count' => function ($q) {
+            $q->whereIn('status', [CollectionStatus::PUBLIK->value, CollectionStatus::ADOPSI->value])
+              ->whereNull('deleted_at');
+        }]);
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('alamat', 'like', "%{$search}%")
+                  ->orWhere('keterangan', 'like', "%{$search}%");
+            });
+        }
+
         $data = [
-            'shelters' => ShelterModel::with('sugargliders')->paginate(10)
+            'shelters' => $query->paginate(10)->appends($request->query()),
+            'search'   => $search,
         ];
 
         return view('shelters.v_shelter', $data);
@@ -40,26 +58,13 @@ class ShelterController extends Controller
         return view('shelters.v_backend_shelter_create');
     }
 
-    function store(Request $request)
+    function store(ShelterRequest $request)
     {
-        if ($request->hasFile('image')) {
-
-            // Only allow .jpg, .bmp and .png file types.
-            $request->validate([
-                'image' => 'mimes:jpg,jpeg,bmp,png'
-            ]);
-
-            $image = $request->file('image');
+        if ($request->hasFile('gambar')) {
+            $image = $request->file('gambar');
             $imagename = 'shelter-' . $request->kode . '.' . $image->extension();
 
-            Image::make($image)->fit(
-                500,
-                500,
-                function ($constraint) {
-                    //$constraint->aspectRatio();
-                    $constraint->upsize();
-                }
-            )->save(public_path('upload/shelters/' . $imagename));
+            Image::read($image)->coverDown(500, 500)->save(public_path('upload/shelters/' . $imagename));
         } else {
             $imagename = null;
         }
@@ -70,7 +75,7 @@ class ShelterController extends Controller
             'alamat'            => $request->alamat,
             'status'            => $request->status,
             'user_id'           => Auth::id(),
-            'image'             => $imagename,
+            'gambar'            => $imagename,
             'keterangan'        => $request->keterangan,
             'gmaps'             => $request->gmaps,
         ]);
@@ -89,8 +94,11 @@ class ShelterController extends Controller
                     'sugargliders.kode as sgKode',
                     'sugargliders.nama as sgNama',
                     'sugargliders.jenis as sgJenis',
+                    'sugargliders.gambar as sgGambar',
+                    'sugargliders.kelamin as sgKelamin',
+                    'collections.status as sgStatus',
                 )
-                ->whereIn('collections.status', [2, 3])
+                ->whereIn('collections.status', [CollectionStatus::PUBLIK->value, CollectionStatus::ADOPSI->value])
                 ->where('shelters.id', $id)
                 ->whereNull('collections.deleted_at')
                 ->paginate(10)
@@ -110,37 +118,24 @@ class ShelterController extends Controller
         return view('shelters.v_backend_shelter_edit', $data);
     }
 
-    function update(Request $request)
+    function update(ShelterRequest $request)
     {
         $shelter = ShelterModel::find($request->id);
-        $shelter->nama    = Request()->nama;
-        $shelter->kode    = Request()->kode;
-        $shelter->alamat  = Request()->alamat;
-        $shelter->status  = Request()->status;
-        $shelter->user_id  = Auth::id();
-        $shelter->keterangan  = Request()->keterangan;
-        $shelter->gmaps  = Request()->gmaps;
+        $shelter->nama        = $request->nama;
+        $shelter->kode        = $request->kode;
+        $shelter->alamat      = $request->alamat;
+        $shelter->status      = $request->status;
+        $shelter->user_id     = Auth::id();
+        $shelter->keterangan  = $request->keterangan;
+        $shelter->gmaps       = $request->gmaps;
 
-        if ($request->hasFile('image')) {
-
-            // Only allow .jpg, .bmp and .png file types.
-            $request->validate([
-                'image' => 'mimes:jpg,jpeg,bmp,png'
-            ]);
-
-            $image = $request->file('image');
+        if ($request->hasFile('gambar')) {
+            $image = $request->file('gambar');
             $imagename = 'shelter-' . $shelter->kode . '.' . $image->extension();
 
-            Image::make($image)->fit(
-                500,
-                500,
-                function ($constraint) {
-                    //$constraint->aspectRatio();
-                    $constraint->upsize();
-                }
-            )->save(public_path('upload/shelters/' . $imagename));
+            Image::read($image)->coverDown(500, 500)->save(public_path('upload/shelters/' . $imagename));
 
-            $shelter->image = $imagename;
+            $shelter->gambar = $imagename;
         }
 
         $shelter->save();
@@ -151,10 +146,7 @@ class ShelterController extends Controller
     function destroy(Request $request)
     {
         $shelter = ShelterModel::findOrFail($request->id);
-
-        // if ($shelter->sugargliders()->count()) {
-        //     return back()->withErrors('Tidak dapat menghapus. Kandang memiliki data sugar glider.');
-        // }
+        $this->authorize('delete', $shelter);
 
         $shelter->delete();
 

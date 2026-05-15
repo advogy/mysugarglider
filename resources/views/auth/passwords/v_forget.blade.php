@@ -1,54 +1,54 @@
 @extends('layouts.v_auth')
 
-@section('title')
-    Lupa Kata Sandi
-@endsection
+@section('title', 'Lupa Kata Sandi')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/style-auth.css') }}" type="text/css" />
-@endpush
+@section('form')
 
-@section('content')
-    <h1 class="auth-title">{{ __('text.forget_password') }}.</h1>
-    <p class="auth-subtitle mb-5">
-        {{ __('text.forget_password_subtitle') }}
-    </p>
+<div class="mb-8">
+    <h1 class="text-3xl font-display font-bold text-bark mb-2">Lupa Kata Sandi?</h1>
+    <p class="text-bark-muted text-sm">Masukkan email Anda dan kami akan kirimkan tautan reset kata sandi.</p>
+</div>
 
-    @if ($errors->has('email'))
-        <div class="alert alert-danger" role="alert">
-            <strong>GAGAL</strong><br>
-            {{ $errors->first('email') }}
-        </div>
-    @endif
-
-    @if (session('pesan'))
-        <div class="alert alert-success" role="alert">
-            <strong>SUKSES</strong><br>
-            {{ session('pesan') }}
-        </div>
-    @endif
-
-    <form role="form" action="{{ route('password.link') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="form-group position-relative has-icon-left mb-4">
-            <input type="email" class="form-control form-control-xl" id="email" name="email"
-                value="{{ old('email') }}" placeholder="{{ __('text.email') }}" placeholder="Email" autofocus required>
-            <div class="form-control-icon">
-                <i class="bi bi-envelope"></i>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-5">
-            {{ __('text.sent_password_link') }}
-        </button>
-    </form>
-
-    <div class="text-center mt-5 text-lg fs-4">
-        <p class="text-gray-600">
-            {{ __('text.remember_account') }}
-            <a href="{{ route('login') }}" class="font-bold">{{ __('text.login') }}</a>.
-        </p>
-        <p>
-            {{ __('text.or') }} <a class="font-bold" href="{{ route('register') }}">{{ __('text.create_account') }}</a>
-        </p>
+@if ($errors->has('email'))
+    <div class="alert-danger mb-5">
+        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
+        <p class="font-semibold">{{ $errors->first('email') }}</p>
     </div>
+@endif
+
+@if (session('pesan'))
+    <div class="alert-success mb-5">
+        <i class="bi bi-check-circle-fill text-lg flex-shrink-0"></i>
+        <p class="font-semibold">{{ session('pesan') }}</p>
+    </div>
+@endif
+
+<form action="{{ route('password.link') }}" method="POST" class="space-y-4">
+    @csrf
+    <div>
+        <label class="form-label">Alamat Email</label>
+        <div class="relative">
+            <i class="bi bi-envelope absolute left-4 top-1/2 -translate-y-1/2 text-bark-muted text-sm"></i>
+            <input type="email" name="email"
+                   value="{{ old('email') }}"
+                   placeholder="nama@email.com"
+                   class="input-field pl-11"
+                   autofocus required>
+        </div>
+    </div>
+    <button type="submit" class="btn-primary w-full justify-center py-3.5">
+        Kirim Tautan Reset <i class="bi bi-send"></i>
+    </button>
+</form>
+
+<div class="text-center mt-8 space-y-2">
+    <p class="text-sm text-bark-muted">
+        Ingat kata sandi?
+        <a href="{{ route('login') }}" class="font-bold text-sage hover:underline">Masuk</a>
+    </p>
+    <p class="text-sm text-bark-muted">
+        atau <a href="{{ route('register') }}" class="font-bold text-sage hover:underline">Buat akun baru</a>
+    </p>
+</div>
+
 @endsection

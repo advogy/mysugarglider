@@ -8,18 +8,38 @@ use App\Models\SugargliderModel;
 use App\Models\ShelterModel;
 use App\Models\AdoptionModel;
 use App\Models\CollectionModel;
+use App\Enums\CollectionStatus;
+use App\Enums\AdoptionStatus;
+use Carbon\Carbon;
 
 class PageController extends Controller
 {
     function index()
     {
+        $heroItems = SugargliderModel::whereNotNull('gambar')
+            ->where('gambar', '!=', '')
+            ->inRandomOrder()
+            ->limit(3)
+            ->get()
+            ->map(function ($sg) {
+                $months = $sg->tgl_lahir
+                    ? Carbon::parse($sg->tgl_lahir)->diffInMonths(now())
+                    : null;
+                $sg->usia_str = $months !== null
+                    ? ($months >= 12 ? floor($months / 12) . ' thn' : $months . ' bln')
+                    : null;
+                return $sg;
+            });
+
         $data = [
             'count_sugargliders'    => SugargliderModel::count(),
             'count_shelters'        => ShelterModel::count(),
             'count_users'           => User::count(),
-            'count_collections'     => CollectionModel::whereIn('status', [2, 3])->count(),
-            'count_adoptions'       => AdoptionModel::count(),
-            'shelters'              => ShelterModel::where('status', '1')->inRandomOrder()->limit(4)->get(),
+            'count_collections'     => CollectionModel::whereIn('status', [CollectionStatus::PUBLIK->value, CollectionStatus::ADOPSI->value])->count(),
+            'count_adoptions'       => AdoptionModel::where('status', AdoptionStatus::AKTIF->value)->count(),
+            'shelters'              => ShelterModel::where('status', '1')->inRandomOrder()->limit(6)->get(),
+            'gallery_items'         => SugargliderModel::whereNotNull('gambar')->where('gambar', '!=', '')->inRandomOrder()->limit(8)->get(),
+            'hero_items'            => $heroItems,
         ];
 
         return view('pages/v_home', $data);
@@ -46,10 +66,7 @@ class PageController extends Controller
     function about()
     {
         $data = [
-            'count_sugargliders'    => SugargliderModel::count(),
-            'count_shelters'        => ShelterModel::count(),
-            'count_users'           => User::count(),
-            'shelters'              => ShelterModel::where('status', '1')->get(),
+            'shelters' => ShelterModel::where('status', '1')->get(),
         ];
         return view('pages/v_about', $data);
     }

@@ -10,10 +10,10 @@ class ContactController extends Controller
     public function contactPost(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required',
-            'email' => 'required|email',
-            'subject' => 'required',
-            'messages' => 'required'
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255',
+            'subject'  => 'required|string|max:255',
+            'messages' => 'required|string|max:2000',
         ]);
 
         Mail::send(

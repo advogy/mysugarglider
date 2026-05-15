@@ -1,70 +1,89 @@
 @extends('layouts.v_auth')
 
-@section('title')
-    Masuk
-@endsection
+@section('title', 'Masuk')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/style-auth.css') }}" type="text/css" />
-@endpush
+@section('form')
 
-@section('content')
-    <h1 class="auth-title">{{ __('text.login') }}.</h1>
-    <p class="auth-subtitle mb-5">{{ __('text.login_subtitle') }}</p>
+<div class="mb-8">
+    <h1 class="text-3xl font-display font-bold text-bark mb-2">Selamat Datang!</h1>
+    <p class="text-bark-muted text-sm">Masuk ke akun MySugarGlider Anda.</p>
+</div>
 
-    @if (session('error'))
-        <div class="alert alert-danger">
-            <strong>{{ __('text.suspended') }}</strong><br>
-            {{ session('error') }}
+@if (session('error'))
+    <div class="alert-danger mb-5">
+        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
+        <div>
+            <p class="font-bold">Akun Ditangguhkan</p>
+            <p class="text-xs mt-0.5">{{ session('error') }}</p>
         </div>
-    @endif
-
-    @if ($errors->has('email'))
-        <div class="alert alert-danger" role="alert">
-            <strong>{{ __('text.failed') }}</strong><br>
-            {{ $errors->first('email') }}
-        </div>
-    @endif
-
-    @if (session('pesan'))
-        <div class="alert alert-success" role="alert">
-            <strong>{{ __('text.success') }}</strong><br>
-            {{ session('pesan') }}
-        </div>
-    @endif
-
-    <form role="form" action="" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="form-group position-relative has-icon-left mb-4">
-            <input type="text" class="form-control form-control-xl" id="email" name="email"
-                value="{{ old('email') }}" placeholder="{{ __('text.email') }}" autofocus required>
-            <div class="form-control-icon">
-                <i class="bi bi-person"></i>
-            </div>
-        </div>
-        <div class="form-group position-relative has-icon-left mb-4">
-            <input type="password" class="form-control form-control-xl" id="password" name="password"
-                value="{{ old('password') }}" placeholder="{{ __('text.password') }}" required>
-            <div class="form-control-icon">
-                <i class="bi bi-shield-lock"></i>
-            </div>
-        </div>
-        <div class="form-check form-check-lg d-flex align-items-end">
-            <input type="checkbox" class="form-check-input me-2" value="1" id="rememberme" name="rememberme">
-            <label class="form-check-label text-gray-600" for="rememberme">
-                {{ __('text.logged_in') }}
-            </label>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-5">
-            {{ __('text.login') }}
-        </button>
-    </form>
-    <div class="text-center mt-5 text-lg fs-4">
-        <p class="text-gray-600">{{ __('text.dont_have_account') }}
-            <a href="{{ route('register') }}" class="font-bold">{{ __('text.register') }}</a>.
-        </p>
-        <p>
-            <a class="font-bold" href="{{ route('password.forget') }}">{{ __('text.forget_password') }}?</a>
-        </p>
     </div>
+@endif
+
+@if ($errors->has('email'))
+    <div class="alert-danger mb-5">
+        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
+        <div>
+            <p class="font-bold">Login Gagal</p>
+            <p class="text-xs mt-0.5">{{ $errors->first('email') }}</p>
+        </div>
+    </div>
+@endif
+
+@if (session('pesan'))
+    <div class="alert-success mb-5">
+        <i class="bi bi-check-circle-fill text-lg flex-shrink-0"></i>
+        <p class="font-semibold">{{ session('pesan') }}</p>
+    </div>
+@endif
+
+<form action="{{ route('login.authenticate') }}" method="POST" class="space-y-4">
+    @csrf
+
+    <div>
+        <label class="form-label">Alamat Email</label>
+        <div class="relative">
+            <i class="bi bi-envelope absolute left-4 top-1/2 -translate-y-1/2 text-bark-muted text-sm"></i>
+            <input type="email" name="email"
+                   value="{{ old('email') }}"
+                   placeholder="nama@email.com"
+                   class="input-field pl-11"
+                   autofocus required>
+        </div>
+    </div>
+
+    <div>
+        <label class="form-label">Kata Sandi</label>
+        <div class="relative">
+            <i class="bi bi-lock absolute left-4 top-1/2 -translate-y-1/2 text-bark-muted text-sm"></i>
+            <input type="password" name="password"
+                   placeholder="••••••••"
+                   class="input-field pl-11 pr-eye"
+                   required>
+            <button type="button" class="auth-eye-btn" onclick="togglePassword(this)" tabindex="-1">
+                <i class="bi bi-eye"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="flex items-center justify-between">
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" name="rememberme" value="1"
+                   class="w-4 h-4 rounded border-cream-dark text-sage focus:ring-sage">
+            <span class="text-sm text-bark-muted font-semibold">Ingat saya</span>
+        </label>
+        <a href="{{ route('password.forget') }}" class="text-sm font-bold text-sage hover:underline">
+            Lupa kata sandi?
+        </a>
+    </div>
+
+    <button type="submit" class="auth-btn">
+        Masuk <i class="bi bi-arrow-right"></i>
+    </button>
+</form>
+
+<p class="text-center text-sm text-bark-muted mt-8">
+    Belum punya akun?
+    <a href="{{ route('register') }}" class="font-bold text-sage hover:underline">Daftar gratis</a>
+</p>
+
 @endsection

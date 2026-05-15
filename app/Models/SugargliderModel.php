@@ -13,7 +13,7 @@ class SugargliderModel extends Model
     protected $table = "sugargliders";
     protected $primaryKey = 'id';
     protected $fillable = [
-        'kode', 'nama', 'kelamin', 'oop', 'warna', 'jenis', 'genetika', 'fenotype', 'indukan_betina', 'indukan_jantan', 'gambar', 'keterangan', 'user_id'
+        'kode', 'nama', 'kelamin', 'tgl_lahir', 'warna', 'jenis', 'genetika', 'fenotype', 'indukan_betina', 'indukan_jantan', 'gambar', 'keterangan', 'user_id'
     ];
 
     protected static function boot()

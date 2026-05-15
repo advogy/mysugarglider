@@ -19,7 +19,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password', 'avatar', 'status'
+        'name', 'email', 'password', 'avatar'
     ];
 
     /**
@@ -39,6 +39,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password'          => 'hashed',
     ];
 
     public function profile()
@@ -48,6 +49,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function shelters()
     {
-        return $this->hasMany(ShelterModel::class, 'shelter_id');
+        return $this->hasMany(ShelterModel::class, 'user_id');
     }
 }

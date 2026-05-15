@@ -6,35 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('shelters', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('kode')->unique();
             $table->string('nama');
-            $table->string('kode');
             $table->string('alamat')->nullable();
-            $table->char('gmaps', 255)->nullable();
-            $table->string('status')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->index('user_id');
-            $table->string('image')->nullable();
+            $table->string('gmaps')->nullable();
+            $table->tinyInteger('status')->default(1);
+            $table->string('gambar')->nullable();
             $table->text('keterangan')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('shelters');
     }

@@ -1,361 +1,352 @@
 @extends('layouts.v_main')
 
-@push('meta')
-    <meta name="description"
-        content="Selamat datang di MySugarGlider.id, situs yang menyediakan database lengkap tentang hewan Sugar Glider di Indonesia. Temukan data silsilah, cara merawat, habitat dan kebiasaan hidup sugar glider, serta komunitas pecinta sugar glider di Indonesia. Dapatkan juga tips dan trik dalam merawat sugar glider, serta informasi tentang jenis-jenis sugar glider yang ada di Indonesia. Kunjungi situs kami sekarang untuk mengetahui lebih lanjut tentang sugar glider di Indonesia.">
-@endpush
-
-@section('title')
-    Database Sugar Glider Indonesia
-@endsection
+@section('title', 'Beranda — MySugarGlider')
 
 @section('content')
-    <!-- ======= Hero Section ======= -->
-    <section id="hero" class="d-flex align-items-center">
-        <div class="container">
-            <h1>Welcome <br>to Shelter</h1>
-            <h2>
-                Selamat datang di website<br>
-                database Sugar Glider di Indonesia. <br>
-                Tempat dimana data<br>
-                Sugar Glider Anda berada.
-            </h2>
-            <a href="#about-us" class="btn-get-started scrollto">Mulai</a>
+<div class="page-home">
+
+{{-- ════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════ --}}
+<section class="hero">
+    <div class="hero-inner">
+
+        {{-- Text --}}
+        <div class="hero-text">
+            <div class="hero-tag">
+                <span><i class="bi bi-stars"></i></span>
+                Platform #1 Sugar Glider Indonesia
+            </div>
+            <h1 class="hero-h1">
+                Sahabat berbulu<br>
+                mencari <em>rumah</em><br>
+                yang tepat
+            </h1>
+            <p class="hero-p">
+                Catat silsilah, kelola kandang, dan temukan sugar glider adopsi terbaik dari peternak terpercaya seluruh Indonesia.
+            </p>
+            <div class="hero-cta">
+                <a href="{{ route('collections') }}" class="btn-yellow">
+                    <i class="bi bi-search"></i> Temukan Sahabat
+                </a>
+                <div class="hero-checklist">
+                    <span><i class="bi bi-check-circle-fill"></i> Gratis selamanya</span>
+                    <span><i class="bi bi-check-circle-fill"></i> Tanpa iklan</span>
+                    <span><i class="bi bi-check-circle-fill"></i> Komunitas terverifikasi</span>
+                </div>
+            </div>
         </div>
-    </section><!-- End Hero -->
 
-    <main id="main">
+        {{-- Visual --}}
+        <div class="hero-visual">
+            <div class="hv-blob hv-blob-yellow"></div>
+            <div class="hv-blob hv-blob-blue"></div>
+            <div class="hv-blob hv-blob-green"></div>
 
-        <!-- ======= Home About Section ======= -->
-        <section id="about-us" class="about-us">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-4 d-flex align-items-stretch">
-                        <div class="content">
-                            <h3>Kenapa <br>MySugarGlider.id?</h3>
-                            <p>
-                                Karena kami menyimpan data Sugar Glider Anda. Dengan data yang akurat, kita
-                                bisa mendapatkan keturunan yang berkualitas.
-                            </p>
-                            <small>
-                                <div class="text-center">
-                                    <a href="{{ route('about') }}" class="more-btn">
-                                        <span class="d-none d-md-inline">{{ __('text.more') }}</span>
-                                    </a>
-                                </div>
-                            </small>
-                        </div>
-                    </div>
-                    <div class="col-lg-8 d-flex align-items-stretch">
-                        <div class="icon-boxes d-flex flex-column justify-content-center">
-                            <div class="row">
-                                <div class="col-xl-4 d-flex align-items-stretch">
-                                    <div class="icon-box mt-4 mt-xl-0">
-                                        <i class="bi bi-diagram-3"></i>
-                                        <h4>Silsilah</h4>
-                                        <p>
-                                            Kami mencatat silsilah indukan setiap Sugar Glider untuk mendapatkan keturunan
-                                            yang terbaik.
-                                        </p>
-                                    </div>
-                                </div>
+            @php
+                $fallbacks = [
+                    ['name'=>'Mochi', 'sub'=>'Classic Grey · 8 bln', 'img'=>asset('assets/images/pets/sg_hero_1778842679372.png')],
+                    ['name'=>'Nala',  'sub'=>'Mosaic · 1 thn',       'img'=>asset('assets/images/pets/sg_card1_1778842695259.png')],
+                    ['name'=>'Kiki',  'sub'=>'Platinum · 2 thn',     'img'=>asset('assets/images/pets/sg_card2_1778842710532.png')],
+                ];
+                $heroes = [];
+                foreach ([0,1,2] as $i) {
+                    $sg = $hero_items->get($i);
+                    if ($sg) {
+                        $sub = ($sg->jenis ?? 'Sugar Glider') . ($sg->usia_str ? ' · ' . $sg->usia_str : '');
+                        $heroes[] = ['name' => $sg->nama, 'sub' => $sub, 'img' => asset('/upload/sugargliders/' . $sg->gambar)];
+                    } else {
+                        $heroes[] = $fallbacks[$i];
+                    }
+                }
+            @endphp
 
-                                <div class="col-xl-4 d-flex align-items-stretch">
-                                    <div class="icon-box mt-4 mt-xl-0">
-                                        <i class="bi bi-gem"></i>
-                                        <h4>Kualitas</h4>
-                                        <p>
-                                            Kami memastikan bahwa Sugar Glider kami mendapatkan perhatian terbaik.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 d-flex align-items-stretch">
-                                    <div class="icon-box mt-4 mt-xl-0">
-                                        <i class="bi bi-cash"></i>
-                                        <h4>Biaya</h4>
-                                        <p>
-                                            Kami menawarkan berbagai jenis varian Sugar Glider yang terbaik dari peternak
-                                            terbaik dengan biaya adopsi yang terjangkau.
-                                        </p>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div><!-- End .content-->
-                    </div>
-                </div>
-
-            </div>
-        </section><!-- End Why Us Section -->
-
-        <!-- ======= Counts Section ======= -->
-        <section id="counts" class="counts">
-            <div class="container">
-                <div class="row">
-
-                    <div class="col-lg-3 col-md-6">
-                        <div class="count-box">
-                            <i class="fas fa-user-md"></i>
-                            <span data-purecounter-start="0" data-purecounter-end="{{ $count_collections }}"
-                                data-purecounter-duration="1" class="purecounter"></span>
-                            <a href="{{ route('collections') }}">
-                                <p>Koleksi <br>Sugar Glider</p>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 mt-5 mt-md-0">
-                        <div class="count-box">
-                            <i class="far fa-hospital"></i>
-                            <span data-purecounter-start="0" data-purecounter-end="{{ $count_shelters }}"
-                                data-purecounter-duration="1" class="purecounter"></span>
-                            <a href="{{ route('shelters') }}">
-                                <p>Kandang <br>yang dimiliki</p>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 mt-5 mt-lg-0">
-                        <div class="count-box">
-                            <i class="fas fa-flask"></i>
-                            <span data-purecounter-start="0" data-purecounter-end="{{ $count_users }}"
-                                data-purecounter-duration="1" class="purecounter"></span>
-                            <p>Pengguna<br>Aplikasi</p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 mt-5 mt-lg-0">
-                        <div class="count-box">
-                            <i class="fas fa-award"></i>
-                            <span data-purecounter-start="0" data-purecounter-end="{{ $count_adoptions }}"
-                                data-purecounter-duration="1" class="purecounter"></span>
-                            <p>Sugar Glider <br> yang dapat diadopsi</p>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </section><!-- End Counts Section -->
-
-        <!-- ======= Shelter Section ======= -->
-        <section id="shelters" class="shelters">
-            <div class="container">
-                <div class="section-title">
-                    <h2>Kandang</h2>
-                    <p>Telusuri setiap kandang untuk melihat koleksi Sugar Glider yang dimiliki.</p>
-                </div>
-
-                <div class="row">
-                    @foreach ($shelters as $shelter)
-                        <div class="col-lg-6 mt-4 mt-lg-4 mb-1">
-                            <div class="member d-flex align-items-start">
-                                <div class="pic"><img src="{{ asset('/upload/shelters/' . $shelter->image) }}"
-                                        class="img-fluid" alt="{{ $shelter->nama }}"></div>
-                                <div class="member-info">
-                                    <a href="{{ route('shelters') }}/{{ $shelter->id }}">
-                                        <h4>{{ $shelter->nama }}</h4>
-                                    </a>
-                                    <span>{{ $shelter->alamat }}</span>
-                                    <p>{{ $shelter->keterangan }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                    <div class="row text-center">
-                        <div class="col-md-4 offset-md-4 form-group">
-                            <a href="{{ route('shelters') }}"><span class="btn">Selengkapnya</span></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section><!-- End Shelter Section -->
-
-        <!-- ======= Gallery Section ======= -->
-        <section id="gallery" class="gallery">
-            <div class="container">
-
-                <div class="section-title">
-                    <h2>Foto Galeri</h2>
-                    <p>Foto Sugar Glider di kandang kami.</p>
+            {{-- Floating badge: top --}}
+            <div class="hv-badge hv-badge-1">
+                <div class="hv-badge-dot"></div>
+                <div>
+                    <div class="b-name">{{ $heroes[0]['name'] }}</div>
+                    <div class="b-sub">{{ $heroes[0]['sub'] }}</div>
                 </div>
             </div>
 
-            <div class="container-fluid">
-                <div class="row g-0">
-
-                    <div class="col-lg-3 col-md-4">
-                        <div class="gallery-item">
-                            <a href="{{ asset('assets/images/gallery/gallery-1.jpg') }}" class="galelry-lightbox">
-                                <img src="{{ asset('assets/images/gallery/gallery-1.jpg') }}" alt=""
-                                    class="img-fluid">
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-4">
-                        <div class="gallery-item">
-                            <a href="{{ asset('assets/images/gallery/gallery-2.jpg') }}" class="galelry-lightbox">
-                                <img src="{{ asset('assets/images/gallery/gallery-2.jpg') }}" alt=""
-                                    class="img-fluid">
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-4">
-                        <div class="gallery-item">
-                            <a href="{{ asset('assets/images/gallery/gallery-3.jpg') }}" class="galelry-lightbox">
-                                <img src="{{ asset('assets/images/gallery/gallery-3.jpg') }}" alt=""
-                                    class="img-fluid">
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-4">
-                        <div class="gallery-item">
-                            <a href="{{ asset('assets/images/gallery/gallery-4.jpg') }}" class="galelry-lightbox">
-                                <img src="{{ asset('assets/images/gallery/gallery-4.jpg') }}" alt=""
-                                    class="img-fluid">
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-4">
-                        <div class="gallery-item">
-                            <a href="{{ asset('assets/images/gallery/gallery-5.jpg') }}" class="galelry-lightbox">
-                                <img src="{{ asset('assets/images/gallery/gallery-5.jpg') }}" alt=""
-                                    class="img-fluid">
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-4">
-                        <div class="gallery-item">
-                            <a href="{{ asset('assets/images/gallery/gallery-6.jpg') }}" class="galelry-lightbox">
-                                <img src="{{ asset('assets/images/gallery/gallery-6.jpg') }}" alt=""
-                                    class="img-fluid">
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-4">
-                        <div class="gallery-item">
-                            <a href="{{ asset('assets/images/gallery/gallery-7.jpg') }}" class="galelry-lightbox">
-                                <img src="{{ asset('assets/images/gallery/gallery-7.jpg') }}" alt=""
-                                    class="img-fluid">
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-4">
-                        <div class="gallery-item">
-                            <a href="{{ asset('assets/images/gallery/gallery-8.jpg') }}" class="galelry-lightbox">
-                                <img src="{{ asset('assets/images/gallery/gallery-8.jpg') }}" alt=""
-                                    class="img-fluid">
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-
+            {{-- Main photo card --}}
+            <div class="hv-card hv-card-1">
+                <img src="{{ $heroes[0]['img'] }}" alt="{{ $heroes[0]['name'] }}">
             </div>
-        </section><!-- End Gallery Section -->
 
-        <!-- ======= Contact Section ======= -->
-        <section id="contact" class="contact">
-            <div class="container">
-
-                <div class="section-title">
-                    <h2>Hubungi</h2>
-                    <p>Jangan ragu untuk menghubungi kami apabila Anda mempunyai pertanyaan seputar Sugar Glider atau ingin
-                        berkunjung ke tempat kami.</p>
+            {{-- Badge right --}}
+            <div class="hv-badge hv-badge-2">
+                <div class="hv-badge-dot"></div>
+                <div>
+                    <div class="b-name">{{ $heroes[1]['name'] }}</div>
+                    <div class="b-sub">{{ $heroes[1]['sub'] }}</div>
                 </div>
             </div>
 
-            <div>
-                <div class="container">
-                    <div class="row mt-5">
+            {{-- Second photo --}}
+            <div class="hv-card hv-card-2">
+                <img src="{{ $heroes[1]['img'] }}" alt="{{ $heroes[1]['name'] }}">
+            </div>
 
-                        <div class="col-lg-4">
-                            <div class="info">
-                                <div class="address">
-                                    <i class="bi bi-geo-alt"></i>
-                                    <h4>Lokasi:</h4>
-                                    <p>Kota Surabaya, Jawa Timur</p>
-                                </div>
-
-                                <div class="email">
-                                    <i class="bi bi-envelope"></i>
-                                    <h4>Email:</h4>
-                                    <p><a href="mailto:info@mysugarglider.id">info@mysugarglider.id</a></p>
-                                </div>
-
-                                <div class="phone">
-                                    <i class="bi bi-phone"></i>
-                                    <h4>Chat WA:</h4>
-                                    <p>
-                                        <a aria-label="Chat on WhatsApp" href="https://wa.me/6285755333232"
-                                            target="_blank">
-                                            +62 857 5533 3232
-                                        </a>
-                                    </p>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-lg-8 mt-5 mt-lg-0">
-
-                            @if (session('pesan'))
-                                <div class="alert alert-success" role="alert">
-                                    <strong>SUKSES</strong><br>
-                                    {{ session('pesan') }}
-                                </div>
-                            @endif
-
-                            <form role="form" action="{{ route('contact.post') }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-
-                                <div class="row">
-                                    <div class="col-md-6 form-group">
-                                        <div class="form-floating">
-                                            <input type="text" name="name" class="form-control" id="name"
-                                                placeholder="Nama" required>
-                                            <label for="name">{{ __('text.name') }}</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 form-group mt-3 mt-md-0 form-floating">
-                                        <div class="form-floating">
-                                            <input type="email" class="form-control" name="email" id="email"
-                                                placeholder="Email" required>
-                                            <label for="email">{{ __('text.email') }}</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group mt-3 form-floating">
-                                    <input type="text" class="form-control" name="subject" id="subject"
-                                        placeholder="Subjek" required>
-                                    <label for="subject">{{ __('text.subject') }}</label>
-                                </div>
-
-                                <div class="form-group mt-3 form-floating">
-                                    <textarea class="form-control" name="messages" id="messages" rows="5" placeholder="Pesan"
-                                        style="height: 150px" required></textarea>
-                                    <label for="messages">{{ __('text.messages') }}</label>
-                                </div>
-
-                                <div class="text-center">
-                                    <button type="submit" class="btn">{{ __('text.send_message') }}</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+            {{-- Badge left small --}}
+            <div class="hv-badge hv-badge-3">
+                <div class="hv-badge-dot"></div>
+                <div>
+                    <div class="b-name">{{ $heroes[2]['name'] }}</div>
+                    <div class="b-sub">{{ $heroes[2]['sub'] }}</div>
                 </div>
-        </section><!-- End Contact Section -->
+            </div>
 
-    </main><!-- End #main -->
+            {{-- Third photo --}}
+            <div class="hv-card hv-card-3">
+                <img src="{{ $heroes[2]['img'] }}" alt="{{ $heroes[2]['name'] }}">
+            </div>
+        </div>
+    </div>
+
+    {{-- Wave bottom --}}
+    <div class="wave-bottom">
+        <svg viewBox="0 0 1440 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path class="fill-white" fill-opacity="1"
+                d="M0,56L80,48C160,40,320,24,480,28C640,32,800,56,960,60C1120,64,1280,48,1360,40L1440,32L1440,90L0,90Z"/>
+        </svg>
+    </div>
+</section>
+
+{{-- ════════════════════════════════════════════════
+     KENALAN DULU
+════════════════════════════════════════════════ --}}
+<section class="pets-section">
+    <h2 class="sec-title">Kenalan Dulu</h2>
+    <p class="sec-sub">Sugar glider imut dari berbagai morph siap menemukan rumah baru mereka</p>
+
+    {{-- Filter bar --}}
+    @php $uniqueJenis = $gallery_items->pluck('jenis')->filter()->unique()->sort()->values(); @endphp
+    <div class="filter-bar">
+        <button class="filter-pill-ref active" data-filter="semua">
+            <i class="bi bi-grid-3x3-gap"></i> Semua
+        </button>
+        @foreach ($uniqueJenis as $jenis)
+        <button class="filter-pill-ref" data-filter="{{ strtolower($jenis) }}">{{ $jenis }}</button>
+        @endforeach
+        <a href="{{ route('collections', ['status' => 'adopsi']) }}" class="filter-pill-adopsi">
+            <i class="bi bi-heart-fill"></i> Cari Adopsi
+        </a>
+    </div>
+
+    {{-- Pet cards --}}
+    <div class="pet-grid">
+        @php
+            $circles = ['yellow','blue','green','mint','yellow','blue','green','mint'];
+            $items = $gallery_items->isNotEmpty()
+                ? $gallery_items
+                : collect(array_fill(0, 8, (object)[
+                    'id'    => 1,
+                    'nama'  => 'Momo',
+                    'jenis' => 'Classic Grey',
+                    'gambar'=> null,
+                ]));
+        @endphp
+
+        @foreach ($items->take(8) as $i => $item)
+        <div class="pet-card" data-jenis="{{ strtolower($item->jenis ?? 'classic grey') }}">
+            <div class="pet-img-wrap">
+                <div class="pet-circle {{ $circles[$i % count($circles)] }}"></div>
+                @php $src = (!empty($item->gambar) && !str_starts_with($item->gambar,'assets/'))
+                    ? asset('/upload/sugargliders/'.$item->gambar)
+                    : asset('assets/images/pets/sg_card1_1778842695259.png'); @endphp
+                <img src="{{ $src }}" alt="{{ $item->nama }}" class="pet-photo">
+            </div>
+            <div class="pet-card-name">{{ $item->nama ?? 'Momo' }}</div>
+            <div class="pet-card-type">{{ $item->jenis ?? 'Classic Grey' }}</div>
+            <a href="{{ route('sugarglider.show', $item->id ?? 1) }}" class="btn-card-outline">Pelajari Lebih Lanjut</a>
+        </div>
+        @endforeach
+    </div>
+
+    <div class="see-more-wrap">
+        <a href="{{ route('collections') }}" class="btn-teal">Lihat Semua Koleksi</a>
+    </div>
+</section>
+
+{{-- ════════════════════════════════════════════════
+     WE HAVE A PET
+════════════════════════════════════════════════ --}}
+<section class="we-have">
+    <div class="wave-top">
+        <svg viewBox="0 0 1440 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path class="fill-white" fill-opacity="1"
+                d="M0,56L80,48C160,40,320,24,480,28C640,32,800,56,960,60C1120,64,1280,48,1360,40L1440,32L1440,90L0,90Z"/>
+        </svg>
+    </div>
+
+    <div class="we-have-inner">
+        <div class="we-have-text">
+            <h2 class="we-have-h2">Kami memiliki koleksi<br>Sugar Glider. Anda?</h2>
+            <p class="we-have-p">
+                Bergabunglah dengan ratusan peternak sugar glider dari seluruh Indonesia. Catat silsilah, kelola kandang, dan temukan sugar glider adopsi terbaik. Ekosistem terlengkap untuk sahabat berbulu Anda.
+            </p>
+            <a href="{{ route('register') }}" class="btn-green">Mulai Bergabung</a>
+        </div>
+
+        <div class="we-have-visual">
+            <div class="we-blob"></div>
+            <img src="{{ asset('assets/images/pets/sg_hero_1778842679372.png') }}" alt="Sugar Glider" class="we-img">
+
+            {{-- Floating badge --}}
+            <div class="we-badge">
+                <div class="we-badge-avatar">
+                    <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}" alt="">
+                </div>
+                <div>
+                    <div class="we-badge-name">Miffy</div>
+                    <div class="we-badge-sub">Mosaic · Tersedia untuk adopsi</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wave-bottom">
+        <svg viewBox="0 0 1440 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path class="fill-gray" fill-opacity="1"
+                d="M0,56L80,48C160,40,320,24,480,28C640,32,800,56,960,60C1120,64,1280,48,1360,40L1440,32L1440,90L0,90Z"/>
+        </svg>
+    </div>
+</section>
+
+{{-- ════════════════════════════════════════════════
+     HAPPY HISTORY / KISAH BAHAGIA
+════════════════════════════════════════════════ --}}
+<section class="history">
+    <h2 class="sec-title">Kisah Bahagia</h2>
+    <p class="sec-sub">Ribuan sugar glider telah menemukan rumah baru mereka melalui platform ini.</p>
+
+    <div class="history-carousel">
+        <button class="history-nav" id="hist-prev"><i class="bi bi-chevron-left"></i></button>
+
+        <div class="history-center">
+            <div class="history-blob">
+                <p class="history-quote" id="hist-quote">
+                    "Berkat MySugarGlider, saya bisa menemukan silsilah lengkap dari peliharaan saya dan memastikan genetikanya sehat. Sangat merekomendasikan!"
+                </p>
+                <div class="history-author" id="hist-author">Arjuna &nbsp;·&nbsp; 2 Tahun bersama</div>
+            </div>
+
+            <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}"  class="history-avatar ha-1" alt="">
+            <img src="{{ asset('assets/images/pets/sg_card2_1778842710532.png') }}"  class="history-avatar ha-2" alt="">
+            <img src="{{ asset('assets/images/pets/sg_hero_1778842679372.png') }}"   class="history-avatar ha-3" alt="">
+            <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}"  class="history-avatar ha-4" alt="">
+        </div>
+
+        <button class="history-nav" id="hist-next"><i class="bi bi-chevron-right"></i></button>
+    </div>
+
+    <div class="history-dots">
+        <div class="history-dot active"></div>
+        <div class="history-dot"></div>
+        <div class="history-dot"></div>
+    </div>
+</section>
+
+{{-- ════════════════════════════════════════════════
+     THEY HAVE A HOME / MEREKA PUNYA RUMAH
+════════════════════════════════════════════════ --}}
+<section class="home-section">
+    <div class="wave-top">
+        <svg viewBox="0 0 1440 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path class="fill-gray" fill-opacity="1"
+                d="M0,56L80,48C160,40,320,24,480,28C640,32,800,56,960,60C1120,64,1280,48,1360,40L1440,32L1440,90L0,90Z"/>
+        </svg>
+    </div>
+
+    <div class="home-inner">
+        <div class="home-visual">
+            <div class="home-blob"></div>
+            <img src="{{ asset('assets/images/pets/sg_card2_1778842710532.png') }}" alt="Sugar Glider Home" class="home-img">
+
+            {{-- Floating location badge --}}
+            <div class="home-location-badge">
+                <i class="bi bi-house-heart-fill"></i>
+                <div>
+                    <div class="loc-name">Kandang Bahagia</div>
+                    <div class="loc-sub">Jakarta Selatan</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="home-content">
+            <h2 class="home-h2">Mereka Memiliki Rumah</h2>
+            <p class="home-p">
+                Telusuri kandang peternak sugar glider dari seluruh Indonesia. Ribuan kandang aktif setiap harinya mencatat silsilah dan kesehatan sahabat berbulu mereka.
+            </p>
+
+            {{-- 6-photo gallery (2 rows × 3 cols) --}}
+            <div class="home-gallery">
+                <div class="home-gallery-item">
+                    <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}" alt="">
+                </div>
+                <div class="home-gallery-item">
+                    <img src="{{ asset('assets/images/pets/sg_hero_1778842679372.png') }}" alt="">
+                </div>
+                <div class="home-gallery-item">
+                    <img src="{{ asset('assets/images/pets/sg_card2_1778842710532.png') }}" alt="">
+                </div>
+                <div class="home-gallery-item">
+                    <img src="{{ asset('assets/images/pets/sg_hero_1778842679372.png') }}" alt="">
+                </div>
+                <div class="home-gallery-item">
+                    <img src="{{ asset('assets/images/pets/sg_card2_1778842710532.png') }}" alt="">
+                </div>
+                <div class="home-gallery-item">
+                    <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</div>
 @endsection
+
+@push('scripts')
+<script>
+// ── Filter pills
+const filterBtns = document.querySelectorAll('.filter-pill-ref[data-filter]');
+const petCards   = document.querySelectorAll('.pets-section .pet-card');
+
+filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.dataset.filter;
+        petCards.forEach(card => {
+            const match = filter === 'semua' || card.dataset.jenis.includes(filter);
+            card.style.display = match ? '' : 'none';
+        });
+    });
+});
+
+// ── History carousel
+const slides = [
+    { quote: '"Berkat MySugarGlider, saya bisa menemukan silsilah lengkap dari peliharaan saya dan memastikan genetikanya sehat. Sangat merekomendasikan!"', author: 'Arjuna · 2 Tahun bersama' },
+    { quote: '"Platform ini luar biasa! Proses adopsi sangat mudah dan transparan. Sugar glider saya sekarang hidup bahagia di kandang baru."', author: 'Sinta · 1 Tahun bersama' },
+    { quote: '"Saya awalnya ragu, tapi setelah mencoba MySugarGlider saya langsung jatuh cinta. Data pedigree-nya lengkap dan akurat."', author: 'Budi · 8 Bulan bersama' },
+];
+let current = 0;
+const quoteEl = document.getElementById('hist-quote');
+const authorEl = document.getElementById('hist-author');
+const dots = document.querySelectorAll('.history-dot');
+
+function showSlide(n) {
+    current = (n + slides.length) % slides.length;
+    quoteEl.textContent = slides[current].quote;
+    authorEl.textContent = slides[current].author;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+}
+document.getElementById('hist-prev').addEventListener('click', () => showSlide(current - 1));
+document.getElementById('hist-next').addEventListener('click', () => showSlide(current + 1));
+dots.forEach((d, i) => d.addEventListener('click', () => showSlide(i)));
+</script>
+@endpush

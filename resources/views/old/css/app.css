@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+    body {
+        @apply font-body bg-cream text-bark antialiased;
+    }
+    h1, h2, h3 {
+        @apply font-display;
+    }
+}
+
+@layer components {
+    /* Navbar */
+    .nav-link-public {
+        @apply text-bark-light hover:text-sage font-medium transition-colors duration-200 text-sm tracking-wide;
+    }
+    .nav-link-public.active {
+        @apply text-sage font-semibold;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        @apply inline-flex items-center gap-2 bg-sage text-white px-6 py-3 rounded-2xl font-semibold text-sm
+               hover:bg-sage-dark active:scale-95 transition-all duration-200 shadow-soft hover:shadow-hover;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center gap-2 border-2 border-sage text-sage px-6 py-3 rounded-2xl font-semibold text-sm
+               hover:bg-sage hover:text-white active:scale-95 transition-all duration-200;
+    }
+    .btn-honey {
+        @apply inline-flex items-center gap-2 bg-honey text-bark px-6 py-3 rounded-2xl font-bold text-sm
+               hover:bg-honey-dark active:scale-95 transition-all duration-200 shadow-soft;
+    }
+
+    /* Cards */
+    .card-public {
+        @apply bg-white rounded-3xl shadow-card hover:shadow-hover transition-all duration-300 overflow-hidden;
+    }
+    .card-stat {
+        @apply bg-white rounded-2xl shadow-soft p-6 text-center hover:-translate-y-1 transition-transform duration-300;
+    }
+
+    /* Section */
+    .section-title {
+        @apply text-3xl md:text-4xl font-display text-bark mb-3;
+    }
+    .section-subtitle {
+        @apply text-bark-muted text-base leading-relaxed;
+    }
+
+    /* Badge */
+    .badge-status {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+    }
+    .badge-active   { @apply badge-status bg-sage-100 text-sage-dark; }
+    .badge-public   { @apply badge-status bg-blue-100 text-blue-700; }
+    .badge-adoption { @apply badge-status bg-honey-light/30 text-honey-dark; }
+    .badge-done     { @apply badge-status bg-gray-100 text-gray-500; }
+
+    /* Form inputs (public) */
+    .input-public {
+        @apply w-full px-4 py-3 rounded-2xl border border-cream-dark bg-cream focus:outline-none
+               focus:ring-2 focus:ring-sage focus:border-transparent placeholder-bark-muted text-sm transition;
+    }
+    .textarea-public {
+        @apply input-public resize-none;
+    }
+
+    /* Divider */
+    .divider-leaf {
+        @apply flex items-center gap-4 my-6;
+    }
+    .divider-leaf::before,
+    .divider-leaf::after {
+        content: '';
+        @apply flex-1 h-px bg-cream-dark;
+    }
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+}

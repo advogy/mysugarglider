@@ -1,0 +1,103 @@
+@extends('layouts.v_backend')
+
+@section('title', 'Edit Kandang')
+
+@section('content')
+
+<div class="flex items-center gap-4 mb-6">
+    <a href="{{ route('shelter.index') }}" class="text-bark-muted hover:text-bark transition-colors">
+        <i class="bi bi-arrow-left text-xl"></i>
+    </a>
+    <div>
+        <h2 class="text-xl font-bold text-bark">{{ __('text.edit') }} — {{ $shelter->nama }}</h2>
+        <p class="text-bark-muted text-sm mt-0.5">{{ __('text.change_data') }}</p>
+    </div>
+</div>
+
+@if ($errors->any())
+    <div class="alert-danger mb-5">
+        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
+        <div>@foreach ($errors->all() as $err)<p>{{ $err }}</p>@endforeach</div>
+    </div>
+@endif
+
+<div class="be-card max-w-2xl">
+    <div class="p-6 sm:p-8">
+        <form action="{{ route('shelter.update', $shelter->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="_method" value="PUT">
+            <div class="space-y-5">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="form-label">{{ __('text.name') }}</label>
+                        <input type="text" name="nama" value="{{ $shelter->nama }}"
+                               placeholder="{{ __('text.name') }}"
+                               class="input-field" required>
+                    </div>
+                    <div>
+                        <label class="form-label">{{ __('text.code') }}</label>
+                        <input type="text" name="kode" value="{{ $shelter->kode }}"
+                               placeholder="{{ __('text.code') }}"
+                               class="input-field" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label">{{ __('text.address') }}</label>
+                    <input type="text" name="alamat" value="{{ $shelter->alamat }}"
+                           placeholder="{{ __('text.address') }}"
+                           class="input-field" required>
+                </div>
+
+                <div>
+                    <label class="form-label">{{ __('text.gmaps') }}</label>
+                    <input type="text" name="gmaps" value="{{ $shelter->gmaps }}"
+                           placeholder="{{ __('text.gmaps') }}"
+                           class="input-field">
+                    <p class="text-xs text-bark-muted mt-1.5">
+                        Masukkan kode embed Google Maps. Contoh:
+                        <span class="font-mono">https://www.google.com/maps/embed?pb=<u>m18!1m12...</u></span>
+                    </p>
+                </div>
+
+                <div>
+                    <label class="form-label">{{ __('text.status') }}</label>
+                    <select name="status" class="input-field">
+                        <option value="">Pilih Status</option>
+                        <option value="1" @selected($shelter->status == '1')>{{ __('text.open') }}</option>
+                        <option value="0" @selected($shelter->status == '0')>{{ __('text.close') }}</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="form-label">{{ __('text.description') }}</label>
+                    <textarea name="keterangan" rows="3" placeholder="{{ __('text.description') }}"
+                              class="input-field">{{ $shelter->keterangan }}</textarea>
+                </div>
+
+                <div>
+                    <label class="form-label">{{ __('text.logo') }}</label>
+                    @if ($shelter->gambar)
+                        <div class="mb-3">
+                            <img src="{{ asset('/upload/shelters/' . $shelter->gambar) }}"
+                                 class="w-24 h-24 rounded-2xl object-cover border border-cream-dark" alt="">
+                        </div>
+                    @endif
+                    <input type="file" name="gambar"
+                           class="w-full text-sm text-bark-muted file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sage/10 file:text-sage cursor-pointer">
+                    <p class="text-xs text-bark-muted mt-1.5">Ukuran logo: 150×150px</p>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="btn-create">
+                        <i class="bi bi-check-lg"></i> {{ __('text.save') }}
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+@endsection

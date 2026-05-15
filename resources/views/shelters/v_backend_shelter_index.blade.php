@@ -1,167 +1,132 @@
 @extends('layouts.v_backend')
 
-@section('title')
-    Data Kandang
-@endsection
+@section('title', __('text.shelter_data'))
 
 @section('content')
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>{{ __('text.shelter_data') }} </h3>
-                <p class="text-subtitle text-muted">
-                    {{ __('text.change_data') }}
-                </p>
-                <p>
-                    <a href="{{ route('shelter.create') }}">
-                        <span class="badge bg-primary">{{ __('text.add_new') }}</span>
-                    </a>
-                </p>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('dashboard.index') }}">{{ __('text.dashboard') }}</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            {{ __('text.shelter') }}
-                        </li>
-                    </ol>
-                </nav>
-            </div>
+
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+        <h2 class="text-xl font-bold text-bark">{{ __('text.shelter_data') }}</h2>
+        <p class="text-bark-muted text-sm mt-0.5">Kelola data kandang Anda.</p>
+    </div>
+    <a href="{{ route('shelter.create') }}" class="btn-create self-start">
+        <i class="bi bi-plus-lg"></i> {{ __('text.add_new') }}
+    </a>
+</div>
+
+@if (session('pesan'))
+    <div class="alert-success mb-5">
+        <i class="bi bi-check-circle-fill text-lg"></i>
+        <p class="font-semibold">{{ session('pesan') }}</p>
+    </div>
+@endif
+
+<div class="be-card overflow-hidden">
+    <div class="overflow-x-auto scrollbar-thin">
+        <table class="be-table">
+            <thead>
+                <tr>
+                    <th class="w-16">Foto</th>
+                    <th>Nama</th>
+                    <th class="hidden sm:table-cell">Kode</th>
+                    <th class="hidden md:table-cell">Alamat</th>
+                    <th class="hidden lg:table-cell">Status</th>
+                    <th class="text-right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($shelters as $shelter)
+                    <tr>
+                        <td>
+                            <div class="w-11 h-11 rounded-xl overflow-hidden bg-sage-100">
+                                @if ($shelter->gambar)
+                                    <img src="{{ asset('/upload/shelters/' . $shelter->gambar) }}" class="w-full h-full object-cover" alt="">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <i class="bi bi-house-heart text-sage/40"></i>
+                                    </div>
+                                @endif
+                            </div>
+                        </td>
+                        <td class="font-bold text-bark">{{ $shelter->nama }}</td>
+                        <td class="hidden sm:table-cell font-mono text-xs text-bark-muted">{{ $shelter->kode }}</td>
+                        <td class="hidden md:table-cell text-bark-light text-sm">{{ $shelter->alamat ?? '—' }}</td>
+                        <td class="hidden lg:table-cell">
+                            @if ($shelter->status == '1')
+                                <span class="badge-sage">{{ __('text.open') }}</span>
+                            @else
+                                <span class="badge-done">{{ __('text.close') }}</span>
+                            @endif
+                        </td>
+                        <td class="text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('shelter.edit', $shelter->id) }}" class="btn-edit">
+                                    <i class="bi bi-pencil"></i>
+                                    <span class="hidden sm:inline">Edit</span>
+                                </a>
+                                <button type="button" onclick="confirmDelete('{{ route('shelter.destroy', $shelter->id) }}', '{{ $shelter->nama }}')" class="btn-delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-16">
+                            <img src="{{ asset('assets/images/mascot/glider-glide.svg') }}" class="w-16 mx-auto mb-3 opacity-30" alt="">
+                            <p class="text-bark-muted font-semibold">Belum ada kandang.</p>
+                            <a href="{{ route('shelter.create') }}" class="btn-create mt-4 inline-flex">
+                                <i class="bi bi-plus-lg"></i> Tambah Kandang
+                            </a>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    @if ($shelters->hasPages())
+        <div class="px-5 py-4 border-t border-cream-dark">
+            {{ $shelters->links('pagination::v_pagination') }}
+        </div>
+    @endif
+</div>
+
+<div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
+    <div class="bg-white rounded-3xl shadow-hover max-w-sm w-full p-6">
+        <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <i class="bi bi-trash text-red-500 text-xl"></i>
+        </div>
+        <h3 class="font-bold text-bark text-center text-lg mb-2">Hapus Data?</h3>
+        <p class="text-bark-muted text-sm text-center mb-2">Anda akan menghapus:</p>
+        <p id="delete-name" class="font-bold text-bark text-center mb-6"></p>
+        <div class="flex gap-3">
+            <button onclick="closeDeleteModal()" class="btn-secondary flex-1 justify-center">Batal</button>
+            <form id="delete-form" method="POST" class="flex-1">
+                @csrf <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-red-500 text-white px-4 py-3 rounded-full font-bold text-sm hover:bg-red-600 transition-colors">
+                    <i class="bi bi-trash"></i> Hapus
+                </button>
+            </form>
         </div>
     </div>
+</div>
 
-    @if (session('pesan'))
-        <div class="alert alert-light-success color-success">
-            <i class="bi bi-check-circle"></i> {{ session('pesan') }}
-        </div>
-    @endif
+@push('scripts')
+<script>
+function confirmDelete(url, name) {
+    document.getElementById('delete-name').textContent = name;
+    document.getElementById('delete-form').action = url;
+    document.getElementById('delete-modal').classList.remove('hidden');
+    document.getElementById('delete-modal').classList.add('flex');
+}
+function closeDeleteModal() {
+    document.getElementById('delete-modal').classList.add('hidden');
+    document.getElementById('delete-modal').classList.remove('flex');
+}
+document.getElementById('delete-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteModal();
+});
+</script>
+@endpush
 
-    @if ($errors->any())
-        <div class="alert alert-light-danger color-danger">
-            <i class="bi bi-exclamation-circle"></i>
-            @foreach ($errors->all() as $err)
-                {{ $err }}<br>
-            @endforeach
-        </div>
-    @endif
-
-    <section class="section">
-        <div class="row" id="table-hover-row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-content">
-                        <!-- table hover -->
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 40px"></th>
-                                        <th>NAMA</th>
-                                        <th>KODE</th>
-                                        <th>ALAMAT</th>
-                                        <th>STATUS</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    @foreach ($shelters as $shelter)
-                                        <tr>
-                                            <td>
-
-                                                @if ($shelter->image)
-                                                    <img src="{{ asset('/upload/shelters/' . $shelter->image) }}"
-                                                        height="40px">
-                                                @else
-                                                    <img src="{{ asset('/assets/images/no-image.png') }}" height="40px">
-                                                @endif
-                                            </td>
-                                            <td class="text-bold-500">{{ $shelter->nama }}</td>
-                                            <td>{{ $shelter->kode }}</td>
-                                            <td class="text-bold-500">{{ $shelter->alamat }}</td>
-                                            <td>
-                                                @if ($shelter->status == '1')
-                                                    {{ __('text.open') }}
-                                                @else
-                                                    {{ __('text.close') }}
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('shelter.edit', $shelter->id) }}"
-                                                    class="btn icon btn-primary" title="{{ __('text.edit') }}"><i
-                                                        class="bi bi-pencil"></i></a>
-
-
-                                                <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                                    data-bs-target="#delete{{ $shelter->id }}">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-
-                                                <div class="modal fade text-left" id="delete{{ $shelter->id }}"
-                                                    tabindex="-1" role="dialog"
-                                                    aria-labelledby="myModalLabel{{ $shelter->id }}" aria-hidden="true">
-                                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-                                                        role="document">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header bg-danger">
-                                                                <h5 class="modal-title white" id="myModalLabel120">
-                                                                    {{ __('text.delete_data') }}
-                                                                </h5>
-                                                                <button type="button" class="close"
-                                                                    data-bs-dismiss="modal" aria-label="Close">
-                                                                    <i data-feather="x"></i>
-                                                                </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                Apakah Anda yakin menghapus data ini?
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-light-secondary"
-                                                                    data-bs-dismiss="modal">
-                                                                    <i class="bx bx-x d-block d-sm-none"></i>
-                                                                    <span
-                                                                        class="d-none d-sm-block">{{ __('text.close') }}</span>
-                                                                </button>
-
-                                                                <form method="POST"
-                                                                    action="{{ route('shelter.destroy', $shelter->id) }}">
-                                                                    @csrf
-                                                                    <input type="hidden" name="_method" value="DELETE">
-                                                                    <input type="hidden" name="id"
-                                                                        value="{{ $shelter->id }}">
-                                                                    <button type="submit" id="delete"
-                                                                        class="btn btn-danger ml-1" data-bs-dismiss="modal">
-                                                                        <i class="bx bx-check d-block d-sm-none"></i>
-                                                                        <span
-                                                                            class="d-none d-sm-block">{{ __('text.delete') }}</span>
-                                                                    </button>
-
-
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            </td>
-                                        </tr>
-                                    @endforeach
-
-
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="card-footer">
-                        {{ $shelters->links('pagination::v_pagination') }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 @endsection

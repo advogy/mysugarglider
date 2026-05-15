@@ -6,30 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('alamat')->nullable();
-            $table->string('telp')->nullable();
-            $table->unsignedBigInteger('user_id');
-            $table->index('user_id');
+            $table->string('kota')->nullable();
+            $table->string('provinsi')->nullable();
+            $table->string('telepon')->nullable();
+            $table->text('bio')->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('website')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('profiles');
     }

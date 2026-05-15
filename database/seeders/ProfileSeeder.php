@@ -23,10 +23,10 @@ class ProfileSeeder extends Seeder
 
         $data = [
             [
-                'alamat' => 'Surabaya', 'telp' => '+62 123456789', 'user_id' => 2
+                'alamat' => 'Surabaya', 'telepon' => '+62 123456789', 'user_id' => 2
             ],
             [
-                'alamat' => 'Malang', 'telp' => '+62 123456789', 'user_id' => 3
+                'alamat' => 'Malang', 'telepon' => '+62 123456789', 'user_id' => 3
             ],
         ];
 

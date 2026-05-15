@@ -67,7 +67,7 @@ class SugargliderPolicy
      */
     public function delete(User $user, SugargliderModel $sugargliderModel)
     {
-        //
+        return $user->id === $sugargliderModel->user_id;
     }
 
     /**

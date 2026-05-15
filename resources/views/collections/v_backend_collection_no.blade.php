@@ -1,16 +1,18 @@
 @extends('layouts.v_backend')
 
-@section('title')
-    Data Koleksi Tidak Ditemukan
-@endsection
+@section('title', __('text.collection_data'))
 
 @section('content')
-    <section class="section">
-        <div class="col-12">
-            <div class="alert alert-danger">
-                <h4 class="alert-heading">{{ __('text.find_no_collection') }}</h4>
-                <p>Silakan lengkapi data <a href="{{ route('collection.index') }}">Koleksi</a> Anda terlebih dahulu.</p>
-            </div>
-        </div>
-    </section>
+
+<div class="flex items-center justify-center min-h-[60vh]">
+    <div class="text-center max-w-sm">
+        <img src="{{ asset('assets/images/mascot/glider-glide.svg') }}" class="w-24 mx-auto mb-6 opacity-30" alt="">
+        <h3 class="text-xl font-bold text-bark mb-2">Belum Ada Koleksi</h3>
+        <p class="text-bark-muted text-sm mb-6">Tambahkan koleksi pertama Anda untuk mulai menggunakan fitur ini.</p>
+        <a href="{{ route('collection.create') }}" class="btn-create">
+            <i class="bi bi-plus-lg"></i> Buat Koleksi
+        </a>
+    </div>
+</div>
+
 @endsection

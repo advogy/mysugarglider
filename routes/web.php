@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Middleware\Authenticate;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SugargliderController;
@@ -30,9 +31,12 @@ use App\Http\Controllers\AdoptionRequestController;
 Route::get('/', [PageController::class, 'index'])->name('index');
 Route::get('/home', [PageController::class, 'index'])->name('home');
 
-Auth::routes(['verify' => true]);
+// Login & Register (definisi manual — hindari konflik nama route dari Auth::routes())
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware(['DisableBackBtn', 'guest']);
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register')->middleware('guest');
+Route::post('/register', [RegisterController::class, 'register'])->middleware('guest');
 
-Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
+Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate')->middleware('throttle:5,1');
 Route::get('/password-forget', [LoginController::class, 'password_forget'])->name('password.forget')->middleware(['DisableBackBtn', 'guest']);
 Route::post('/password-link', [LoginController::class, 'password_link'])->name('password.link')->middleware('DisableBackBtn', 'guest');
 Route::get('/password-reset/{token}', [LoginController::class, 'password_reset_form'])->name('password.reset')->middleware('guest');
@@ -44,7 +48,7 @@ Route::group(['middleware' => ['auth']], function () {
     /**
      * Logout Routes
      */
-    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     /**
      * Verification Routes
@@ -115,14 +119,15 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/dashboard/adoptions/{id}/request', [AdoptionController::class, 'backend_adoption_request'])->name('adoption.request');
         Route::get('/dashboard/adoptions/{id}/edit', [AdoptionController::class, 'edit'])->name('adoption.edit');
         Route::put('/dashboard/adoptions/{id}', [AdoptionController::class, 'update'])->name('adoption.update');
-        Route::put('/dashboard/adoptions/{id}', [AdoptionController::class, 'adopted'])->name('adoption.adopted');
-
 
         /**
-         * Adoption Request Sugar Glider Routes
+         * Adoption Request Routes
          */
         Route::post('/dashboard/adoptions/{id}/request', [AdoptionRequestController::class, 'store'])->name('adoptionrequest.store');
         Route::post('/dashboard/adoptions/select', [AdoptionRequestController::class, 'backend_adoption_select'])->name('adoptionrequest.select');
+        Route::post('/dashboard/adoptionrequests/{id}/upload-payment', [AdoptionRequestController::class, 'upload_payment'])->name('adoptionrequest.upload-payment');
+        Route::post('/dashboard/adoptionrequests/{id}/confirm-free', [AdoptionRequestController::class, 'confirm_free'])->name('adoptionrequest.confirm-free');
+        Route::post('/dashboard/adoptionrequests/{id}/confirm-payment', [AdoptionRequestController::class, 'confirm_payment'])->name('adoptionrequest.confirm-payment');
         Route::post('/dashboard/adoptions/{id}/shipping', [AdoptionRequestController::class, 'backend_adoption_shipping'])->name('adoptionrequest.shipping');
         Route::post('/dashboard/adoptions/{id}/finalize', [AdoptionRequestController::class, 'backend_adoption_finalize'])->name('adoptionrequest.finalize');
     });

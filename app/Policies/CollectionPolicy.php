@@ -66,7 +66,7 @@ class CollectionPolicy
      */
     public function delete(User $user, CollectionModel $collectionModel)
     {
-        //
+        return $user->id === $collectionModel->user_id;
     }
 
     /**

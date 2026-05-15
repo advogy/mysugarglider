@@ -1,466 +1,113 @@
 @extends('layouts.v_main')
-
-@section('title')
-    Bagan Silsilah {{ $collection->sgNama }} - {{ $collection->sgKode }}
-@endsection
+@section('title', 'Silsilah — ' . $collection->sgNama . ' ' . $collection->sgKode)
 
 @section('content')
-    <main id="main">
 
-        <!-- ======= Breadcrumbs Section ======= -->
-        <section class="breadcrumbs">
-            <div class="container">
+<header class="premium-page-header">
+    <div class="header-blob-1 blob-right blob-blue-light"></div>
+    <h1 class="page-title size-md">Bagan Silsilah</h1>
+</header>
 
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2>Bagan Silsilah Indukan</h2>
-                    <ol>
-                        <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ route('collections') }}">Koleksi</a></li>
-                        <li><a href="{{ route('sugarglider.show', $collection->sgId) }}">{{ $collection->sgKode }}</a></li>
-                        <li>Bagan Silsilah</li>
-                    </ol>
-                </div>
+<div class="bg-white pb-20 pt-10">
+    <div class="pedigree-container">
 
-            </div>
-        </section><!-- End Breadcrumbs Section -->
-
-        <section id="inner-page collection" class="collection">
-            <div class="container">
-                <div class="collection-wrap">
-                    <div class="collection-item">
-                        @if ($collection->sgGambar)
-                            <a href="{{ asset('/upload/sugargliders/' . $collection->sgGambar) }}" class="galelry-lightbox">
-                                <img src="{{ asset('/upload/sugargliders/' . $collection->sgGambar) }}"
-                                    class="collection-img" alt="{{ $collection->sgNama }}">
-                            </a>
+        <div class="profile-bar">
+            <div class="pb-info">
+                @if ($collection->sgGambar)
+                    <img src="{{ asset('/upload/sugargliders/' . $collection->sgGambar) }}" class="pb-img" alt="{{ $collection->sgNama }}">
+                @else
+                    <div class="pb-img flex items-center justify-center text-3xl pedigree-ph"><i class="bi bi-bezier2"></i></div>
+                @endif
+                <div>
+                    <div class="pb-name">{{ $collection->sgNama }}</div>
+                    <div class="pb-meta">
+                        {{ $collection->sgKode }}
+                        @if ($collection->stNama)
+                            <span class="divider-light">|</span>
+                            <a href="{{ route('shelter.show', $collection->stId) }}" class="link-green">{{ $collection->stNama }}</a>
                         @endif
-
-                        <h2>{{ $collection->sgNama }}</h2>
-                        <h4>
-                            <a href="{{ route('shelter.show', $collection->stId) }}">{{ $collection->stNama }}</a>
-                            | {{ $collection->sgKode }}
-                        </h4>
-                        <p>
-                            <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                            {{ $collection->sgKeterangan }}
-                            <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                        </p>
-
-                        <div class="collection">
-                            <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                    <h3>BAGAN SILSILAH INDUKAN</h3>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered align-middle">
-                                            <thead class="table-light text-center">
-                                                <tr class="text-uppercase">
-                                                    <th scope="col">SUGAR GLIDER</th>
-                                                    <th scope="col">{{ __('text.parents') }}</th>
-                                                    <th scope="col">{{ __('text.grandparents') }}</th>
-                                                    <th scope="col">{{ __('text.great_grandparents') }}</th>
-                                                    <th scope="col">{{ __('text.great_great_grandparents') }}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="table-group-divider">
-                                                <tr>
-                                                    <td rowspan="16"
-                                                        class="{{ $collection->sgKelamin === 1 ? 'table-primary' : 'table-success' }}">
-                                                        @if ($silsilah->id != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->id) }}">
-                                                                @if ($collection->sgKelamin === 1)
-                                                                    &#9794;
-                                                                @else
-                                                                    &#9792;
-                                                                @endif
-
-                                                                {{ $silsilah->nama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->jenis ?? __('text.unknown') }}
-                                                        @else
-                                                            {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td rowspan="8" class="table-primary">
-                                                        @if ($silsilah->mId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mId) }}">
-                                                                &#9794; {{ $silsilah->mNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td rowspan="4" class="table-primary">
-                                                        @if ($silsilah->mmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mmId) }}">
-                                                                &#9794; {{ $silsilah->mmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td rowspan="2" class="table-primary">
-                                                        @if ($silsilah->mmmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mmmId) }}">
-                                                                &#9794; {{ $silsilah->mmmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mmmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td class="table-primary">
-                                                        @if ($silsilah->mmmmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mmmmId) }}">
-                                                                &#9794; {{ $silsilah->mmmmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mmmmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="table-success">
-                                                        @if ($silsilah->mmmfId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mmmfId) }}">
-                                                                &#9792; {{ $silsilah->mmmfNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mmmfJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td rowspan="2" class="table-success">
-                                                        @if ($silsilah->mmfId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mmfId) }}">
-                                                                &#9792; {{ $silsilah->mmfNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mmfJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td class="table-primary">
-                                                        @if ($silsilah->mmfmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mmfmId) }}">
-                                                                &#9794; {{ $silsilah->mmfmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mmfmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="table-success">
-                                                        @if ($silsilah->mmffId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mmffId) }}">
-                                                                &#9792; {{ $silsilah->mmffNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mmffJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td rowspan="4" class="table-success">
-                                                        @if ($silsilah->mfId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mfId) }}">
-                                                                &#9792; {{ $silsilah->mfNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mfJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td rowspan="2" class="table-primary">
-                                                        @if ($silsilah->mfmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mfmId) }}">
-                                                                &#9794; {{ $silsilah->mfmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mfmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td class="table-primary">
-                                                        @if ($silsilah->mfmmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mfmmId) }}">
-                                                                &#9794; {{ $silsilah->mfmmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mfmmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="table-success">
-                                                        @if ($silsilah->mfmfId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mfmfId) }}">
-                                                                &#9792; {{ $silsilah->mfmfNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mfmfJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td rowspan="2" class="table-success">
-                                                        @if ($silsilah->mffId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mffId) }}">
-                                                                &#9792; {{ $silsilah->mffNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mffJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td class="table-primary">
-                                                        @if ($silsilah->mffmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mffmId) }}">
-                                                                &#9794; {{ $silsilah->mffmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mffmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="table-success">
-                                                        @if ($silsilah->mfffId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->mfffId) }}">
-                                                                &#9792; {{ $silsilah->mfffNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->mfffJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td rowspan="8" class="table-success">
-                                                        @if ($silsilah->fId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->fId) }}">
-                                                                &#9792; {{ $silsilah->fNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->fJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td rowspan="4" class="table-primary">
-                                                        @if ($silsilah->fmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->fmId) }}">
-                                                                &#9794; {{ $silsilah->fmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->fmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td rowspan="2" class="table-primary">
-                                                        @if ($silsilah->fmmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->fmmId) }}">
-                                                                &#9794; {{ $silsilah->fmmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->fmmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td class="table-primary">
-                                                        @if ($silsilah->fmmmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->fmmmId) }}">
-                                                                &#9794; {{ $silsilah->fmmmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->fmmmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="table-success">
-                                                        @if ($silsilah->fmmfId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->fmmfId) }}">
-                                                                &#9792; {{ $silsilah->fmmfNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->fmmfJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td rowspan="2" class="table-success">
-                                                        @if ($silsilah->fmfId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->fmfId) }}">
-                                                                &#9792; {{ $silsilah->fmfNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->fmfJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td class="table-primary">
-                                                        @if ($silsilah->fmfmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->fmfmId) }}">
-                                                                &#9794; {{ $silsilah->fmfmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->fmfmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="table-success">
-                                                        @if ($silsilah->fmffId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->fmffId) }}">
-                                                                &#9792; {{ $silsilah->fmffNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->fmffJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td rowspan="4" class="table-success">
-                                                        @if ($silsilah->ffId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->ffId) }}">
-                                                                &#9792; {{ $silsilah->ffNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->ffJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td rowspan="2" class="table-primary">
-                                                        @if ($silsilah->ffmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->ffmId) }}">
-                                                                &#9794; {{ $silsilah->ffmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->ffmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td class="table-primary">
-                                                        @if ($silsilah->ffmmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->ffmmId) }}">
-                                                                &#9794; {{ $silsilah->ffmmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->ffmmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="table-success">
-                                                        @if ($silsilah->ffmfId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->ffmfId) }}">
-                                                                &#9792; {{ $silsilah->ffmfNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->ffmfJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td rowspan="2" class="table-success">
-                                                        @if ($silsilah->fffId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->fffId) }}">
-                                                                &#9792; {{ $silsilah->fffNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->fffJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                    <td class="table-primary">
-                                                        @if ($silsilah->fffmId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->fffmId) }}">
-                                                                &#9794; {{ $silsilah->fffmNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->fffmJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9794; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="table-success">
-                                                        @if ($silsilah->ffffId != 0)
-                                                            <a href="{{ route('sugarglider.show', $silsilah->ffffId) }}">
-                                                                &#9792; {{ $silsilah->ffffNama }}
-                                                            </a>
-                                                            <br>
-                                                            {{ $silsilah->ffffJenis ?? __('text.unknown') }}
-                                                        @else
-                                                            &#9792; {{ __('text.unknown') }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                            <tfoot class="table-light text-center">
-                                                <tr>
-                                                    <th scope="col">SUGAR GLIDER</th>
-                                                    <th scope="col">INDUKAN</th>
-                                                    <th scope="col">KAKEK-NENEK</th>
-                                                    <th scope="col">MOYANG</th>
-                                                    <th scope="col">BUYUT</th>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
                     </div>
                 </div>
             </div>
-        </section>
-    </main><!-- End #main -->
+            <a href="{{ route('sugarglider.show', $collection->sgId) }}" class="pb-btn">Profil Lengkap</a>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color legend-color-male"></div> Jantan (♂)</div>
+            <div class="legend-item"><div class="legend-color legend-color-female"></div> Betina (♀)</div>
+        </div>
+
+        <div class="tree-card overflow-x-auto scrollbar-thin">
+            <table class="pedigree-table">
+                <thead>
+                    <tr>
+                        <th>Sugar Glider</th>
+                        <th>Indukan</th>
+                        <th>Kakek–Nenek</th>
+                        <th>Moyang</th>
+                        <th>Buyut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="16" class="cell-self">
+                            @if ($silsilah->id != 0)
+                                <a href="{{ route('sugarglider.show', $silsilah->id) }}">
+                                    @if ($collection->sgKelamin === 1) <span class="icon-male">&#9794;</span> @else <span class="icon-female">&#9792;</span> @endif
+                                    {{ $silsilah->nama }}
+                                </a>
+                                <span class="species">{{ $silsilah->jenis ?? __('text.unknown') }}</span>
+                            @else {{ __('text.unknown') }} @endif
+                        </td>
+                        <td rowspan="8" class="cell-male">@if ($silsilah->mId != 0) <a href="{{ route('sugarglider.show', $silsilah->mId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->mNama }}</a><span class="species">{{ $silsilah->mJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td rowspan="4" class="cell-male">@if ($silsilah->mmId != 0) <a href="{{ route('sugarglider.show', $silsilah->mmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->mmNama }}</a><span class="species">{{ $silsilah->mmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td rowspan="2" class="cell-male">@if ($silsilah->mmmId != 0) <a href="{{ route('sugarglider.show', $silsilah->mmmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->mmmNama }}</a><span class="species">{{ $silsilah->mmmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td class="cell-male">@if ($silsilah->mmmmId != 0) <a href="{{ route('sugarglider.show', $silsilah->mmmmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->mmmmNama }}</a><span class="species">{{ $silsilah->mmmmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                    </tr>
+                    <tr><td class="cell-female">@if ($silsilah->mmmfId != 0) <a href="{{ route('sugarglider.show', $silsilah->mmmfId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->mmmfNama }}</a><span class="species">{{ $silsilah->mmmfJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td></tr>
+                    <tr>
+                        <td rowspan="2" class="cell-female">@if ($silsilah->mmfId != 0) <a href="{{ route('sugarglider.show', $silsilah->mmfId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->mmfNama }}</a><span class="species">{{ $silsilah->mmfJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td class="cell-male">@if ($silsilah->mmfmId != 0) <a href="{{ route('sugarglider.show', $silsilah->mmfmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->mmfmNama }}</a><span class="species">{{ $silsilah->mmfmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                    </tr>
+                    <tr><td class="cell-female">@if ($silsilah->mmffId != 0) <a href="{{ route('sugarglider.show', $silsilah->mmffId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->mmffNama }}</a><span class="species">{{ $silsilah->mmffJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td></tr>
+                    <tr>
+                        <td rowspan="4" class="cell-female">@if ($silsilah->mfId != 0) <a href="{{ route('sugarglider.show', $silsilah->mfId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->mfNama }}</a><span class="species">{{ $silsilah->mfJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td rowspan="2" class="cell-male">@if ($silsilah->mfmId != 0) <a href="{{ route('sugarglider.show', $silsilah->mfmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->mfmNama }}</a><span class="species">{{ $silsilah->mfmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td class="cell-male">@if ($silsilah->mfmmId != 0) <a href="{{ route('sugarglider.show', $silsilah->mfmmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->mfmmNama }}</a><span class="species">{{ $silsilah->mfmmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                    </tr>
+                    <tr><td class="cell-female">@if ($silsilah->mfmfId != 0) <a href="{{ route('sugarglider.show', $silsilah->mfmfId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->mfmfNama }}</a><span class="species">{{ $silsilah->mfmfJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td></tr>
+                    <tr>
+                        <td rowspan="2" class="cell-female">@if ($silsilah->mffId != 0) <a href="{{ route('sugarglider.show', $silsilah->mffId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->mffNama }}</a><span class="species">{{ $silsilah->mffJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td class="cell-male">@if ($silsilah->mffmId != 0) <a href="{{ route('sugarglider.show', $silsilah->mffmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->mffmNama }}</a><span class="species">{{ $silsilah->mffmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                    </tr>
+                    <tr><td class="cell-female">@if ($silsilah->mfffId != 0) <a href="{{ route('sugarglider.show', $silsilah->mfffId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->mfffNama }}</a><span class="species">{{ $silsilah->mfffJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td></tr>
+                    <tr>
+                        <td rowspan="8" class="cell-female">@if ($silsilah->fId != 0) <a href="{{ route('sugarglider.show', $silsilah->fId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->fNama }}</a><span class="species">{{ $silsilah->fJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td rowspan="4" class="cell-male">@if ($silsilah->fmId != 0) <a href="{{ route('sugarglider.show', $silsilah->fmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->fmNama }}</a><span class="species">{{ $silsilah->fmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td rowspan="2" class="cell-male">@if ($silsilah->fmmId != 0) <a href="{{ route('sugarglider.show', $silsilah->fmmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->fmmNama }}</a><span class="species">{{ $silsilah->fmmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td class="cell-male">@if ($silsilah->fmmmId != 0) <a href="{{ route('sugarglider.show', $silsilah->fmmmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->fmmmNama }}</a><span class="species">{{ $silsilah->fmmmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                    </tr>
+                    <tr><td class="cell-female">@if ($silsilah->fmmfId != 0) <a href="{{ route('sugarglider.show', $silsilah->fmmfId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->fmmfNama }}</a><span class="species">{{ $silsilah->fmmfJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td></tr>
+                    <tr>
+                        <td rowspan="2" class="cell-female">@if ($silsilah->fmfId != 0) <a href="{{ route('sugarglider.show', $silsilah->fmfId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->fmfNama }}</a><span class="species">{{ $silsilah->fmfJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td class="cell-male">@if ($silsilah->fmfmId != 0) <a href="{{ route('sugarglider.show', $silsilah->fmfmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->fmfmNama }}</a><span class="species">{{ $silsilah->fmfmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                    </tr>
+                    <tr><td class="cell-female">@if ($silsilah->fmffId != 0) <a href="{{ route('sugarglider.show', $silsilah->fmffId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->fmffNama }}</a><span class="species">{{ $silsilah->fmffJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td></tr>
+                    <tr>
+                        <td rowspan="4" class="cell-female">@if ($silsilah->ffId != 0) <a href="{{ route('sugarglider.show', $silsilah->ffId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->ffNama }}</a><span class="species">{{ $silsilah->ffJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td rowspan="2" class="cell-male">@if ($silsilah->ffmId != 0) <a href="{{ route('sugarglider.show', $silsilah->ffmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->ffmNama }}</a><span class="species">{{ $silsilah->ffmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td class="cell-male">@if ($silsilah->ffmmId != 0) <a href="{{ route('sugarglider.show', $silsilah->ffmmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->ffmmNama }}</a><span class="species">{{ $silsilah->ffmmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                    </tr>
+                    <tr><td class="cell-female">@if ($silsilah->ffmfId != 0) <a href="{{ route('sugarglider.show', $silsilah->ffmfId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->ffmfNama }}</a><span class="species">{{ $silsilah->ffmfJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td></tr>
+                    <tr>
+                        <td rowspan="2" class="cell-female">@if ($silsilah->fffId != 0) <a href="{{ route('sugarglider.show', $silsilah->fffId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->fffNama }}</a><span class="species">{{ $silsilah->fffJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                        <td class="cell-male">@if ($silsilah->fffmId != 0) <a href="{{ route('sugarglider.show', $silsilah->fffmId) }}"><span class="icon-male">&#9794;</span> {{ $silsilah->fffmNama }}</a><span class="species">{{ $silsilah->fffmJenis ?? __('text.unknown') }}</span>@else <span class="icon-male">&#9794;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td>
+                    </tr>
+                    <tr><td class="cell-female">@if ($silsilah->ffffId != 0) <a href="{{ route('sugarglider.show', $silsilah->ffffId) }}"><span class="icon-female">&#9792;</span> {{ $silsilah->ffffNama }}</a><span class="species">{{ $silsilah->ffffJenis ?? __('text.unknown') }}</span>@else <span class="icon-female">&#9792;</span> <span class="text-unknown">{{ __('text.unknown') }}</span> @endif</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
 @endsection

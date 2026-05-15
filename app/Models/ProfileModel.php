@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -13,12 +14,12 @@ class ProfileModel extends Model
     protected $table = "profiles";
     protected $primaryKey = 'id';
     protected $fillable = [
-        'alamat', 'telp', 'user_id'
+        'user_id', 'alamat', 'kota', 'provinsi', 'telepon', 'bio', 'instagram', 'website'
     ];
 
     public function user()
     {
-        return $this->belongsTo(UserModel::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function profile_shelter()

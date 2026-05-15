@@ -27,7 +27,6 @@ class DatabaseSeeder extends Seeder
             SugargliderSeeder::class,
             ShelterSeeder::class,
             CollectionSeeder::class,
-            StatusSeeder::class,
         ]);
     }
 }

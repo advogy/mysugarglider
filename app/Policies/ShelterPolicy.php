@@ -67,7 +67,7 @@ class ShelterPolicy
      */
     public function delete(User $user, ShelterModel $shelterModel)
     {
-        //
+        return $user->id === $shelterModel->user_id;
     }
 
     /**
