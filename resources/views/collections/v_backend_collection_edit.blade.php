@@ -1,18 +1,14 @@
 @extends('layouts.v_backend')
 
-@section('title', 'Edit Koleksi')
+@section('title', 'Edit Penempatan')
 
 @section('content')
 
-<div class="flex items-center gap-4 mb-6">
-    <a href="{{ route('collection.index') }}" class="text-bark-muted hover:text-bark transition-colors">
-        <i class="bi bi-arrow-left text-xl"></i>
-    </a>
-    <div>
-        <h2 class="text-xl font-bold text-bark">{{ __('text.edit') }}</h2>
-        <p class="text-bark-muted text-sm mt-0.5">{{ __('text.change_data') }}</p>
-    </div>
-</div>
+<x-page-header
+    :title="__('text.edit')"
+    :subtitle="__('text.change_data')"
+    :backRoute="route('collection.index')"
+/>
 
 @if ($errors->any())
     <div class="alert-danger mb-5">
@@ -62,18 +58,25 @@
 
                 <div>
                     <label class="form-label">{{ __('text.status') }}</label>
-                    <select name="status" class="input-field" required>
-                        <option value="">Pilih Status</option>
-                        <option value="2" @selected($collection->status == '2')>
-                            {{ __('text.live') }} — {{ __('text.not_adopted') }}
-                        </option>
-                        <option value="3" @selected($collection->status == '3')>
-                            {{ __('text.live') }} — {{ __('text.open_adopted') }}
-                        </option>
-                        <option value="0" @selected($collection->status == '0')>
-                            {{ __('text.death') }}
-                        </option>
-                    </select>
+                    @if ($collection->status == '5')
+                        <input type="hidden" name="status" value="5">
+                        <div class="input-field bg-gray-50 text-bark-muted cursor-not-allowed flex items-center gap-2">
+                            <span class="badge-done">Selesai</span>
+                            <span class="text-xs">Status ini tidak dapat diubah.</span>
+                        </div>
+                    @else
+                        <select name="status" class="input-field" required>
+                            <option value="1" @selected($collection->status == '1')>Privat — Tidak ditampilkan ke publik</option>
+                            <option value="2" @selected($collection->status == '2')>Publik — Ditampilkan ke publik</option>
+                            @if ($collection->status != '4')
+                                <option value="3" @selected($collection->status == '3')>Adopsi — Terbuka untuk diadopsi</option>
+                            @endif
+                            <option value="4" @selected($collection->status == '4')>Mati — Data tersimpan untuk history</option>
+                        </select>
+                        @if ($collection->status == '4')
+                            <p class="form-hint text-amber-600">SG dengan status Mati tidak dapat dibuka untuk adopsi.</p>
+                        @endif
+                    @endif
                 </div>
 
                 <div class="flex justify-end pt-2">

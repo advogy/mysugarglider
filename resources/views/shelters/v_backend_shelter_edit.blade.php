@@ -4,15 +4,11 @@
 
 @section('content')
 
-<div class="flex items-center gap-4 mb-6">
-    <a href="{{ route('shelter.index') }}" class="text-bark-muted hover:text-bark transition-colors">
-        <i class="bi bi-arrow-left text-xl"></i>
-    </a>
-    <div>
-        <h2 class="text-xl font-bold text-bark">{{ __('text.edit') }} — {{ $shelter->nama }}</h2>
-        <p class="text-bark-muted text-sm mt-0.5">{{ __('text.change_data') }}</p>
-    </div>
-</div>
+<x-page-header
+    :title="__('text.edit') . ' — ' . $shelter->nama"
+    :subtitle="__('text.change_data')"
+    :backRoute="route('shelter.index')"
+/>
 
 @if ($errors->any())
     <div class="alert-danger mb-5">

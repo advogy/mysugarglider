@@ -26,16 +26,16 @@
         <div class="flex items-center justify-between h-[70px]">
 
             {{-- Logo --}}
-            <a href="{{ route('home') }}" class="flex-shrink-0 hover:opacity-80 transition-opacity" style="text-decoration:none;">
-                <span class="nav-logo-my" style="font-family:'Outfit',sans-serif; font-weight:800; font-size:1.5rem; color:#1A1A1A; letter-spacing:-0.5px; line-height:1;">
-                    My<span style="color:#06D6A0;">SugarGlider</span><span style="color:#FFD166; font-size:0.9rem;">.id</span>
+            <a href="{{ route('home') }}" class="flex-shrink-0 no-underline hover:opacity-80 transition-opacity">
+                <span class="site-logo font-number font-extrabold text-bark text-2xl">
+                    <span class="nav-logo-my">My</span><span class="logo-sg">SugarGlider</span><span class="logo-id">.id</span>
                 </span>
             </a>
 
             {{-- Desktop nav links --}}
             <div id="nav-desktop-links" class="hidden lg:flex items-center gap-8">
                 <a href="{{ route('home') }}"
-                   class="relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('home') || request()->routeIs('index') ? 'text-bark' : 'text-bark-muted hover:text-bark' }}" style="font-family: 'Inter', sans-serif;">
+                   class="font-ui relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('home') || request()->routeIs('index') ? 'text-bark' : 'text-bark-muted hover:text-bark' }}">
                     Beranda
                     @if(request()->routeIs('home') || request()->routeIs('index'))
                     <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-1.5 rounded-full" style="background-color: #FFD166;"></span>
@@ -43,15 +43,15 @@
                 </a>
 
                 <a href="{{ route('collections') }}"
-                   class="relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('collections') && request('status') !== 'adopsi' ? 'text-bark' : 'text-bark-muted hover:text-bark' }}" style="font-family: 'Inter', sans-serif;">
+                   class="font-ui relative font-bold text-[0.95rem] transition-colors {{ (request()->routeIs('collections') && request('status') !== 'adopsi') || request()->routeIs('sugarglider.show') ? 'text-bark' : 'text-bark-muted hover:text-bark' }}">
                     Koleksi
-                    @if(request()->routeIs('collections') && request('status') !== 'adopsi')
+                    @if((request()->routeIs('collections') && request('status') !== 'adopsi') || request()->routeIs('sugarglider.show'))
                     <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-1.5 rounded-full" style="background-color: #FFD166;"></span>
                     @endif
                 </a>
 
                 <a href="{{ route('collections', ['status' => 'adopsi']) }}"
-                   class="relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('collections') && request('status') === 'adopsi' ? 'text-bark' : 'text-bark-muted hover:text-bark' }}" style="font-family: 'Inter', sans-serif;">
+                   class="font-ui relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('collections') && request('status') === 'adopsi' ? 'text-bark' : 'text-bark-muted hover:text-bark' }}">
                     Adopsi
                     @if(request()->routeIs('collections') && request('status') === 'adopsi')
                     <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-1.5 rounded-full" style="background-color: #FFD166;"></span>
@@ -59,7 +59,7 @@
                 </a>
 
                 <a href="{{ route('shelters') }}"
-                   class="relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('shelters') || request()->routeIs('shelter.show') ? 'text-bark' : 'text-bark-muted hover:text-bark' }}" style="font-family: 'Inter', sans-serif;">
+                   class="font-ui relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('shelters') || request()->routeIs('shelter.show') ? 'text-bark' : 'text-bark-muted hover:text-bark' }}">
                     Kandang
                     @if(request()->routeIs('shelters') || request()->routeIs('shelter.show'))
                     <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-1.5 rounded-full" style="background-color: #FFD166;"></span>
@@ -67,7 +67,7 @@
                 </a>
                 
                 <a href="{{ route('about') }}"
-                   class="relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('about') ? 'text-bark' : 'text-bark-muted hover:text-bark' }}" style="font-family: 'Inter', sans-serif;">
+                   class="font-ui relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('about') ? 'text-bark' : 'text-bark-muted hover:text-bark' }}">
                     Tentang
                     @if(request()->routeIs('about'))
                     <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-1.5 rounded-full" style="background-color: #FFD166;"></span>
@@ -79,7 +79,7 @@
             <div class="hidden lg:flex items-center gap-5">
                 @auth
                     <a href="{{ route('dashboard.index') }}"
-                       class="nav-user-link flex items-center gap-2 font-bold text-[0.95rem] text-bark hover:opacity-70 transition-opacity" style="font-family: 'Inter', sans-serif;">
+                       class="font-ui nav-user-link flex items-center gap-2 font-bold text-[0.95rem] text-bark hover:opacity-70 transition-opacity">
                         @if (Auth::user()->avatar)
                             <img src="{{ asset('/upload/avatars/' . Auth::user()->avatar) }}"
                                  class="w-8 h-8 rounded-full object-cover border-2" style="border-color: #FFD166;" alt="">
@@ -90,14 +90,14 @@
                         @endif
                         <span>{{ Str::limit(Auth::user()->name, 12) }}</span>
                     </a>
-                    <a href="{{ route('dashboard.index') }}" class="font-bold text-[0.95rem] px-6 py-2.5 rounded-full transition-all hover:opacity-90" style="font-family: 'Inter', sans-serif; background-color: #118AB2; color: #FFF; box-shadow: 0 4px 15px rgba(17,138,178,0.2);">
+                    <a href="{{ route('dashboard.index') }}" class="font-ui font-bold text-[0.95rem] px-6 py-2.5 rounded-full transition-all hover:opacity-90" style="background-color: #118AB2; color: #FFF; box-shadow: 0 4px 15px rgba(17,138,178,0.2);">
                         Dashboard
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="nav-user-link font-bold text-[0.95rem] text-bark hover:opacity-70 transition-opacity" style="font-family: 'Inter', sans-serif;">
+                    <a href="{{ route('login') }}" class="font-ui nav-user-link font-bold text-[0.95rem] text-bark hover:opacity-70 transition-opacity">
                         Masuk
                     </a>
-                    <a href="{{ route('register') }}" class="font-bold text-[0.95rem] px-6 py-2.5 rounded-full transition-all hover:opacity-90" style="font-family: 'Inter', sans-serif; background-color: #118AB2; color: #FFF; box-shadow: 0 4px 15px rgba(17,138,178,0.2);">
+                    <a href="{{ route('register') }}" class="font-ui font-bold text-[0.95rem] px-6 py-2.5 rounded-full transition-all hover:opacity-90" style="background-color: #118AB2; color: #FFF; box-shadow: 0 4px 15px rgba(17,138,178,0.2);">
                         Daftar
                     </a>
                 @endauth
@@ -112,32 +112,32 @@
         {{-- Mobile menu --}}
         <div id="mobile-menu" class="lg:hidden hidden bg-white rounded-[24px] mb-4 overflow-hidden p-3" style="box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
             <div class="flex flex-col gap-1">
-                <a href="{{ route('home') }}" class="flex items-center gap-3 px-5 py-3.5 text-[0.95rem] rounded-2xl text-bark hover:bg-[#F8F9FA] transition-colors" style="font-family: 'Inter', sans-serif; font-weight: 600;">
+                <a href="{{ route('home') }}" class="font-ui font-semibold flex items-center gap-3 px-5 py-3.5 text-[0.95rem] rounded-2xl text-bark hover:bg-[#F8F9FA] transition-colors">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: rgba(255, 209, 102, 0.2); color: #E5A910;"><i class="bi bi-house"></i></div>
                     Beranda
                 </a>
-                <a href="{{ route('collections') }}" class="flex items-center gap-3 px-5 py-3.5 text-[0.95rem] rounded-2xl text-bark hover:bg-[#F8F9FA] transition-colors" style="font-family: 'Inter', sans-serif; font-weight: 600;">
+                <a href="{{ route('collections') }}" class="font-ui font-semibold flex items-center gap-3 px-5 py-3.5 text-[0.95rem] rounded-2xl text-bark hover:bg-[#F8F9FA] transition-colors">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: rgba(17, 138, 178, 0.1); color: #118AB2;"><i class="bi bi-grid-3x3-gap"></i></div>
                     Semua Koleksi
                 </a>
-                <a href="{{ route('collections') }}?status=adopsi" class="flex items-center gap-3 px-5 py-3.5 text-[0.95rem] rounded-2xl text-bark hover:bg-[#F8F9FA] transition-colors" style="font-family: 'Inter', sans-serif; font-weight: 600;">
+                <a href="{{ route('collections') }}?status=adopsi" class="font-ui font-semibold flex items-center gap-3 px-5 py-3.5 text-[0.95rem] rounded-2xl text-bark hover:bg-[#F8F9FA] transition-colors">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: rgba(255, 209, 102, 0.2); color: #E5A910;"><i class="bi bi-house-heart"></i></div>
                     Adopsi
                 </a>
-                <a href="{{ route('shelters') }}" class="flex items-center gap-3 px-5 py-3.5 text-[0.95rem] rounded-2xl text-bark hover:bg-[#F8F9FA] transition-colors" style="font-family: 'Inter', sans-serif; font-weight: 600;">
+                <a href="{{ route('shelters') }}" class="font-ui font-semibold flex items-center gap-3 px-5 py-3.5 text-[0.95rem] rounded-2xl text-bark hover:bg-[#F8F9FA] transition-colors">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: rgba(17, 138, 178, 0.1); color: #118AB2;"><i class="bi bi-house-check"></i></div>
                     Kandang
                 </a>
-                <a href="{{ route('about') }}" class="flex items-center gap-3 px-5 py-3.5 text-[0.95rem] rounded-2xl text-bark hover:bg-[#F8F9FA] transition-colors" style="font-family: 'Inter', sans-serif; font-weight: 600;">
+                <a href="{{ route('about') }}" class="font-ui font-semibold flex items-center gap-3 px-5 py-3.5 text-[0.95rem] rounded-2xl text-bark hover:bg-[#F8F9FA] transition-colors">
                     <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: rgba(153, 153, 153, 0.1); color: #666;"><i class="bi bi-info-circle"></i></div>
                     Tentang
                 </a>
                 <div class="px-2 py-4 flex gap-3 mt-2 border-t border-gray-100">
                     @auth
-                        <a href="{{ route('dashboard.index') }}" class="flex-1 text-center font-bold text-[0.95rem] px-6 py-3 rounded-full transition-all hover:opacity-90" style="font-family: 'Inter', sans-serif; background-color: #118AB2; color: #FFF;">Dashboard</a>
+                        <a href="{{ route('dashboard.index') }}" class="font-ui flex-1 text-center font-bold text-[0.95rem] px-6 py-3 rounded-full transition-all hover:opacity-90" style="background-color: #118AB2; color: #FFF;">Dashboard</a>
                     @else
-                        <a href="{{ route('login') }}" class="flex-1 text-center font-bold text-[0.95rem] px-6 py-3 rounded-full transition-all hover:bg-gray-100" style="font-family: 'Inter', sans-serif; border: 2px solid #EAEAEA; color: #1A1A1A;">Masuk</a>
-                        <a href="{{ route('register') }}" class="flex-1 text-center font-bold text-[0.95rem] px-6 py-3 rounded-full transition-all hover:opacity-90" style="font-family: 'Inter', sans-serif; background-color: #118AB2; color: #FFF;">Daftar</a>
+                        <a href="{{ route('login') }}" class="font-ui flex-1 text-center font-bold text-[0.95rem] px-6 py-3 rounded-full transition-all hover:bg-gray-100" style="border: 2px solid #EAEAEA; color: #1A1A1A;">Masuk</a>
+                        <a href="{{ route('register') }}" class="font-ui flex-1 text-center font-bold text-[0.95rem] px-6 py-3 rounded-full transition-all hover:opacity-90" style="background-color: #118AB2; color: #FFF;">Daftar</a>
                     @endauth
                 </div>
             </div>
@@ -159,22 +159,22 @@
         {{-- Top row: logo + tagline --}}
         <div style="display:flex; flex-direction:column; align-items:center; text-align:center; margin-bottom:32px;">
             <a href="{{ route('home') }}" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; margin-bottom:10px;">
-                <span style="font-family:'Outfit',sans-serif; font-weight:800; font-size:1.5rem; color:#1A1A1A; letter-spacing:-0.5px;">
-                    My<span style="color:#06D6A0;">SugarGlider</span><span style="color:#FFD166; font-size:0.9rem;">.id</span>
+                <span class="site-logo font-number font-extrabold text-bark text-2xl">
+                    <span class="nav-logo-my">My</span><span class="logo-sg">SugarGlider</span><span class="logo-id">.id</span>
                 </span>
             </a>
-            <p style="font-size:0.875rem; color:#999; max-width:380px; line-height:1.6; margin:0; font-family:'Inter',sans-serif;">
+            <p class="font-ui" style="font-size:0.875rem; color:#999; max-width:380px; line-height:1.6; margin:0;">
                 Platform komunitas Sugar Glider terpercaya di Indonesia — catat silsilah, kelola kandang, dan adopsi sahabat berbulu Anda.
             </p>
         </div>
 
         {{-- Middle: nav links --}}
-        <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:6px 28px; margin-bottom:36px;">
-            <a href="{{ route('home') }}"        style="font-size:0.9rem; font-weight:600; color:#555; text-decoration:none; font-family:'Inter',sans-serif; transition:color .2s;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='#555'">Beranda</a>
-            <a href="{{ route('collections') }}" style="font-size:0.9rem; font-weight:600; color:#555; text-decoration:none; font-family:'Inter',sans-serif;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='#555'">Koleksi</a>
-            <a href="{{ route('collections') }}?status=adopsi" style="font-size:0.9rem; font-weight:600; color:#555; text-decoration:none; font-family:'Inter',sans-serif;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='#555'">Adopsi</a>
-            <a href="{{ route('shelters') }}"    style="font-size:0.9rem; font-weight:600; color:#555; text-decoration:none; font-family:'Inter',sans-serif;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='#555'">Kandang</a>
-            <a href="{{ route('about') }}"       style="font-size:0.9rem; font-weight:600; color:#555; text-decoration:none; font-family:'Inter',sans-serif;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='#555'">Tentang</a>
+        <div class="font-ui" style="display:flex; justify-content:center; flex-wrap:wrap; gap:6px 28px; margin-bottom:36px;">
+            <a href="{{ route('home') }}"        style="font-size:0.9rem; font-weight:600; color:#555; text-decoration:none; transition:color .2s;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='#555'">Beranda</a>
+            <a href="{{ route('collections') }}" style="font-size:0.9rem; font-weight:600; color:#555; text-decoration:none;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='#555'">Koleksi</a>
+            <a href="{{ route('collections') }}?status=adopsi" style="font-size:0.9rem; font-weight:600; color:#555; text-decoration:none;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='#555'">Adopsi</a>
+            <a href="{{ route('shelters') }}"    style="font-size:0.9rem; font-weight:600; color:#555; text-decoration:none;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='#555'">Kandang</a>
+            <a href="{{ route('about') }}"       style="font-size:0.9rem; font-weight:600; color:#555; text-decoration:none;" onmouseover="this.style.color='#1A1A1A'" onmouseout="this.style.color='#555'">Tentang</a>
         </div>
 
         {{-- Bottom row: social icons + copyright --}}
@@ -197,7 +197,7 @@
             </div>
 
             {{-- Copyright --}}
-            <p style="font-size:0.8rem; color:#bbb; margin:0; font-family:'Inter',sans-serif;">
+            <p class="font-ui" style="font-size:0.8rem; color:#bbb; margin:0;">
                 &copy; {{ date('Y') }} MySugarGlider.id &nbsp;·&nbsp; All rights reserved.
             </p>
         </div>

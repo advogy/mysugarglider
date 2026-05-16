@@ -47,7 +47,7 @@
 
         @foreach ($collections as $index => $c)
         <div class="pet-card">
-            @if ($c->sgStatus == '3')
+            @if ($c->sgStatus == \App\Enums\CollectionStatus::ADOPSI->value)
                 <span class="pet-badge badge-adopsi">Adopsi</span>
             @else
                 <span class="pet-badge badge-koleksi">Koleksi</span>
@@ -63,15 +63,11 @@
             </div>
             <h3 class="pet-name">{{ $c->sgNama }}</h3>
             <p class="pet-desc">
-                @if ($c->sgKelamin == '0')
-                    <i class="bi bi-gender-female icon-female"></i> Betina
-                @else
-                    <i class="bi bi-gender-male icon-male"></i> Jantan
-                @endif
+                @include('partials.gender', ['kelamin' => $c->sgKelamin])
                 <span class="divider-light">|</span>
                 {{ $c->sgJenis ?? 'Classic Grey' }}
             </p>
-            <div class="text-[0.7rem] text-[#999] mb-5 font-bold uppercase tracking-widest"><i class="bi bi-shop"></i> {{ $c->stNama }}</div>
+            <div class="text-xs text-bark-muted mb-5 font-bold uppercase tracking-widest"><i class="bi bi-shop"></i> {{ $c->stNama }}</div>
             <a href="{{ route('sugarglider.show', $c->sgId) }}" class="btn-outline">Lihat Detail</a>
         </div>
         @endforeach

@@ -192,16 +192,24 @@
 
         <div class="we-have-visual">
             <div class="we-blob"></div>
-            <img src="{{ asset('assets/images/pets/sg_hero_1778842679372.png') }}" alt="Sugar Glider" class="we-img">
+            @if ($we_have_item)
+                <img src="{{ asset('/upload/sugargliders/' . $we_have_item->gambar) }}" alt="{{ $we_have_item->nama }}" class="we-img">
+            @else
+                <img src="{{ asset('assets/images/pets/sg_hero_1778842679372.png') }}" alt="Sugar Glider" class="we-img">
+            @endif
 
             {{-- Floating badge --}}
             <div class="we-badge">
                 <div class="we-badge-avatar">
-                    <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}" alt="">
+                    @if ($we_have_item)
+                        <img src="{{ asset('/upload/sugargliders/' . $we_have_item->gambar) }}" alt="{{ $we_have_item->nama }}">
+                    @else
+                        <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}" alt="">
+                    @endif
                 </div>
                 <div>
-                    <div class="we-badge-name">Miffy</div>
-                    <div class="we-badge-sub">Mosaic · Tersedia untuk adopsi</div>
+                    <div class="we-badge-name">{{ $we_have_item->nama ?? 'Miffy' }}</div>
+                    <div class="we-badge-sub">{{ $we_have_item->jenis ?? 'Mosaic' }}</div>
                 </div>
             </div>
         </div>
@@ -218,6 +226,16 @@
 {{-- ════════════════════════════════════════════════
      HAPPY HISTORY / KISAH BAHAGIA
 ════════════════════════════════════════════════ --}}
+@if ($testimonials->isNotEmpty())
+@php
+    $fallbackAvatars = [
+        asset('assets/images/pets/sg_card1_1778842695259.png'),
+        asset('assets/images/pets/sg_card2_1778842710532.png'),
+        asset('assets/images/pets/sg_hero_1778842679372.png'),
+        asset('assets/images/pets/sg_card1_1778842695259.png'),
+    ];
+    $firstTestimonial = $testimonials->first();
+@endphp
 <section class="history">
     <h2 class="sec-title">Kisah Bahagia</h2>
     <p class="sec-sub">Ribuan sugar glider telah menemukan rumah baru mereka melalui platform ini.</p>
@@ -227,27 +245,31 @@
 
         <div class="history-center">
             <div class="history-blob">
-                <p class="history-quote" id="hist-quote">
-                    "Berkat MySugarGlider, saya bisa menemukan silsilah lengkap dari peliharaan saya dan memastikan genetikanya sehat. Sangat merekomendasikan!"
-                </p>
-                <div class="history-author" id="hist-author">Arjuna &nbsp;·&nbsp; 2 Tahun bersama</div>
+                <p class="history-quote" id="hist-quote">"{{ $firstTestimonial->quote }}"</p>
+                <div class="history-author" id="hist-author">
+                    {{ $firstTestimonial->author }}{{ $firstTestimonial->durasi ? ' · ' . $firstTestimonial->durasi : '' }}
+                </div>
             </div>
 
-            <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}"  class="history-avatar ha-1" alt="">
-            <img src="{{ asset('assets/images/pets/sg_card2_1778842710532.png') }}"  class="history-avatar ha-2" alt="">
-            <img src="{{ asset('assets/images/pets/sg_hero_1778842679372.png') }}"   class="history-avatar ha-3" alt="">
-            <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}"  class="history-avatar ha-4" alt="">
+            @for ($ai = 0; $ai < 4; $ai++)
+                @php
+                    $av = $sg_avatars->get($ai);
+                    $avSrc = $av ? asset('/upload/sugargliders/' . $av->gambar) : $fallbackAvatars[$ai];
+                @endphp
+                <img src="{{ $avSrc }}" class="history-avatar ha-{{ $ai + 1 }}" alt="">
+            @endfor
         </div>
 
         <button class="history-nav" id="hist-next"><i class="bi bi-chevron-right"></i></button>
     </div>
 
-    <div class="history-dots">
-        <div class="history-dot active"></div>
-        <div class="history-dot"></div>
-        <div class="history-dot"></div>
+    <div class="history-dots" id="hist-dots">
+        @foreach ($testimonials as $t)
+            <div class="history-dot {{ $loop->first ? 'active' : '' }}"></div>
+        @endforeach
     </div>
 </section>
+@endif
 
 {{-- ════════════════════════════════════════════════
      THEY HAVE A HOME / MEREKA PUNYA RUMAH
@@ -329,24 +351,33 @@ filterBtns.forEach(btn => {
 });
 
 // ── History carousel
-const slides = [
-    { quote: '"Berkat MySugarGlider, saya bisa menemukan silsilah lengkap dari peliharaan saya dan memastikan genetikanya sehat. Sangat merekomendasikan!"', author: 'Arjuna · 2 Tahun bersama' },
-    { quote: '"Platform ini luar biasa! Proses adopsi sangat mudah dan transparan. Sugar glider saya sekarang hidup bahagia di kandang baru."', author: 'Sinta · 1 Tahun bersama' },
-    { quote: '"Saya awalnya ragu, tapi setelah mencoba MySugarGlider saya langsung jatuh cinta. Data pedigree-nya lengkap dan akurat."', author: 'Budi · 8 Bulan bersama' },
-];
+@if ($testimonials->isNotEmpty())
+const slides = @json($testimonials->map(fn($t) => [
+    'quote'  => '"' . $t->quote . '"',
+    'author' => $t->author . ($t->durasi ? ' · ' . $t->durasi : ''),
+]));
 let current = 0;
-const quoteEl = document.getElementById('hist-quote');
+const quoteEl  = document.getElementById('hist-quote');
 const authorEl = document.getElementById('hist-author');
-const dots = document.querySelectorAll('.history-dot');
+const dots     = document.querySelectorAll('#hist-dots .history-dot');
 
 function showSlide(n) {
     current = (n + slides.length) % slides.length;
-    quoteEl.textContent = slides[current].quote;
+    quoteEl.textContent  = slides[current].quote;
     authorEl.textContent = slides[current].author;
     dots.forEach((d, i) => d.classList.toggle('active', i === current));
 }
-document.getElementById('hist-prev').addEventListener('click', () => showSlide(current - 1));
-document.getElementById('hist-next').addEventListener('click', () => showSlide(current + 1));
-dots.forEach((d, i) => d.addEventListener('click', () => showSlide(i)));
+
+let autoplay = setInterval(() => showSlide(current + 1), 5000);
+
+function resetAutoplay() {
+    clearInterval(autoplay);
+    autoplay = setInterval(() => showSlide(current + 1), 5000);
+}
+
+document.getElementById('hist-prev').addEventListener('click', () => { showSlide(current - 1); resetAutoplay(); });
+document.getElementById('hist-next').addEventListener('click', () => { showSlide(current + 1); resetAutoplay(); });
+dots.forEach((d, i) => d.addEventListener('click', () => { showSlide(i); resetAutoplay(); }));
+@endif
 </script>
 @endpush

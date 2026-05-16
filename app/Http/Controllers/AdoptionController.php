@@ -7,12 +7,15 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AdoptionRequest;
 use App\Enums\CollectionStatus;
 use App\Enums\AdoptionStatus;
+use App\Enums\AdoptionRequestStatus;
+use App\Enums\PointType;
 use App\Models\ProfileModel;
 use App\Models\ShelterModel;
 use App\Models\CollectionModel;
 use App\Models\SugargliderModel;
 use App\Models\AdoptionModel;
 use App\Models\AdoptionRequestModel;
+use App\Services\PointService;
 use Illuminate\Support\Facades\DB;
 
 class AdoptionController extends Controller
@@ -26,7 +29,7 @@ class AdoptionController extends Controller
         }
 
         $collection = CollectionModel::whereIn('status', [
-            CollectionStatus::AKTIF->value,
+            CollectionStatus::PRIVAT->value,
             CollectionStatus::ADOPSI->value,
         ])->where('user_id', Auth::id())->first();
 
@@ -82,13 +85,15 @@ class AdoptionController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        AdoptionModel::create([
+        $adoption = AdoptionModel::create([
             'collection_id' => $collection->id,
             'harga'         => $request->harga,
             'keterangan'    => $request->keterangan,
             'status'        => AdoptionStatus::AKTIF->value,
             'user_id'       => Auth::id(),
         ]);
+
+        app(PointService::class)->earn(Auth::user(), PointType::ADOPTION_OPEN, $adoption);
 
         return redirect()->route('adoption.index')->with('pesan', 'Adopsi berhasil dibuka.');
     }
@@ -175,6 +180,11 @@ class AdoptionController extends Controller
                 })
                 ->where('adoptions.status', AdoptionStatus::AKTIF->value)
                 ->where('adoptions.user_id', '!=', Auth::id())
+                ->whereNotIn('adoptions.id', AdoptionRequestModel::whereIn('status', [
+                    AdoptionRequestStatus::DIPILIH->value,
+                    AdoptionRequestStatus::DIBAYAR->value,
+                    AdoptionRequestStatus::DIKIRIM->value,
+                ])->pluck('adoption_id'))
                 ->orderBy('adoptions.updated_at', 'desc')
                 ->paginate(10),
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\ImageManager;
 use App\Http\Requests\ShelterRequest;
 use App\Enums\CollectionStatus;
 use App\Models\ShelterModel;
@@ -46,7 +46,11 @@ class ShelterController extends Controller
             return view('profiles.v_profile_no');
         } else {
             $data = [
-                'shelters' => ShelterModel::where('user_id', Auth::id())->paginate(10)
+                'shelters' => ShelterModel::withCount(['collections as sg_count' => function ($q) {
+                    $q->whereNull('collections.deleted_at');
+                }])
+                ->where('user_id', Auth::id())
+                ->paginate(20)
             ];
 
             return view('shelters.v_backend_shelter_index', $data);
@@ -64,7 +68,7 @@ class ShelterController extends Controller
             $image = $request->file('gambar');
             $imagename = 'shelter-' . $request->kode . '.' . $image->extension();
 
-            Image::read($image)->coverDown(500, 500)->save(public_path('upload/shelters/' . $imagename));
+            ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/shelters/' . $imagename));
         } else {
             $imagename = null;
         }
@@ -133,7 +137,7 @@ class ShelterController extends Controller
             $image = $request->file('gambar');
             $imagename = 'shelter-' . $shelter->kode . '.' . $image->extension();
 
-            Image::read($image)->coverDown(500, 500)->save(public_path('upload/shelters/' . $imagename));
+            ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/shelters/' . $imagename));
 
             $shelter->gambar = $imagename;
         }

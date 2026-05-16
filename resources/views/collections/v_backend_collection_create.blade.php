@@ -1,18 +1,14 @@
 @extends('layouts.v_backend')
 
-@section('title', 'Tambah Koleksi')
+@section('title', 'Tambah Penempatan')
 
 @section('content')
 
-<div class="flex items-center gap-4 mb-6">
-    <a href="{{ route('collection.index') }}" class="text-bark-muted hover:text-bark transition-colors">
-        <i class="bi bi-arrow-left text-xl"></i>
-    </a>
-    <div>
-        <h2 class="text-xl font-bold text-bark">{{ __('text.add_new') }}</h2>
-        <p class="text-bark-muted text-sm mt-0.5">{{ __('text.input_data') }}</p>
-    </div>
-</div>
+<x-page-header
+    :title="__('text.add_new')"
+    :subtitle="__('text.input_data')"
+    :backRoute="route('collection.index')"
+/>
 
 @if ($errors->any())
     <div class="alert-danger mb-5">
@@ -63,12 +59,9 @@
                     <label class="form-label">{{ __('text.status') }}</label>
                     <select name="status" class="input-field" required>
                         <option value="">Pilih Status</option>
-                        <option value="2" @selected(old('status') == '2')>
-                            {{ __('text.live') }} — {{ __('text.not_adopted') }}
-                        </option>
-                        <option value="3" @selected(old('status') == '3')>
-                            {{ __('text.live') }} — {{ __('text.open_adopted') }}
-                        </option>
+                        <option value="1" @selected(old('status') == '1')>Privat — Tidak ditampilkan ke publik</option>
+                        <option value="2" @selected(old('status') == '2')>Publik — Ditampilkan ke publik</option>
+                        <option value="3" @selected(old('status') == '3')>Adopsi — Terbuka untuk diadopsi</option>
                     </select>
                 </div>
 

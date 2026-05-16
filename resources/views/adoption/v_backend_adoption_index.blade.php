@@ -4,15 +4,11 @@
 
 @section('content')
 
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-    <div>
-        <h2 class="text-xl font-bold text-bark">{{ __('text.adoption_data') }}</h2>
-        <p class="text-bark-muted text-sm mt-0.5">Kelola data adopsi sugar glider Anda.</p>
-    </div>
-    <a href="{{ route('adoption.create') }}" class="btn-create self-start">
-        <i class="bi bi-plus-lg"></i> {{ __('text.add_new') }}
-    </a>
-</div>
+<x-page-header
+    :title="__('text.adoption_data')"
+    subtitle="Kelola data adopsi sugar glider Anda."
+    :createRoute="route('adoption.create')"
+/>
 
 @if (session('pesan'))
     <div class="alert-success mb-5">
@@ -65,7 +61,7 @@
                             </a>
                         </td>
                         <td class="text-right">
-                            <div class="flex items-center justify-end gap-2 flex-wrap">
+                            <div class="table-actions flex-wrap">
                                 <button type="button"
                                         onclick="confirmAdopted('{{ route('adoption.adopted', $adoption->id) }}', '{{ $adoption->id }}', '{{ $adoption->collection_id }}')"
                                         class="inline-flex items-center gap-1.5 text-sage text-xs font-bold
@@ -86,16 +82,12 @@
                         </td>
                     </tr>
                 @empty
-                    <tr>
-                        <td colspan="6" class="text-center py-16">
-                            <img src="{{ asset('assets/images/mascot/glider-glide.svg') }}"
-                                 class="w-16 mx-auto mb-3 opacity-30" alt="">
-                            <p class="text-bark-muted font-semibold">Belum ada data adopsi.</p>
-                            <a href="{{ route('adoption.create') }}" class="btn-create mt-4 inline-flex">
-                                <i class="bi bi-plus-lg"></i> Buat Adopsi
-                            </a>
-                        </td>
-                    </tr>
+                    <x-empty-state
+                        message="Belum ada data adopsi."
+                        :createRoute="route('adoption.create')"
+                        createLabel="Buat Adopsi"
+                        colspan="6"
+                    />
                 @endforelse
             </tbody>
         </table>
@@ -107,28 +99,10 @@
     @endif
 </div>
 
-{{-- Delete modal --}}
-<div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
-    <div class="bg-white rounded-3xl shadow-hover max-w-sm w-full p-6">
-        <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <i class="bi bi-trash text-red-500 text-xl"></i>
-        </div>
-        <h3 class="font-bold text-bark text-center text-lg mb-2">Hapus Data Adopsi?</h3>
-        <p id="delete-name" class="font-bold text-bark text-center mb-6"></p>
-        <div class="flex gap-3">
-            <button onclick="closeModal('delete-modal')" class="btn-secondary flex-1 justify-center">Batal</button>
-            <form id="delete-form" method="POST" class="flex-1">
-                @csrf <input type="hidden" name="_method" value="DELETE">
-                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-red-500 text-white px-4 py-3 rounded-full font-bold text-sm hover:bg-red-600 transition-colors">
-                    <i class="bi bi-trash"></i> Hapus
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
+<x-delete-modal title="Hapus Data Adopsi?" subtitle="" />
 
 {{-- Adopted confirmation modal --}}
-<div id="adopted-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:rgba(0,0,0,0.4)">
+<div id="adopted-modal" class="be-modal hidden">
     <div class="bg-white rounded-3xl shadow-hover max-w-sm w-full p-6 text-center">
         <div class="w-12 h-12 bg-sage-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <i class="bi bi-house-heart-fill text-sage text-xl"></i>
@@ -154,18 +128,13 @@
 
 @push('scripts')
 <script>
-function closeModal(id) {
-    const m = document.getElementById(id);
-    m.classList.add('hidden'); m.classList.remove('flex');
-}
 function openModal(id) {
     const m = document.getElementById(id);
     m.classList.remove('hidden'); m.classList.add('flex');
 }
-function confirmDelete(url, name) {
-    document.getElementById('delete-name').textContent = name;
-    document.getElementById('delete-form').action = url;
-    openModal('delete-modal');
+function closeModal(id) {
+    const m = document.getElementById(id);
+    m.classList.add('hidden'); m.classList.remove('flex');
 }
 function confirmAdopted(url, id, collectionId) {
     document.getElementById('adopted-form').action = url;
@@ -173,10 +142,8 @@ function confirmAdopted(url, id, collectionId) {
     document.getElementById('adopted-collection-id').value = collectionId;
     openModal('adopted-modal');
 }
-['delete-modal','adopted-modal'].forEach(id => {
-    document.getElementById(id)?.addEventListener('click', function(e) {
-        if (e.target === this) closeModal(id);
-    });
+document.getElementById('adopted-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeModal('adopted-modal');
 });
 </script>
 @endpush

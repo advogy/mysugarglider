@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\ImageManager;
 use App\Http\Requests\SugargliderRequest;
 use App\Models\SugargliderModel;
 use App\Models\ProfileModel;
 use App\Models\ShelterModel;
 use App\Models\CollectionModel;
+use App\Models\AdoptionModel;
+use App\Models\AdoptionRequestModel;
+use App\Enums\AdoptionStatus;
+use App\Enums\AdoptionRequestStatus;
+use Carbon\Carbon;
 
 class SugargliderController extends Controller
 {
@@ -25,27 +30,177 @@ class SugargliderController extends Controller
     function backend_sugarglider_index()
     {
         $profile = ProfileModel::where('user_id', Auth::id())->first();
-        $shelter = ShelterModel::where('user_id', Auth::id())->first();
 
         if (is_null($profile)) {
             return view('profiles.v_profile_no');
-        } elseif (is_null($shelter)) {
-            return view('shelters.v_backend_shelter_no');
-        } else {
-            $data = [
-                'sugargliders' => SugargliderModel::where('user_id', Auth::id())->paginate(10),
-            ];
-
-            return view('sugargliders.v_backend_sugarglider_index', $data);
         }
+
+        $data = [
+            'sugargliders' => SugargliderModel::leftJoin('collections', function ($join) {
+                $join->on('collections.sugarglider_id', '=', 'sugargliders.id')
+                     ->whereNull('collections.deleted_at')
+                     ->where('collections.status', '!=', \App\Enums\CollectionStatus::SELESAI->value);
+            })
+            ->leftJoin('shelters', function ($join) {
+                $join->on('shelters.id', '=', 'collections.shelter_id')
+                     ->whereNull('shelters.deleted_at');
+            })
+            ->select('sugargliders.*', 'shelters.nama as kandang_nama', 'collections.status as cl_status')
+            ->where('sugargliders.user_id', Auth::id())
+            ->whereNull('sugargliders.deleted_at')
+            ->paginate(20),
+        ];
+
+        return view('sugargliders.v_backend_sugarglider_index', $data);
+    }
+
+    function backend_show($id)
+    {
+        $sugarglider = SugargliderModel::findOrFail($id);
+
+        if ($sugarglider->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $collection = CollectionModel::with('shelter')
+            ->where('sugarglider_id', $sugarglider->id)
+            ->where('status', '!=', \App\Enums\CollectionStatus::SELESAI->value)
+            ->first();
+
+        $silsilah = SugargliderModel::silsilah($sugarglider->id);
+
+        $ancestorMap = collect();
+        if ($silsilah) {
+            $ids = collect([
+                $silsilah->mId,    $silsilah->fId,
+                $silsilah->mmId,   $silsilah->mfId,   $silsilah->fmId,   $silsilah->ffId,
+                $silsilah->mmmId,  $silsilah->mmfId,  $silsilah->mfmId,  $silsilah->mffId,
+                $silsilah->fmmId,  $silsilah->fmfId,  $silsilah->ffmId,  $silsilah->fffId,
+                $silsilah->mmmmId, $silsilah->mmmfId, $silsilah->mmfmId, $silsilah->mmffId,
+                $silsilah->mfmmId, $silsilah->mfmfId, $silsilah->mffmId, $silsilah->mfffId,
+                $silsilah->fmmmId, $silsilah->fmmfId, $silsilah->fmfmId, $silsilah->fmffId,
+                $silsilah->ffmmId, $silsilah->ffmfId, $silsilah->fffmId, $silsilah->ffffId,
+            ])->filter()->unique()->values();
+
+            if ($ids->isNotEmpty()) {
+                $ancestorMap = SugargliderModel::select('sugargliders.id', 'sugargliders.user_id', 'collections.status as cl_status')
+                    ->leftJoin('collections', function ($join) {
+                        $join->on('collections.sugarglider_id', '=', 'sugargliders.id')
+                             ->whereNull('collections.deleted_at')
+                             ->where('collections.status', '!=', \App\Enums\CollectionStatus::SELESAI->value);
+                    })
+                    ->whereIn('sugargliders.id', $ids->all())
+                    ->get()
+                    ->keyBy('id');
+            }
+        }
+
+        $transfers = \App\Models\ShelterTransferModel::leftJoin('shelters as from_st', 'shelter_transfers.from_shelter_id', '=', 'from_st.id')
+            ->join('shelters as to_st', 'shelter_transfers.to_shelter_id', '=', 'to_st.id')
+            ->leftJoin('users as from_u', 'shelter_transfers.from_user_id', '=', 'from_u.id')
+            ->join('users as to_u', 'shelter_transfers.to_user_id', '=', 'to_u.id')
+            ->select(
+                'shelter_transfers.created_at',
+                'from_st.nama as from_shelter_nama',
+                'to_st.nama as to_shelter_nama',
+                'from_u.name as from_user_name',
+                'to_u.name as to_user_name',
+            )
+            ->where('shelter_transfers.sugarglider_id', $sugarglider->id)
+            ->orderBy('shelter_transfers.created_at', 'asc')
+            ->get();
+
+        $keturunan = SugargliderModel::select(
+                'sugargliders.id',
+                'sugargliders.nama',
+                'sugargliders.jenis',
+                'sugargliders.kelamin',
+                'sugargliders.user_id',
+                'collections.status as cl_status',
+                'users.name as user_name',
+            )
+            ->join('users', 'users.id', '=', 'sugargliders.user_id')
+            ->leftJoin('collections', function ($join) {
+                $join->on('collections.sugarglider_id', '=', 'sugargliders.id')
+                     ->whereNull('collections.deleted_at')
+                     ->where('collections.status', '!=', \App\Enums\CollectionStatus::SELESAI->value);
+            })
+            ->where(function ($q) use ($sugarglider) {
+                $q->where('sugargliders.indukan_jantan', $sugarglider->id)
+                  ->orWhere('sugargliders.indukan_betina', $sugarglider->id);
+            })
+            ->whereNull('sugargliders.deleted_at')
+            ->where(function ($q) {
+                $q->where('sugargliders.user_id', Auth::id())
+                  ->orWhereIn('collections.status', [
+                      \App\Enums\CollectionStatus::PUBLIK->value,
+                      \App\Enums\CollectionStatus::ADOPSI->value,
+                  ]);
+            })
+            ->orderBy('sugargliders.user_id')
+            ->orderBy('sugargliders.nama')
+            ->get();
+
+        return view('sugargliders.v_backend_sugarglider_detail', compact('sugarglider', 'collection', 'silsilah', 'transfers', 'ancestorMap', 'keturunan'));
     }
 
     function create()
     {
-        $data = [
-            'sugargliders' => SugargliderModel::orderBy('nama', 'asc')->get(),
-        ];
-        return view('sugargliders.v_backend_sugarglider_create', $data);
+        return view('sugargliders.v_backend_sugarglider_create');
+    }
+
+    function parents(\Illuminate\Http\Request $request)
+    {
+        $q       = trim($request->input('q', ''));
+        $kelamin = (int) $request->input('kelamin', 1);
+        $exclude = (int) $request->input('exclude', 0);
+        $userId  = Auth::id();
+
+        $results = SugargliderModel::select(
+                'sugargliders.id',
+                'sugargliders.nama',
+                'sugargliders.jenis',
+                'sugargliders.user_id',
+                'users.name as user_name'
+            )
+            ->join('users', 'users.id', '=', 'sugargliders.user_id')
+            ->where('sugargliders.kelamin', $kelamin)
+            ->whereNull('sugargliders.deleted_at')
+            ->whereNotIn('sugargliders.id', function ($sub) {
+                $sub->select('sugarglider_id')
+                    ->from('collections')
+                    ->where('status', \App\Enums\CollectionStatus::MATI->value)
+                    ->whereNull('deleted_at');
+            })
+            ->where(function ($q2) use ($userId) {
+                // SG sendiri: semua status boleh
+                // SG orang lain: hanya yang PUBLIK atau ADOPSI
+                $q2->where('sugargliders.user_id', $userId)
+                   ->orWhereIn('sugargliders.id', function ($sub) {
+                       $sub->select('sugarglider_id')
+                           ->from('collections')
+                           ->whereIn('status', [
+                               \App\Enums\CollectionStatus::PUBLIK->value,
+                               \App\Enums\CollectionStatus::ADOPSI->value,
+                           ])
+                           ->whereNull('deleted_at');
+                   });
+            })
+            ->when($q !== '', fn($query) => $query->where('sugargliders.nama', 'like', "%{$q}%"))
+            ->when($exclude > 0, fn($query) => $query->where('sugargliders.id', '!=', $exclude))
+            ->orderByRaw('sugargliders.user_id = ? DESC', [$userId])
+            ->orderBy('sugargliders.nama')
+            ->limit(30)
+            ->get()
+            ->map(fn($sg) => [
+                'value' => $sg->id,
+                'text'  => $sg->user_id === $userId
+                    ? "{$sg->nama} – {$sg->jenis}"
+                    : "{$sg->nama} – {$sg->jenis} ({$sg->user_name})",
+                'group' => $sg->user_id === $userId ? 'mine' : 'other',
+            ]);
+
+        return response()->json($results);
     }
 
     function store(SugargliderRequest $request)
@@ -54,7 +209,7 @@ class SugargliderController extends Controller
             $image = $request->file('gambar');
             $imagename = 'sg-' . $request->kode . '.' . $image->extension();
 
-            Image::read($image)->coverDown(500, 500)->save(public_path('upload/sugargliders/' . $imagename));
+            ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/sugargliders/' . $imagename));
         } else {
             $imagename = null;
         }
@@ -102,6 +257,9 @@ class SugargliderController extends Controller
             CollectionModel::leftjoin('shelters', 'collections.shelter_id', '=', 'shelters.id')
                 ->leftjoin('sugargliders', 'collections.sugarglider_id', '=', 'sugargliders.id')
                 ->select(
+                    'collections.id as cId',
+                    'collections.status as clStatus',
+                    'collections.user_id as clUser',
                     'sugargliders.id as sgId',
                     'sugargliders.kode as sgKode',
                     'sugargliders.nama as sgNama',
@@ -117,8 +275,6 @@ class SugargliderController extends Controller
                     'sugargliders.keterangan as sgKeterangan',
                     'shelters.id as stId',
                     'shelters.nama as stNama',
-                    'collections.status as clStatus',
-                    'collections.user_id as clUser'
                 )
                 ->where('sugargliders.id', '=', $id)
                 ->first(),
@@ -135,19 +291,50 @@ class SugargliderController extends Controller
                 ->get(),
         ];
 
+        $collection = $data['collection'];
+
+        // Hitung usia di controller agar tidak ada logika di view
+        $usia = null;
+        if ($collection && $collection->sgTglLahir) {
+            $diff = Carbon::parse($collection->sgTglLahir)->diff(Carbon::now());
+            $parts = [];
+            if ($diff->y > 0) $parts[] = $diff->y . ' thn';
+            if ($diff->m > 0) $parts[] = $diff->m . ' bln';
+            $usia = $parts ? implode(' ', $parts) : '< 1 bln';
+        }
+
+        // Cari adoption yang masih terbuka (belum ada pemohon terpilih)
+        $adoptionId = null;
+        if ($collection && $collection->clStatus == 3) {
+            $adoptionId = AdoptionModel::where('collection_id', $collection->cId)
+                ->where('status', AdoptionStatus::AKTIF->value)
+                ->whereNotIn('id', AdoptionRequestModel::whereIn('status', [
+                    AdoptionRequestStatus::DIPILIH->value,
+                    AdoptionRequestStatus::DIBAYAR->value,
+                    AdoptionRequestStatus::DIKIRIM->value,
+                ])->pluck('adoption_id'))
+                ->value('id');
+        }
+
+        $data['usia']       = $usia;
+        $data['adoptionId'] = $adoptionId;
+
         return view('sugargliders.v_sugarglider_detail', $data);
     }
 
     function edit($id)
     {
-        $this->authorize('update', SugargliderModel::find($id));
+        $sugarglider   = SugargliderModel::findOrFail($id);
+        $this->authorize('update', $sugarglider);
 
-        $data = [
-            'sugarglider' => SugargliderModel::findOrFail($id),
-            'sugargliders' => SugargliderModel::orderBy('nama', 'asc')->get(),
-        ];
+        $indukanJantan = $sugarglider->indukan_jantan
+            ? SugargliderModel::select('id', 'nama', 'jenis')->find($sugarglider->indukan_jantan)
+            : null;
+        $indukanBetina = $sugarglider->indukan_betina
+            ? SugargliderModel::select('id', 'nama', 'jenis')->find($sugarglider->indukan_betina)
+            : null;
 
-        return view('sugargliders.v_backend_sugarglider_edit', $data);
+        return view('sugargliders.v_backend_sugarglider_edit', compact('sugarglider', 'indukanJantan', 'indukanBetina'));
     }
 
     function update(SugargliderRequest $request)
@@ -170,7 +357,7 @@ class SugargliderController extends Controller
             $image = $request->file('gambar');
             $imagename = 'sg-' . $request->kode . '.' . $image->extension();
 
-            Image::read($image)->coverDown(500, 500)->save(public_path('upload/sugargliders/' . $imagename));
+            ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/sugargliders/' . $imagename));
 
             $sugarglider->gambar = $imagename;
         }

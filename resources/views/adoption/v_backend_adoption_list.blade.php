@@ -4,12 +4,10 @@
 
 @section('content')
 
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-    <div>
-        <h2 class="text-xl font-bold text-bark">Cari Adopsi</h2>
-        <p class="text-bark-muted text-sm mt-0.5">Daftar sugar glider yang dibuka untuk adopsi oleh pemilik lain.</p>
-    </div>
-</div>
+<x-page-header
+    title="Cari Adopsi"
+    subtitle="Daftar sugar glider yang dibuka untuk adopsi oleh pemilik lain."
+/>
 
 @if (session('pesan'))
     <div class="alert-success mb-5">
@@ -134,8 +132,8 @@
 
                             {{-- Modal: Ajukan permohonan --}}
                             @if (!$adoption->arId)
-                            <div id="adopt-{{ $adoption->id }}" class="fixed inset-0 z-50 hidden items-center justify-center p-4"
-                                 style="background:rgba(0,0,0,0.4)"
+                            <div id="adopt-{{ $adoption->id }}" class="be-modal hidden"
+
                                  onclick="if(event.target===this)closeModal('adopt-{{ $adoption->id }}')">
                                 <div class="bg-white rounded-3xl shadow-hover max-w-md w-full p-6">
                                     <div class="flex items-start justify-between mb-4">
@@ -193,8 +191,8 @@
 
                             {{-- Modal: Konfirmasi adopsi gratis (status 5, harga=0) --}}
                             @if ($adoption->arId && $adoption->arStatus == 5 && $adoption->arHarga == 0)
-                            <div id="confirm-free-{{ $adoption->arId }}" class="fixed inset-0 z-50 hidden items-center justify-center p-4"
-                                 style="background:rgba(0,0,0,0.4)"
+                            <div id="confirm-free-{{ $adoption->arId }}" class="be-modal hidden"
+
                                  onclick="if(event.target===this)closeModal('confirm-free-{{ $adoption->arId }}')">
                                 <div class="bg-white rounded-3xl shadow-hover max-w-md w-full p-6">
                                     <div class="w-12 h-12 bg-sage/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -223,8 +221,8 @@
 
                             {{-- Modal: Upload bukti transfer (status 5, harga>0) --}}
                             @if ($adoption->arId && $adoption->arStatus == 5 && $adoption->arHarga > 0)
-                            <div id="upload-{{ $adoption->arId }}" class="fixed inset-0 z-50 hidden items-center justify-center p-4"
-                                 style="background:rgba(0,0,0,0.4)"
+                            <div id="upload-{{ $adoption->arId }}" class="be-modal hidden"
+
                                  onclick="if(event.target===this)closeModal('upload-{{ $adoption->arId }}')">
                                 <div class="bg-white rounded-3xl shadow-hover max-w-md w-full p-6">
                                     <div class="flex items-start justify-between mb-4">
@@ -268,8 +266,8 @@
 
                             {{-- Modal: Konfirmasi sudah terima fisik (status 7) --}}
                             @if ($adoption->arId && $adoption->arStatus == 7)
-                            <div id="delivered-{{ $adoption->id }}" class="fixed inset-0 z-50 hidden items-center justify-center p-4"
-                                 style="background:rgba(0,0,0,0.4)"
+                            <div id="delivered-{{ $adoption->id }}" class="be-modal hidden"
+
                                  onclick="if(event.target===this)closeModal('delivered-{{ $adoption->id }}')">
                                 <div class="bg-white rounded-3xl shadow-hover max-w-md w-full p-6">
                                     <div class="w-12 h-12 bg-sage/10 rounded-2xl flex items-center justify-center mx-auto mb-4">

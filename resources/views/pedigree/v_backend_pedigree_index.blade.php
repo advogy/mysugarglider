@@ -4,12 +4,10 @@
 
 @section('content')
 
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-    <div>
-        <h2 class="text-xl font-bold text-bark">{{ __('text.pedigree') }} Sugar Glider</h2>
-        <p class="text-bark-muted text-sm mt-0.5">{{ __('text.search_data') }}</p>
-    </div>
-</div>
+<x-page-header
+    :title="__('text.pedigree') . ' Sugar Glider'"
+    :subtitle="__('text.search_data')"
+/>
 
 <div class="be-card overflow-hidden">
     <div class="overflow-x-auto scrollbar-thin">

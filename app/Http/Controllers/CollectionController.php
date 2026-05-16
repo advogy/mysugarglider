@@ -7,17 +7,29 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\CollectionRequest;
 use App\Enums\CollectionStatus;
 use App\Enums\AdoptionStatus;
+use App\Enums\AdoptionRequestStatus;
 use App\Models\ProfileModel;
 use App\Models\CollectionModel;
 use App\Models\ShelterModel;
 use App\Models\SugargliderModel;
 use App\Models\AdoptionModel;
+use App\Models\AdoptionRequestModel;
 
 class CollectionController extends Controller
 {
     function index(Request $request)
     {
-        $search = trim($request->get('q', ''));
+        $search       = trim($request->get('q', ''));
+        $statusFilter = $request->get('status', '');
+
+        // Collection IDs where the owner has already selected an applicant (adoption in progress)
+        $inProgressCollections = AdoptionModel::whereIn('id',
+            AdoptionRequestModel::whereIn('status', [
+                AdoptionRequestStatus::DIPILIH->value,
+                AdoptionRequestStatus::DIBAYAR->value,
+                AdoptionRequestStatus::DIKIRIM->value,
+            ])->pluck('adoption_id')
+        )->pluck('collection_id');
 
         $query = CollectionModel::join('sugargliders as sg', 'collections.sugarglider_id', '=', 'sg.id')
             ->join('shelters as st', 'collections.shelter_id', '=', 'st.id')
@@ -33,7 +45,20 @@ class CollectionController extends Controller
                 'sg.gambar as sgGambar',
                 'st.nama as stNama',
             )
-            ->whereIn('collections.status', [CollectionStatus::PUBLIK->value, CollectionStatus::ADOPSI->value]);
+            ->where(function ($q) use ($statusFilter, $inProgressCollections) {
+                if ($statusFilter === 'adopsi') {
+                    // Hanya tampilkan adopsi yg belum ada pemohon terpilih
+                    $q->where('collections.status', CollectionStatus::ADOPSI->value)
+                      ->whereNotIn('collections.id', $inProgressCollections);
+                } else {
+                    // Tampilkan semua publik + adopsi yg masih terbuka
+                    $q->where('collections.status', CollectionStatus::PUBLIK->value)
+                      ->orWhere(function ($q2) use ($inProgressCollections) {
+                          $q2->where('collections.status', CollectionStatus::ADOPSI->value)
+                             ->whereNotIn('collections.id', $inProgressCollections);
+                      });
+                }
+            });
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
@@ -54,38 +79,38 @@ class CollectionController extends Controller
     function backend_collection_index()
     {
         $profile = ProfileModel::where('user_id', Auth::id())->first();
-        $sugarglider = SugargliderModel::where('user_id', Auth::id())->first();
 
         if (is_null($profile)) {
             return view('profiles.v_profile_no');
-        } elseif (is_null($sugarglider)) {
-            return view('sugargliders.v_backend_sugarglider_no');
-        } else {
-            $data = [
-                'collections' =>
-                CollectionModel::join('sugargliders as sg', 'collections.sugarglider_id', '=', 'sg.id')
-                    ->join('shelters as st', 'collections.shelter_id', '=', 'st.id')
-                    ->select(
-                        'collections.id as id',
-                        'collections.status as status',
-                        'sg.nama as sgNama',
-                        'st.nama as stNama',
-                    )
-                    ->whereIn('collections.status', [CollectionStatus::PUBLIK->value, CollectionStatus::ADOPSI->value])
-                    ->where('collections.user_id', Auth::id())
-                    ->paginate(10)
-            ];
-
-            return view('collections.v_backend_collection_index', $data);
         }
+
+        $data = [
+            'collections' =>
+            CollectionModel::join('sugargliders as sg', 'collections.sugarglider_id', '=', 'sg.id')
+                ->join('shelters as st', 'collections.shelter_id', '=', 'st.id')
+                ->select(
+                    'collections.id as id',
+                    'collections.status as status',
+                    'sg.nama as sgNama',
+                    'sg.gambar as sgGambar',
+                    'st.nama as stNama',
+                    'st.gambar as stGambar',
+                )
+                ->where('st.user_id', Auth::id())
+                ->orderBy('collections.updated_at', 'desc')
+                ->paginate(20)
+        ];
+
+        return view('collections.v_backend_collection_index', $data);
     }
 
     function create()
     {
-        $sugarglidercollections = CollectionModel::pluck('sugarglider_id')->all();
+        $sugarglidercollections = CollectionModel::where('status', '!=', CollectionStatus::SELESAI->value)
+            ->pluck('sugarglider_id')->all();
 
         $data = [
-            'shelters' => ShelterModel::where('status', 1)->where('user_id', Auth::id())->orderBy('nama', 'asc')->get(),
+            'shelters'     => ShelterModel::where('status', 1)->where('user_id', Auth::id())->orderBy('nama', 'asc')->get(),
             'sugargliders' => SugargliderModel::whereNotIn('id', $sugarglidercollections)->where('user_id', Auth::id())->orderBy('nama', 'asc')->get(),
         ];
         return view('collections.v_backend_collection_create', $data);
@@ -106,13 +131,16 @@ class CollectionController extends Controller
     function edit($id)
     {
 
-        $this->authorize('update', CollectionModel::find($id));
+        $collection = CollectionModel::findOrFail($id);
+        $this->authorize('update', $collection);
 
-        $sugarglidercollections = CollectionModel::pluck('sugarglider_id')->all();
+        $sugarglidercollections = CollectionModel::where('status', '!=', CollectionStatus::SELESAI->value)
+            ->where('id', '!=', $id)
+            ->pluck('sugarglider_id')->all();
 
         $data = [
-            'collection' => CollectionModel::findOrFail($id),
-            'shelters' => ShelterModel::where('status', 1)->where('user_id', Auth::id())->orderBy('nama', 'asc')->get(),
+            'collection'   => $collection,
+            'shelters'     => ShelterModel::where('status', 1)->where('user_id', Auth::id())->orderBy('nama', 'asc')->get(),
             'sugargliders' => SugargliderModel::whereNotIn('id', $sugarglidercollections)->where('user_id', Auth::id())->orderBy('nama', 'asc')->get(),
         ];
 
@@ -126,10 +154,14 @@ class CollectionController extends Controller
         $collection->sugarglider_id = $request->sugarglider_id;
         $collection->status         = $request->status;
 
-        if ($collection->status == CollectionStatus::NONAKTIF->value) {
-            $adoption           = AdoptionModel::where('collection_id', $request->id)->first();
-            $adoption->status   = AdoptionStatus::NONAKTIF->value;
-            $adoption->save();
+        if ($collection->status != CollectionStatus::ADOPSI->value) {
+            $adoption = AdoptionModel::where('collection_id', $request->id)
+                ->where('status', AdoptionStatus::AKTIF->value)
+                ->first();
+            if ($adoption) {
+                $adoption->status = AdoptionStatus::NONAKTIF->value;
+                $adoption->save();
+            }
         }
 
         $collection->save();

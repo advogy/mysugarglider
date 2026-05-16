@@ -4,19 +4,11 @@
 
 @section('content')
 
-<div class="flex items-center gap-4 mb-6">
-    <a href="{{ route('adoption.index') }}" class="text-bark-muted hover:text-bark transition-colors">
-        <i class="bi bi-arrow-left text-xl"></i>
-    </a>
-    <div>
-        <h2 class="text-xl font-bold text-bark">{{ $sugarglider->nama }}
-            @if($sugarglider->jenis)
-                <span class="text-bark-muted font-normal text-base">({{ $sugarglider->jenis }})</span>
-            @endif
-        </h2>
-        <p class="text-bark-muted text-sm mt-0.5">{{ __('text.adoption_request') }}</p>
-    </div>
-</div>
+<x-page-header
+    :title="$sugarglider->nama . ($sugarglider->jenis ? ' (' . $sugarglider->jenis . ')' : '')"
+    subtitle="{{ __('text.adoption_request') }}"
+    :backRoute="route('adoption.index')"
+/>
 
 @if (session('pesan'))
     <div class="alert-success mb-5">
@@ -136,8 +128,8 @@
 
                             {{-- MODAL: Status 5 — menunggu respons pemohon --}}
                             @if ($adoptionrequest->status == 5)
-                            <div id="waiting-{{ $adoptionrequest->id }}" class="fixed inset-0 z-50 hidden items-center justify-center p-4"
-                                 style="background:rgba(0,0,0,0.4)"
+                            <div id="waiting-{{ $adoptionrequest->id }}" class="be-modal hidden"
+
                                  onclick="if(event.target===this)closeModal('waiting-{{ $adoptionrequest->id }}')">
                                 <div class="bg-white rounded-3xl shadow-hover max-w-md w-full p-6">
                                     <div class="flex items-start justify-between mb-4">
@@ -172,8 +164,8 @@
 
                             {{-- MODAL: Status 6 + confirmed_at NULL — konfirmasi pembayaran --}}
                             @if ($adoptionrequest->status == 6 && is_null($adoptionrequest->confirmed_at))
-                            <div id="confirm-pay-{{ $adoptionrequest->id }}" class="fixed inset-0 z-50 hidden items-center justify-center p-4"
-                                 style="background:rgba(0,0,0,0.4)"
+                            <div id="confirm-pay-{{ $adoptionrequest->id }}" class="be-modal hidden"
+
                                  onclick="if(event.target===this)closeModal('confirm-pay-{{ $adoptionrequest->id }}')">
                                 <div class="bg-white rounded-3xl shadow-hover max-w-md w-full p-6">
                                     <div class="flex items-start justify-between mb-4">
@@ -218,8 +210,8 @@
 
                             {{-- MODAL: Status 6 + confirmed_at NOT NULL — tandai terkirim --}}
                             @if ($adoptionrequest->status == 6 && !is_null($adoptionrequest->confirmed_at))
-                            <div id="shipping-{{ $adoptionrequest->id }}" class="fixed inset-0 z-50 hidden items-center justify-center p-4"
-                                 style="background:rgba(0,0,0,0.4)"
+                            <div id="shipping-{{ $adoptionrequest->id }}" class="be-modal hidden"
+
                                  onclick="if(event.target===this)closeModal('shipping-{{ $adoptionrequest->id }}')">
                                 <div class="bg-white rounded-3xl shadow-hover max-w-md w-full p-6">
                                     <div class="flex items-start justify-between mb-4">
@@ -259,8 +251,8 @@
 
                             {{-- MODAL: Status 7 — sudah dikirim, menunggu konfirmasi pemohon --}}
                             @if ($adoptionrequest->status == 7)
-                            <div id="shipped-{{ $adoptionrequest->id }}" class="fixed inset-0 z-50 hidden items-center justify-center p-4"
-                                 style="background:rgba(0,0,0,0.4)"
+                            <div id="shipped-{{ $adoptionrequest->id }}" class="be-modal hidden"
+
                                  onclick="if(event.target===this)closeModal('shipped-{{ $adoptionrequest->id }}')">
                                 <div class="bg-white rounded-3xl shadow-hover max-w-md w-full p-6 text-center">
                                     <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-4">

@@ -30,7 +30,7 @@
                transition-all duration-200 shadow-soft hover:shadow-hover;
     }
     .btn-secondary {
-        @apply inline-flex items-center gap-2 border-2 border-sage text-sage
+        @apply font-ui inline-flex items-center gap-2 border-2 border-sage text-sage
                px-6 py-3 rounded-full font-bold text-sm
                hover:bg-sage hover:text-white active:scale-95
                transition-all duration-200;
@@ -48,10 +48,21 @@
                transition-all duration-200 backdrop-blur-sm;
     }
     .btn-ghost {
-        @apply inline-flex items-center gap-2 text-bark-light
+        @apply font-ui inline-flex items-center gap-2 text-bark-light
                px-4 py-2 rounded-full font-semibold text-sm
                hover:bg-cream hover:text-bark active:scale-95
                transition-all duration-200;
+    }
+
+    /* Site Logo — shared by public navbar, footer, and admin sidebar */
+    .site-logo {
+        letter-spacing: -0.5px;
+        line-height: 1;
+    }
+    .site-logo .logo-sg { color: #06D6A0; }
+    .site-logo .logo-id {
+        color: #FFD166;
+        font-size: 0.6em;
     }
 
     /* Cards – Public */
@@ -101,7 +112,7 @@
 
     /* Badges / Pills */
     .badge {
-        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
+        @apply font-ui inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold;
     }
     .badge-sage   { @apply badge bg-sage-100 text-sage-dark; }
     .badge-honey  { @apply badge bg-honey-50 text-honey-dark; }
@@ -149,26 +160,43 @@
 /* ─── BACKEND LAYOUT ─────────────────────────────── */
 @layer components {
 
-    /* Sidebar */
+    /* Sidebar — hidden by default (mobile), visible from lg+ via media query */
     .sidebar {
-        @apply fixed top-0 left-0 h-screen w-64 bg-bark flex flex-col z-40
+        @apply fixed top-0 left-0 h-screen w-64 bg-white border-r border-cream-dark flex flex-col z-40
                transition-transform duration-300;
+        box-shadow: 2px 0 24px rgba(45,45,45,0.06);
+        transform: translateX(-100%);
     }
+    @media (min-width: 1024px) {
+        .sidebar { transform: translateX(0); }
+    }
+    .sidebar.is-open { transform: translateX(0); }
     .sidebar-link {
-        @apply flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold
-               text-white/70 hover:bg-white/10 hover:text-white
+        @apply font-ui flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-semibold
+               text-bark-light hover:bg-cream hover:text-bark
                transition-all duration-200;
     }
     .sidebar-link.active {
         @apply bg-sage text-white shadow-soft;
     }
     .sidebar-title {
-        @apply text-xs font-bold text-white/30 uppercase tracking-widest px-4 pt-5 pb-2;
+        @apply font-ui text-xs font-bold text-bark-muted uppercase tracking-widest px-4 pt-5 pb-2;
+    }
+
+    /* Backend content wrapper — Inter for all UI elements inside main */
+    .be-content {
+        @apply font-ui;
+    }
+    /* Override the base h1/h2/h3 DM-Serif rule within admin content.
+       Utilities (e.g. font-display on the dashboard greeting) still win
+       because the @layer utilities cascade is higher than @layer components. */
+    .be-content h1, .be-content h2, .be-content h3 {
+        @apply font-ui;
     }
 
     /* Backend Topbar */
     .topbar {
-        @apply bg-white border-b border-cream-dark px-6 py-4 flex items-center
+        @apply bg-white border-b border-cream-dark px-4 sm:px-6 py-3 sm:py-4 flex items-center
                justify-between sticky top-0 z-30 shadow-soft;
     }
 
@@ -183,19 +211,19 @@
 
     /* Backend Buttons */
     .btn-create {
-        @apply inline-flex items-center gap-2 bg-sage text-white
-               px-5 py-2.5 rounded-2xl font-semibold text-sm
+        @apply font-ui inline-flex items-center gap-2 bg-sage text-white
+               px-5 py-2.5 rounded-2xl font-bold text-sm
                hover:bg-sage-dark active:scale-95
                transition-all duration-200;
     }
     .btn-edit {
-        @apply inline-flex items-center gap-1.5 text-sage text-xs font-semibold
+        @apply font-ui inline-flex items-center gap-1.5 text-sage text-xs font-semibold
                px-3 py-1.5 rounded-xl border border-sage
                hover:bg-sage hover:text-white
                transition-all duration-200;
     }
     .btn-delete {
-        @apply inline-flex items-center gap-1.5 text-red-500 text-xs font-semibold
+        @apply font-ui inline-flex items-center gap-1.5 text-red-500 text-xs font-semibold
                px-3 py-1.5 rounded-xl border border-red-200
                hover:bg-red-50
                transition-all duration-200;
@@ -206,7 +234,7 @@
         @apply w-full text-sm;
     }
     .be-table th {
-        @apply px-5 py-4 text-xs font-bold text-bark-muted uppercase tracking-wider
+        @apply font-ui px-5 py-4 text-xs font-bold text-bark-muted uppercase tracking-wider
                text-left bg-cream border-b border-cream-dark;
     }
     .be-table td {
@@ -221,7 +249,7 @@
 
     /* Backend Form */
     .form-label {
-        @apply block text-xs font-bold text-bark-light mb-1.5 uppercase tracking-wide;
+        @apply font-ui block text-xs font-bold text-bark-light mb-1.5 uppercase tracking-wide;
     }
     .form-input {
         @apply w-full px-4 py-3 rounded-2xl border border-cream-dark bg-white
@@ -235,24 +263,40 @@
         @apply form-input resize-none;
     }
     .form-hint {
-        @apply text-xs text-bark-muted mt-1.5;
+        @apply font-ui text-xs text-bark-muted mt-1.5;
     }
     .form-error {
-        @apply text-xs text-red-500 mt-1.5;
+        @apply font-ui text-xs text-red-500 mt-1.5;
+    }
+
+    /* Modal Backdrop */
+    .be-modal {
+        @apply fixed inset-0 z-50 items-center justify-center p-4;
+        background: rgba(0,0,0,0.4);
     }
 
     /* Alert */
     .alert-success {
-        @apply bg-sage-50 border border-sage/30 text-sage-dark rounded-2xl px-5 py-4
+        @apply font-ui bg-sage-50 border border-sage/30 text-sage-dark rounded-2xl px-5 py-4
                flex items-center gap-3 text-sm;
     }
     .alert-danger {
-        @apply bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4
+        @apply font-ui bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4
                flex items-center gap-3 text-sm;
     }
     .alert-warning {
-        @apply bg-honey-50 border border-honey/40 text-honey-dark rounded-2xl px-5 py-4
+        @apply font-ui bg-honey-50 border border-honey/40 text-honey-dark rounded-2xl px-5 py-4
                flex items-center gap-3 text-sm;
+    }
+
+    /* Table action buttons wrapper */
+    .table-actions {
+        @apply flex items-center justify-end gap-2;
+    }
+
+    /* Form field group (label + input + hint) */
+    .form-group {
+        @apply space-y-1.5 mb-5;
     }
 }
 
@@ -298,7 +342,7 @@
     body.auth-page .font-display,
     body.auth-page h1,
     body.auth-page h2,
-    body.auth-page h3 { font-family: 'Outfit', sans-serif !important; }
+    body.auth-page h3 { @apply font-number; }
 
     .auth-logo-bar { padding-left: 1.25rem; }
     @media (min-width: 640px)  { .auth-logo-bar { padding-left: 2rem; } }
@@ -377,15 +421,15 @@
     .auth-eye-btn:hover { color: #1A1A1A; }
 
     .auth-logo-link  { text-decoration: none; }
-    .auth-logo-text  { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.5rem; color: #1A1A1A; letter-spacing: -0.5px; line-height: 1; }
+    .auth-logo-text  { @apply font-number; font-weight: 800; font-size: 1.5rem; color: #1A1A1A; letter-spacing: -0.5px; line-height: 1; }
     .auth-logo-green { color: #06D6A0; }
     .auth-logo-gold  { color: #FFD166; font-size: 0.9rem; }
-    .auth-panel-title { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 800; color: #1A1A1A; line-height: 1.2; margin-bottom: 12px; }
+    .auth-panel-title { @apply font-number; font-size: 2rem; font-weight: 800; color: #1A1A1A; line-height: 1.2; margin-bottom: 12px; }
     .auth-panel-desc  { font-size: 0.95rem; color: #666; line-height: 1.7; max-width: 340px; margin: 0 auto 36px; }
     .auth-stats { display: flex; justify-content: center; border-top: 1.5px solid #EFEFEF; padding-top: 28px; gap: 0; }
     .auth-stat-box { text-align: center; padding: 0 32px; }
     .auth-stat-box.stat-divider { border-right: 1.5px solid #EFEFEF; }
-    .auth-stat-num { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; line-height: 1; }
+    .auth-stat-num { @apply font-number; font-size: 1.8rem; font-weight: 800; line-height: 1; }
     .auth-stat-num.color-yellow { color: #FFD166; }
     .auth-stat-num.color-blue   { color: #118AB2; }
     .auth-stat-num.color-green  { color: #06D6A0; }
@@ -503,6 +547,7 @@
 .text-male        { color: #118AB2; font-weight: 700; }
 .text-female      { color: #FF758F; font-weight: 700; }
 .text-blue-sg     { color: #118AB2; }
+.bg-blue-sg       { background-color: #118AB2; }
 .text-green-sg    { color: #06D6A0; }
 .text-yellow-sg   { color: #FFD166; }
 .text-orange-sg   { color: #D4930A; }
@@ -518,6 +563,8 @@
 .legend-color-male   { background: rgba(17,138,178,0.1); border: 1px solid rgba(17,138,178,0.2); }
 .legend-color-female { background: rgba(255,117,143,0.1); border: 1px solid rgba(255,117,143,0.2); }
 .pedigree-ph { color: #06D6A0; background: #EAFBF6; }
+.bg-sage-pale { background-color: #EAFBF6; }
+.profile-quote { color: #666; font-size: 0.95rem; font-style: italic; margin-bottom: 1.5rem; border-left: 4px solid #06D6A0; padding-left: 1rem; }
 
 /* ═══════════════════════════════════════════════════════════
    HOME PAGE  (.page-home wrapper)
@@ -788,17 +835,22 @@
    SHELTERS LIST PAGE
 ═══════════════════════════════════════════════════════════ */
 .shelter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; padding: 60px 5%; }
-.shelter-card { background: #FFFFFF; border-radius: 24px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); transition: transform 0.4s ease, box-shadow 0.4s ease; border: 1px solid #F5F5F5; position: relative; overflow: hidden; }
+.shelter-card { --sc: #06D6A0; --sc-tint: rgba(6,214,160,0.13); background: #FFFFFF; border-radius: 24px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); transition: transform 0.4s ease, box-shadow 0.4s ease; border: 1px solid #F5F5F5; position: relative; overflow: hidden; }
+.shelter-card.sc-sage   { --sc: #06D6A0; --sc-tint: rgba(6,214,160,0.13); }
+.shelter-card.sc-blue   { --sc: #118AB2; --sc-tint: rgba(17,138,178,0.13); }
+.shelter-card.sc-honey  { --sc: #FFD166; --sc-tint: rgba(255,209,102,0.13); }
+.shelter-card.sc-green  { --sc: #7BAE92; --sc-tint: rgba(123,174,146,0.13); }
 .shelter-card:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.08); }
-.shelter-blob { position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; border-radius: 50%; z-index: 1; opacity: 0.1; }
-.sg-count-badge { position: absolute; top: 18px; right: 18px; z-index: 3; width: 46px; height: 46px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
-.sg-count-badge .count-num { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem; line-height: 1; }
-.sg-count-badge .count-label { font-family: 'Inter', sans-serif; font-size: 0.55rem; font-weight: 600; line-height: 1; opacity: 0.75; letter-spacing: 0.3px; }
-.shelter-icon { width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; position: relative; z-index: 2; }
+.shelter-blob { position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; border-radius: 50%; z-index: 1; opacity: 0.1; background: var(--sc); }
+.sg-count-badge { position: absolute; top: 18px; right: 18px; z-index: 3; width: 46px; height: 46px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; background: var(--sc-tint); }
+.sg-count-badge .count-num { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem; line-height: 1; color: var(--sc); }
+.sg-count-badge .count-label { font-family: 'Inter', sans-serif; font-size: 0.55rem; font-weight: 600; line-height: 1; opacity: 0.75; letter-spacing: 0.3px; color: var(--sc); }
+.shelter-icon { width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; position: relative; z-index: 2; background: var(--sc-tint); color: var(--sc); }
 .shelter-name { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700; color: #1A1A1A; margin-bottom: 10px; position: relative; z-index: 2; }
 .shelter-address { font-family: 'Inter', sans-serif; font-size: 0.95rem; color: #888; margin-bottom: 15px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
-.btn-outline-green { display: block; width: 100%; padding: 12px; border: 2px solid #EAEAEA; border-radius: 12px; background: transparent; color: #1A1A1A; text-align: center; font-family: 'Outfit', sans-serif; font-weight: 600; text-decoration: none; transition: all 0.3s ease; position: relative; z-index: 2; }
-.btn-outline-green:hover { background: #06D6A0; color: #FFFFFF; border-color: #06D6A0; }
+.shelter-address .sc-icon { color: var(--sc); }
+.btn-outline-shelter { display: block; width: 100%; padding: 12px; border: 2px solid var(--sc); border-radius: 12px; background: transparent; color: var(--sc); text-align: center; font-family: 'Outfit', sans-serif; font-weight: 600; text-decoration: none; transition: all 0.3s ease; position: relative; z-index: 2; }
+.btn-outline-shelter:hover { background: var(--sc); color: #FFFFFF; }
 
 /* ═══════════════════════════════════════════════════════════
    SHELTER DETAIL PAGE  (.page-shelter-detail wrapper)
@@ -807,6 +859,7 @@
     background: linear-gradient(135deg, #118AB2 0%, #0D6E8A 100%);
     padding: 120px 5% 80px; text-align: center; position: relative; overflow: hidden;
 }
+.page-shelter-detail .shelter-page-header .page-title { color: #FFFFFF; }
 .page-shelter-detail .shelter-page-header::before {
     content: ''; position: absolute; width: 350px; height: 350px; border-radius: 50%;
     background: rgba(6,214,160,0.12); top: -80px; right: -80px;

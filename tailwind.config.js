@@ -38,6 +38,8 @@ export default {
             fontFamily: {
                 display: ['"DM Serif Display"', 'Georgia', 'serif'],
                 body: ['Nunito', 'system-ui', 'sans-serif'],
+                ui: ['Inter', 'system-ui', 'sans-serif'],
+                number: ['Outfit', 'system-ui', 'sans-serif'],
             },
             borderRadius: {
                 '2xl': '1rem',

@@ -7,7 +7,7 @@ use App\Models\ProfileModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\ImageManager;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\ChangePasswordRequest;
@@ -84,7 +84,7 @@ class ProfileController extends Controller
             $image = $request->file('avatar');
             $imagename = 'avatar-' . Auth::id() . '.' . $image->extension();
 
-            Image::read($image)->coverDown(150, 150)->save(public_path('upload/avatars/' . $imagename));
+            ImageManager::gd()->read($image)->coverDown(150, 150)->save(public_path('upload/avatars/' . $imagename));
 
             $user = User::find(Auth::id());
             $user->avatar = $imagename;

@@ -21,7 +21,7 @@ class CollectionRequest extends FormRequest
             'shelter_id'     => 'required|integer|exists:shelters,id',
             'sugarglider_id' => 'required|integer|exists:sugargliders,id',
             'status'         => 'required|integer|in:' . implode(',', array_column(
-                [CollectionStatus::NONAKTIF, CollectionStatus::AKTIF, CollectionStatus::PUBLIK, CollectionStatus::ADOPSI],
+                [CollectionStatus::PRIVAT, CollectionStatus::PUBLIK, CollectionStatus::ADOPSI, CollectionStatus::MATI],
                 'value'
             )),
         ];

@@ -4,20 +4,20 @@ namespace App\Enums;
 
 enum CollectionStatus: int
 {
-    case NONAKTIF = 0;
-    case AKTIF    = 1;
-    case PUBLIK   = 2;
-    case ADOPSI   = 3;
-    case SELESAI  = 9;
+    case PRIVAT  = 1;
+    case PUBLIK  = 2;
+    case ADOPSI  = 3;
+    case MATI    = 4;
+    case SELESAI = 5;
 
     public function label(): string
     {
         return match($this) {
-            self::NONAKTIF => 'Nonaktif',
-            self::AKTIF    => 'Aktif',
-            self::PUBLIK   => 'Publik',
-            self::ADOPSI   => 'Adopsi',
-            self::SELESAI  => 'Selesai',
+            self::PRIVAT  => 'Privat',
+            self::PUBLIK  => 'Publik',
+            self::ADOPSI  => 'Adopsi',
+            self::MATI    => 'Mati',
+            self::SELESAI => 'Selesai',
         };
     }
 }

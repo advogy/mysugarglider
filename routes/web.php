@@ -16,6 +16,8 @@ use App\Http\Controllers\PedigreeController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\AdoptionController;
 use App\Http\Controllers\AdoptionRequestController;
+use App\Http\Controllers\PointController;
+use App\Http\Controllers\TestimonialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,74 +64,87 @@ Route::group(['middleware' => ['auth']], function () {
         /**
          * Dashboard Routes
          */
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+        Route::get('/my', [DashboardController::class, 'index'])->name('dashboard.index');
 
         /**
          * Profile Routes
          */
-        Route::get('/dashboard/profile', [ProfileController::class, 'show'])->name('profile');
-        Route::post('/dashboard/profile', [ProfileController::class, 'update_profile'])->name('profile.update');
-        Route::post('/dashboard/profile/user', [ProfileController::class, 'update_user'])->name('profile.update.user');
-        Route::post('/dashboard/password', [ProfileController::class, 'password_change'])->name('profile.password.change');
-        Route::post('/dashboard/profile/avatar', [ProfileController::class, 'update_avatar'])->name('profile.update.avatar');
+        Route::get('/my/profile', [ProfileController::class, 'show'])->name('profile');
+        Route::post('/my/profile', [ProfileController::class, 'update_profile'])->name('profile.update');
+        Route::post('/my/profile/user', [ProfileController::class, 'update_user'])->name('profile.update.user');
+        Route::post('/my/password', [ProfileController::class, 'password_change'])->name('profile.password.change');
+        Route::post('/my/profile/avatar', [ProfileController::class, 'update_avatar'])->name('profile.update.avatar');
 
         /**
          * Shelter Routes
          */
-        Route::get('/dashboard/shelters', [ShelterController::class, 'backend_shelters_index'])->name('shelter.index');
-        Route::get('/dashboard/shelters/create', [ShelterController::class, 'create'])->name('shelter.create');
-        Route::post('/dashboard/shelters', [ShelterController::class, 'store'])->name('shelter.store');
-        Route::get('/dashboard/shelters/{id}/edit', [ShelterController::class, 'edit'])->name('shelter.edit');
-        Route::put('/dashboard/shelters/{id}', [ShelterController::class, 'update'])->name('shelter.update');
-        Route::delete('/dashboard/shelters/{id}', [ShelterController::class, 'destroy'])->name('shelter.destroy');
+        Route::get('/my/shelters', [ShelterController::class, 'backend_shelters_index'])->name('shelter.index');
+        Route::get('/my/shelters/create', [ShelterController::class, 'create'])->name('shelter.create');
+        Route::post('/my/shelters', [ShelterController::class, 'store'])->name('shelter.store');
+        Route::get('/my/shelters/{id}/edit', [ShelterController::class, 'edit'])->name('shelter.edit');
+        Route::put('/my/shelters/{id}', [ShelterController::class, 'update'])->name('shelter.update');
+        Route::delete('/my/shelters/{id}', [ShelterController::class, 'destroy'])->name('shelter.destroy');
 
         /**
          * Sugar Glider Routes
          */
-        Route::get('/dashboard/sugargliders', [SugargliderController::class, 'backend_sugarglider_index'])->name('sugarglider.index');
-        Route::get('/dashboard/sugargliders/create', [SugargliderController::class, 'create'])->name('sugarglider.create');
-        Route::post('/dashboard/sugargliders', [SugargliderController::class, 'store'])->name('sugarglider.store');
-        Route::get('/dashboard/sugargliders/{id}/edit', [SugargliderController::class, 'edit'])->name('sugarglider.edit');
-        Route::put('/dashboard/sugargliders/{id}', [SugargliderController::class, 'update'])->name('sugarglider.update');
-        Route::delete('/dashboard/sugargliders/{id}', [SugargliderController::class, 'destroy'])->name('sugarglider.destroy');
+        Route::get('/my/sugargliders', [SugargliderController::class, 'backend_sugarglider_index'])->name('sugarglider.index');
+        Route::get('/my/sugargliders/create', [SugargliderController::class, 'create'])->name('sugarglider.create');
+        Route::get('/my/sugargliders/parents', [SugargliderController::class, 'parents'])->name('sugarglider.parents');
+        Route::post('/my/sugargliders', [SugargliderController::class, 'store'])->name('sugarglider.store');
+        Route::get('/my/sugargliders/{id}', [SugargliderController::class, 'backend_show'])->name('sugarglider.backend.show');
+        Route::get('/my/sugargliders/{id}/edit', [SugargliderController::class, 'edit'])->name('sugarglider.edit');
+        Route::put('/my/sugargliders/{id}', [SugargliderController::class, 'update'])->name('sugarglider.update');
+        Route::delete('/my/sugargliders/{id}', [SugargliderController::class, 'destroy'])->name('sugarglider.destroy');
 
         /**
          * Collections Routes
          */
-        Route::get('/dashboard/collections', [CollectionController::class, 'backend_collection_index'])->name('collection.index');
-        Route::get('/dashboard/collections/create', [CollectionController::class, 'create'])->name('collection.create');
-        Route::post('/dashboard/collections', [CollectionController::class, 'store'])->name('collection.store');
-        Route::get('/dashboard/collections/{id}/edit', [CollectionController::class, 'edit'])->name('collection.edit');
-        Route::put('/dashboard/collections/{id}', [CollectionController::class, 'update'])->name('collection.update');
-        Route::delete('/dashboard/collections/{id}', [CollectionController::class, 'destroy'])->name('collection.destroy');
+        Route::get('/my/collections', [CollectionController::class, 'backend_collection_index'])->name('collection.index');
+        Route::get('/my/collections/create', [CollectionController::class, 'create'])->name('collection.create');
+        Route::post('/my/collections', [CollectionController::class, 'store'])->name('collection.store');
+        Route::get('/my/collections/{id}/edit', [CollectionController::class, 'edit'])->name('collection.edit');
+        Route::put('/my/collections/{id}', [CollectionController::class, 'update'])->name('collection.update');
+        Route::delete('/my/collections/{id}', [CollectionController::class, 'destroy'])->name('collection.destroy');
 
         /**
          * Pedigree Sugar Glider Routes
          */
-        Route::get('/dashboard/pedigree', [PedigreeController::class, 'backend_pedigree_index'])->name('pedigree.index');
-        Route::get('/dashboard/pedigree/{id}', [PedigreeController::class, 'backend_show'])->name('pedigree.backend.show');
+        Route::get('/my/pedigree', [PedigreeController::class, 'backend_pedigree_index'])->name('pedigree.index');
+        Route::get('/my/pedigree/{id}', [PedigreeController::class, 'backend_show'])->name('pedigree.backend.show');
 
         /**
          * Adoption Sugar Glider Routes
          */
-        Route::get('/dashboard/adoptions', [AdoptionController::class, 'backend_adoption_index'])->name('adoption.index');
-        Route::get('/dashboard/adoptions/create', [AdoptionController::class, 'create'])->name('adoption.create');
-        Route::post('/dashboard/adoptions', [AdoptionController::class, 'store'])->name('adoption.store');
-        Route::get('/dashboard/adoptions/list', [AdoptionController::class, 'backend_adoption_list'])->name('adoption.list');
-        Route::get('/dashboard/adoptions/{id}/request', [AdoptionController::class, 'backend_adoption_request'])->name('adoption.request');
-        Route::get('/dashboard/adoptions/{id}/edit', [AdoptionController::class, 'edit'])->name('adoption.edit');
-        Route::put('/dashboard/adoptions/{id}', [AdoptionController::class, 'update'])->name('adoption.update');
+        Route::get('/my/adoptions', [AdoptionController::class, 'backend_adoption_index'])->name('adoption.index');
+        Route::get('/my/adoptions/create', [AdoptionController::class, 'create'])->name('adoption.create');
+        Route::post('/my/adoptions', [AdoptionController::class, 'store'])->name('adoption.store');
+        Route::get('/my/adoptions/list', [AdoptionController::class, 'backend_adoption_list'])->name('adoption.list');
+        Route::get('/my/adoptions/{id}/request', [AdoptionController::class, 'backend_adoption_request'])->name('adoption.request');
+        Route::get('/my/adoptions/{id}/edit', [AdoptionController::class, 'edit'])->name('adoption.edit');
+        Route::put('/my/adoptions/{id}', [AdoptionController::class, 'update'])->name('adoption.update');
 
         /**
          * Adoption Request Routes
          */
-        Route::post('/dashboard/adoptions/{id}/request', [AdoptionRequestController::class, 'store'])->name('adoptionrequest.store');
-        Route::post('/dashboard/adoptions/select', [AdoptionRequestController::class, 'backend_adoption_select'])->name('adoptionrequest.select');
-        Route::post('/dashboard/adoptionrequests/{id}/upload-payment', [AdoptionRequestController::class, 'upload_payment'])->name('adoptionrequest.upload-payment');
-        Route::post('/dashboard/adoptionrequests/{id}/confirm-free', [AdoptionRequestController::class, 'confirm_free'])->name('adoptionrequest.confirm-free');
-        Route::post('/dashboard/adoptionrequests/{id}/confirm-payment', [AdoptionRequestController::class, 'confirm_payment'])->name('adoptionrequest.confirm-payment');
-        Route::post('/dashboard/adoptions/{id}/shipping', [AdoptionRequestController::class, 'backend_adoption_shipping'])->name('adoptionrequest.shipping');
-        Route::post('/dashboard/adoptions/{id}/finalize', [AdoptionRequestController::class, 'backend_adoption_finalize'])->name('adoptionrequest.finalize');
+        Route::post('/my/adoptions/{id}/request', [AdoptionRequestController::class, 'store'])->name('adoptionrequest.store');
+        Route::post('/my/adoptions/select', [AdoptionRequestController::class, 'backend_adoption_select'])->name('adoptionrequest.select');
+        Route::post('/my/adoptionrequests/{id}/upload-payment', [AdoptionRequestController::class, 'upload_payment'])->name('adoptionrequest.upload-payment');
+        Route::post('/my/adoptionrequests/{id}/confirm-free', [AdoptionRequestController::class, 'confirm_free'])->name('adoptionrequest.confirm-free');
+        Route::post('/my/adoptionrequests/{id}/confirm-payment', [AdoptionRequestController::class, 'confirm_payment'])->name('adoptionrequest.confirm-payment');
+        Route::post('/my/adoptions/{id}/shipping', [AdoptionRequestController::class, 'backend_adoption_shipping'])->name('adoptionrequest.shipping');
+        Route::post('/my/adoptions/{id}/finalize', [AdoptionRequestController::class, 'backend_adoption_finalize'])->name('adoptionrequest.finalize');
+
+        Route::get('/my/points', [PointController::class, 'index'])->name('points.index');
+        Route::post('/my/points/redeem', [PointController::class, 'redeem'])->name('points.redeem');
+        Route::get('/my/points/history', [PointController::class, 'history'])->name('points.history');
+
+        Route::post('/my/testimonial', [TestimonialController::class, 'store'])->name('testimonial.store');
+        Route::delete('/my/testimonial/{testimonial}', [TestimonialController::class, 'destroy'])->name('testimonial.destroy');
+
+        Route::get('/admin/testimonials', [TestimonialController::class, 'adminIndex'])->name('testimonial.admin');
+        Route::post('/admin/testimonials/{testimonial}/approve', [TestimonialController::class, 'approve'])->name('testimonial.approve');
+        Route::post('/admin/testimonials/{testimonial}/reject', [TestimonialController::class, 'reject'])->name('testimonial.reject');
     });
 });
 

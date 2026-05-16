@@ -11,9 +11,11 @@ use App\Http\Requests\AdoptionApplicationRequest;
 use App\Enums\AdoptionStatus;
 use App\Enums\AdoptionRequestStatus;
 use App\Enums\CollectionStatus;
+use App\Enums\PointType;
 use App\Models\AdoptionRequestModel;
 use App\Models\CollectionModel;
 use App\Models\SugargliderModel;
+use App\Services\PointService;
 use Carbon\Carbon;
 
 class AdoptionRequestController extends Controller
@@ -156,7 +158,7 @@ class AdoptionRequestController extends Controller
         return redirect()->route('adoption.request', $adoption->id)->with('pesan', 'Sugar glider ditandai sudah dikirim.');
     }
 
-    // Pemohon konfirmasi sudah terima fisik → data berpindah
+    // Pemohon konfirmasi sudah terima fisik → kepemilikan berpindah
     function backend_adoption_finalize(Request $request)
     {
         $adoptionrequest = AdoptionRequestModel::where('id', $request->adoptionrequest_id)
@@ -172,6 +174,8 @@ class AdoptionRequestController extends Controller
         $collection  = CollectionModel::findOrFail($adoption->collection_id);
         $sugarglider = SugargliderModel::findOrFail($collection->sugarglider_id);
 
+        $oldOwner = \App\Models\User::find($collection->user_id);
+
         // Catat riwayat perpindahan kandang
         ShelterTransferModel::create([
             'sugarglider_id'      => $sugarglider->id,
@@ -183,13 +187,12 @@ class AdoptionRequestController extends Controller
             'adoption_request_id' => $adoptionrequest->id,
         ]);
 
-        // Pindahkan kepemilikan
-        $sugarglider->user_id  = Auth::id();
+        // Pindahkan kepemilikan SG ke adopter
+        $sugarglider->user_id = Auth::id();
         $sugarglider->save();
 
-        $collection->shelter_id = $shelter->id;
-        $collection->user_id    = Auth::id();
-        $collection->status     = CollectionStatus::PUBLIK->value;
+        // Tandai penempatan lama sebagai selesai (jadi riwayat), adopter tempatkan sendiri
+        $collection->status = CollectionStatus::SELESAI->value;
         $collection->save();
 
         $adoption->status = AdoptionStatus::SELESAI->value;
@@ -198,6 +201,12 @@ class AdoptionRequestController extends Controller
         $adoptionrequest->status = AdoptionRequestStatus::SELESAI->value;
         $adoptionrequest->save();
 
-        return redirect()->route('collection.index')->with('pesan', 'Selamat! Sugar glider berhasil diadopsi dan data telah dipindahkan.');
+        $svc = app(PointService::class);
+        if ($oldOwner) {
+            $svc->earn($oldOwner, PointType::ADOPTION_SOLD, $adoptionrequest);
+        }
+        $svc->earn(Auth::user(), PointType::ADOPTION_RECEIVED, $adoptionrequest);
+
+        return redirect()->route('sugarglider.index')->with('pesan', 'Selamat! Sugar glider berhasil diadopsi. Silakan tambahkan penempatan di kandang Anda.');
     }
 }

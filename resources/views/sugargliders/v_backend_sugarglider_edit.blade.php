@@ -1,18 +1,29 @@
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css">
+<style>
+.ts-wrapper.full .ts-control { box-shadow: none !important; }
+.ts-control { border: 1px solid #e2d9ce !important; border-radius: 0.75rem !important; padding: 0.5rem 0.75rem !important; font-size: 0.875rem !important; background: white !important; min-height: 2.5rem !important; }
+.ts-control input { font-size: 0.875rem !important; }
+.ts-dropdown { border: 1px solid #e2d9ce !important; border-radius: 0.75rem !important; box-shadow: 0 4px 12px rgba(0,0,0,.08) !important; font-size: 0.875rem !important; margin-top: 4px !important; }
+.ts-dropdown .option { padding: 0.5rem 0.75rem !important; }
+.ts-dropdown .option.selected, .ts-dropdown .option:hover { background: #f0f5f0 !important; color: #2d5a2d !important; }
+.ts-dropdown .optgroup-header { padding: 0.4rem 0.75rem !important; font-size: 0.7rem !important; font-weight: 700 !important; color: #9e8e7e !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; background: #faf8f5 !important; }
+.ts-dropdown .no-results { padding: 0.5rem 0.75rem !important; color: #9e8e7e !important; }
+.ts-wrapper .ts-control .item { background: #eef4ee !important; border-radius: 0.5rem !important; padding: 2px 8px !important; color: #2d5a2d !important; font-size: 0.8rem !important; }
+</style>
+@endpush
+
 @extends('layouts.v_backend')
 
 @section('title', 'Edit Sugar Glider')
 
 @section('content')
 
-<div class="flex items-center gap-4 mb-6">
-    <a href="{{ route('sugarglider.index') }}" class="text-bark-muted hover:text-bark transition-colors">
-        <i class="bi bi-arrow-left text-xl"></i>
-    </a>
-    <div>
-        <h2 class="text-xl font-bold text-bark">{{ __('text.edit') }} — {{ $sugarglider->nama }}</h2>
-        <p class="text-bark-muted text-sm mt-0.5">{{ __('text.change_data') }}</p>
-    </div>
-</div>
+<x-page-header
+    :title="__('text.edit') . ' — ' . $sugarglider->nama"
+    :subtitle="__('text.change_data')"
+    :backRoute="route('sugarglider.index')"
+/>
 
 @if ($errors->any())
     <div class="alert-danger mb-5">
@@ -68,31 +79,27 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                         <label class="form-label">{{ __('text.parent_male') }}</label>
-                        <select name="indukan_jantan" class="input-field" required>
-                            <option value="">{{ __('text.parent_male') }}</option>
-                            <option value="0" @selected($sugarglider->indukan_jantan == 0)>{{ __('text.unknown') }}</option>
-                            @foreach ($sugargliders as $sg)
-                                @if ($sg->kelamin == 1)
-                                    <option value="{{ $sg->id }}" @selected($sugarglider->indukan_jantan == $sg->id)>
-                                        {{ $sg->nama }} - {{ $sg->jenis }}
-                                    </option>
-                                @endif
-                            @endforeach
+                        <select id="ts-indukan-jantan" name="indukan_jantan">
+                            <option value="">Tidak diketahui / Tidak diisi</option>
+                            @if ($indukanJantan)
+                                <option value="{{ $indukanJantan->id }}" selected>
+                                    {{ $indukanJantan->nama }} – {{ $indukanJantan->jenis }}
+                                </option>
+                            @endif
                         </select>
+                        <p class="form-hint">Ketik nama untuk mencari • Kosongkan jika tidak diketahui</p>
                     </div>
                     <div>
                         <label class="form-label">{{ __('text.parent_female') }}</label>
-                        <select name="indukan_betina" class="input-field" required>
-                            <option value="">{{ __('text.parent_female') }}</option>
-                            <option value="0" @selected($sugarglider->indukan_betina == 0)>{{ __('text.unknown') }}</option>
-                            @foreach ($sugargliders as $sg)
-                                @if ($sg->kelamin == 0)
-                                    <option value="{{ $sg->id }}" @selected($sugarglider->indukan_betina == $sg->id)>
-                                        {{ $sg->nama }} - {{ $sg->jenis }}
-                                    </option>
-                                @endif
-                            @endforeach
+                        <select id="ts-indukan-betina" name="indukan_betina">
+                            <option value="">Tidak diketahui / Tidak diisi</option>
+                            @if ($indukanBetina)
+                                <option value="{{ $indukanBetina->id }}" selected>
+                                    {{ $indukanBetina->nama }} – {{ $indukanBetina->jenis }}
+                                </option>
+                            @endif
                         </select>
+                        <p class="form-hint">Ketik nama untuk mencari • Kosongkan jika tidak diketahui</p>
                     </div>
                 </div>
                 <div>
@@ -125,3 +132,52 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<script>
+function makeTomSelect(elId, kelamin, selectedId, selectedText) {
+    const parentsUrl = "{{ route('sugarglider.parents') }}";
+    const excludeId  = {{ $sugarglider->id }};
+    const optgroups  = [
+        { value: 'mine',  label: '— Kandang Saya' },
+        { value: 'other', label: '— Kandang Lain' },
+    ];
+
+    const opts    = selectedId ? [{ value: selectedId, text: selectedText, group: 'mine' }] : [];
+    const items   = selectedId ? [selectedId] : [];
+
+    return new TomSelect('#' + elId, {
+        valueField:    'value',
+        labelField:    'text',
+        searchField:   'text',
+        optgroupField: 'group',
+        optgroups:     optgroups,
+        options:       opts,
+        items:         items,
+        placeholder:   'Ketik nama untuk mencari...',
+        allowEmptyOption: true,
+        shouldLoad: (q) => q.length >= 1,
+        load(q, callback) {
+            fetch(`${parentsUrl}?q=${encodeURIComponent(q)}&kelamin=${kelamin}&exclude=${excludeId}`)
+                .then(r => r.json())
+                .then(callback)
+                .catch(() => callback());
+        },
+        render: {
+            no_results: () => '<div class="no-results">Tidak ditemukan</div>',
+            loading:    () => '<div class="no-results">Mencari...</div>',
+        },
+    });
+}
+
+makeTomSelect(
+    'ts-indukan-jantan', 1,
+    @if($indukanJantan) {{ $indukanJantan->id }}, @json($indukanJantan->nama . ' – ' . $indukanJantan->jenis) @else null, null @endif
+);
+makeTomSelect(
+    'ts-indukan-betina', 0,
+    @if($indukanBetina) {{ $indukanBetina->id }}, @json($indukanBetina->nama . ' – ' . $indukanBetina->jenis) @else null, null @endif
+);
+</script>
+@endpush

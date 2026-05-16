@@ -41,37 +41,34 @@
 @else
 <div class="bg-white">
     <div class="shelter-grid">
-        @php $colors = [
-            ['bg' => '#06D6A0', 'icon' => 'bi-house-heart'],
-            ['bg' => '#118AB2', 'icon' => 'bi-shop'],
-            ['bg' => '#FFD166', 'icon' => 'bi-building'],
-            ['bg' => '#7BAE92', 'icon' => 'bi-house-door']
-        ]; @endphp
+        @php
+            $colorClasses = ['sc-sage', 'sc-blue', 'sc-honey', 'sc-green'];
+            $icons        = ['bi-house-heart', 'bi-shop', 'bi-building', 'bi-house-door'];
+        @endphp
 
         @foreach ($shelters as $index => $shelter)
-        @php $c = $colors[$index % count($colors)]; @endphp
-        <div class="shelter-card">
-            <div class="shelter-blob" style="background-color: {{ $c['bg'] }};"></div>
+        <div class="shelter-card {{ $colorClasses[$index % 4] }}">
+            <div class="shelter-blob"></div>
 
-            <div class="sg-count-badge" style="background-color: {{ $c['bg'] }}20;">
-                <span class="count-num" style="color: {{ $c['bg'] }};">{{ $shelter->sg_count }}</span>
-                <span class="count-label" style="color: {{ $c['bg'] }};">ekor</span>
+            <div class="sg-count-badge">
+                <span class="count-num">{{ $shelter->sg_count }}</span>
+                <span class="count-label">ekor</span>
             </div>
 
-            <div class="shelter-icon" style="background-color: {{ $c['bg'] }}20; color: {{ $c['bg'] }};">
-                <i class="bi {{ $c['icon'] }}"></i>
+            <div class="shelter-icon">
+                <i class="bi {{ $icons[$index % 4] }}"></i>
             </div>
 
             <h3 class="shelter-name">{{ $shelter->nama }}</h3>
             <p class="shelter-address">
-                <i class="bi bi-geo-alt mt-1" style="color: {{ $c['bg'] }};"></i>
+                <i class="bi bi-geo-alt sc-icon mt-1"></i>
                 <span>{{ Str::limit($shelter->alamat, 60) }}</span>
             </p>
-            <p class="text-[0.9rem] text-[#999] mb-6 line-clamp-2">
+            <p class="text-sm text-bark-muted mb-6 line-clamp-2">
                 {{ $shelter->keterangan ?? 'Peternak sugar glider terverifikasi.' }}
             </p>
 
-            <a href="{{ route('shelter.show', $shelter->id) }}" class="btn-outline-green" style="border-color: {{ $c['bg'] }}40; color: {{ $c['bg'] }};" onmouseover="this.style.backgroundColor='{{ $c['bg'] }}'; this.style.color='#FFF'; this.style.borderColor='{{ $c['bg'] }}';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='{{ $c['bg'] }}'; this.style.borderColor='{{ $c['bg'] }}40';">Kunjungi Kandang</a>
+            <a href="{{ route('shelter.show', $shelter->id) }}" class="btn-outline-shelter">Kunjungi Kandang</a>
         </div>
         @endforeach
     </div>

@@ -4,10 +4,10 @@
 
 @section('content')
 
-<div class="mb-6">
-    <h2 class="text-xl font-bold text-bark">{{ __('text.profile') }}</h2>
-    <p class="text-bark-muted text-sm mt-0.5">Perbarui data Anda</p>
-</div>
+<x-page-header
+    :title="__('text.profile')"
+    subtitle="Perbarui data Anda."
+/>
 
 @if (session('pesan'))
     <div class="alert-success mb-5">

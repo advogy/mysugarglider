@@ -53,20 +53,14 @@ class CollectionPolicy
      */
     public function update(User $user, CollectionModel $collectionModel)
     {
-        return $user->id === $collectionModel->user_id;
+        return $user->id === $collectionModel->user_id
+            || ($collectionModel->shelter && $user->id === $collectionModel->shelter->user_id);
     }
 
-
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\CollectionModel  $collectionModel
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
     public function delete(User $user, CollectionModel $collectionModel)
     {
-        return $user->id === $collectionModel->user_id;
+        return $user->id === $collectionModel->user_id
+            || ($collectionModel->shelter && $user->id === $collectionModel->shelter->user_id);
     }
 
     /**

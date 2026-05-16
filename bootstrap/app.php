@@ -29,10 +29,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (NotFoundHttpException|ModelNotFoundException $e, $request) {
-            return response()->view('errors.404', [], 404);
+            return response()->view('errors.404', ['exception' => $e], 404);
         });
 
         $exceptions->render(function (AccessDeniedHttpException|AuthorizationException $e, $request) {
-            return response()->view('errors.403', [], 403);
+            return response()->view('errors.403', ['exception' => $e], 403);
         });
     })->create();
