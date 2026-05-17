@@ -10,19 +10,13 @@
     :createRoute="route('collection.create')"
 />
 
-@if (session('pesan'))
-    <div class="alert-success mb-5">
-        <i class="bi bi-check-circle-fill text-lg"></i>
-        <p class="font-semibold">{{ session('pesan') }}</p>
-    </div>
-@endif
+<x-alert type="danger" :errors="$errors" />
 
-@if ($errors->any())
-    <div class="alert-danger mb-5">
-        <i class="bi bi-exclamation-circle-fill text-lg"></i>
-        <div>@foreach ($errors->all() as $err)<p>{{ $err }}</p>@endforeach</div>
-    </div>
-@endif
+<x-search-bar
+    placeholder="Cari nama sugar glider atau kandang..."
+    :resetRoute="route('collection.index')"
+    :q="$q"
+/>
 
 <div class="be-card overflow-hidden">
     <div class="overflow-x-auto scrollbar-thin">

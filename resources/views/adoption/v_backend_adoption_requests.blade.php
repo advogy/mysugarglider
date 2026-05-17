@@ -10,18 +10,6 @@
     :backRoute="route('adoption.index')"
 />
 
-@if (session('pesan'))
-    <div class="alert-success mb-5">
-        <i class="bi bi-check-circle-fill text-lg"></i>
-        <p class="font-semibold">{{ session('pesan') }}</p>
-    </div>
-@endif
-@if (session('error'))
-    <div class="alert-danger mb-5">
-        <i class="bi bi-exclamation-circle-fill text-lg"></i>
-        <p class="font-semibold">{{ session('error') }}</p>
-    </div>
-@endif
 @if ($errors->any())
     <div class="alert-danger mb-5">
         <i class="bi bi-exclamation-circle-fill text-lg"></i>

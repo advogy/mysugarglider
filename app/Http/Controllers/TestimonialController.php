@@ -12,8 +12,6 @@ class TestimonialController extends Controller
 {
     public function adminIndex()
     {
-        abort_unless(Auth::user()->is_admin, 403);
-
         $data = [
             'pending'  => Testimonial::with('user')->where('status', Testimonial::STATUS_PENDING)->latest()->get(),
             'approved' => Testimonial::with('user')->where('status', Testimonial::STATUS_APPROVED)->orderBy('urutan')->get(),
@@ -50,7 +48,6 @@ class TestimonialController extends Controller
 
     public function approve(Request $request, Testimonial $testimonial)
     {
-        abort_unless(Auth::user()->is_admin, 403);
 
         $request->validate(['durasi' => 'nullable|string|max:50']);
 
@@ -75,7 +72,6 @@ class TestimonialController extends Controller
 
     public function reject(Testimonial $testimonial)
     {
-        abort_unless(Auth::user()->is_admin, 403);
 
         $testimonial->update([
             'status' => Testimonial::STATUS_REJECTED,
@@ -85,12 +81,27 @@ class TestimonialController extends Controller
         return back()->with('pesan', 'Testimoni ditolak.');
     }
 
+    public function update(Request $request, Testimonial $testimonial)
+    {
+        $request->validate([
+            'author' => 'required|string|max:100',
+            'quote'  => 'required|string|min:10|max:500',
+            'durasi' => 'nullable|string|max:50',
+            'urutan' => 'nullable|integer|min:0',
+        ]);
+
+        $testimonial->update($request->only('author', 'quote', 'durasi', 'urutan'));
+
+        return back()->with('pesan', 'Testimoni berhasil diperbarui.');
+    }
+
     public function destroy(Testimonial $testimonial)
     {
-        abort_unless(Auth::user()->is_admin || $testimonial->user_id === Auth::id(), 403);
+        $user = Auth::user();
 
-        // Jika masih pending, user boleh hapus untuk kirim ulang
-        if (!Auth::user()->is_admin && !$testimonial->isPending()) {
+        abort_unless($user->isAdmin() || $testimonial->user_id === $user->id, 403);
+
+        if (!$user->isAdmin() && !$testimonial->isPending()) {
             return back()->with('error', 'Hanya testimoni yang masih pending yang dapat dihapus.');
         }
 

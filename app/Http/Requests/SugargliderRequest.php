@@ -14,7 +14,7 @@ class SugargliderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'kode'           => 'required|string|max:50',
+            'kode'           => 'nullable|string|max:50',
             'nama'           => 'required|string|max:255',
             'kelamin'        => 'required|in:0,1',
             'tgl_lahir'      => 'required|date',
@@ -32,7 +32,6 @@ class SugargliderRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'kode.required'    => 'Kode wajib diisi.',
             'nama.required'    => 'Nama wajib diisi.',
             'kelamin.required' => 'Jenis kelamin wajib dipilih.',
             'kelamin.in'       => 'Jenis kelamin tidak valid.',

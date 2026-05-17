@@ -57,8 +57,16 @@
             </div>
 
             @if ($shelter->gmaps)
-                <div class="map-card">
-                    <iframe class="w-full h-full border-0" src="https://www.google.com/maps/embed?pb={{ $shelter->gmaps }}" allowfullscreen loading="lazy"></iframe>
+                @php
+                    $mapsUrl = str_starts_with($shelter->gmaps, 'http')
+                        ? $shelter->gmaps
+                        : 'https://www.google.com/maps/embed?pb=' . $shelter->gmaps;
+                @endphp
+                <div class="map-card" onclick="openMapsModal()">
+                    <iframe class="w-full h-full border-0" src="{{ $mapsUrl }}" allowfullscreen loading="lazy"></iframe>
+                    <div class="map-card-overlay">
+                        <span><i class="bi bi-arrows-fullscreen"></i> Perbesar Peta</span>
+                    </div>
                 </div>
             @endif
         </div>
@@ -120,4 +128,42 @@
 </div>
 
 <x-photo-preview-modal />
+
+@if ($shelter->gmaps)
+<div id="map-modal" class="be-modal hidden" onclick="closeMapsModal(event)">
+    <div onclick="event.stopPropagation()"
+         style="width:90%;max-width:860px;height:78vh;background:#fff;border-radius:24px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,0.25);">
+        <div style="padding:16px 20px;border-bottom:1px solid #F0F0F0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <span style="font-family:'Inter',sans-serif;font-weight:700;font-size:0.875rem;color:#1A1A1A;display:flex;align-items:center;gap:8px;">
+                <i class="bi bi-geo-alt-fill" style="color:#06D6A0;"></i>
+                {{ $shelter->nama }}
+            </span>
+            <button onclick="closeMapsModal()"
+                    style="background:none;border:none;cursor:pointer;color:#999;font-size:1.1rem;line-height:1;padding:4px;">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <iframe src="{{ $mapsUrl }}" style="flex:1;width:100%;border:none;" allowfullscreen loading="lazy"></iframe>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+function openMapsModal() {
+    const m = document.getElementById('map-modal');
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+}
+function closeMapsModal(e) {
+    if (!e || e.target === document.getElementById('map-modal')) {
+        const m = document.getElementById('map-modal');
+        m.classList.add('hidden');
+        m.classList.remove('flex');
+    }
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeMapsModal(); });
+</script>
+@endpush
+@endif
+
 @endsection

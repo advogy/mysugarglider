@@ -65,7 +65,7 @@
                     <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-1.5 rounded-full" style="background-color: #FFD166;"></span>
                     @endif
                 </a>
-                
+
                 <a href="{{ route('about') }}"
                    class="font-ui relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('about') ? 'text-bark' : 'text-bark-muted hover:text-bark' }}">
                     Tentang
@@ -198,7 +198,7 @@
 
             {{-- Copyright --}}
             <p class="font-ui" style="font-size:0.8rem; color:#bbb; margin:0;">
-                &copy; {{ date('Y') }} MySugarGlider.id &nbsp;·&nbsp; All rights reserved.
+                &copy; 2022–{{ date('Y') }} - v{{ config('app.version', '1.0.0') }}. MySugarGlider.id &nbsp;·&nbsp; Seluruh hak cipta dilindungi. Dikembangkan oleh <a href="https://github.com/advogy" target="_blank" rel="noopener" class="text-sage font-semibold hover:underline">Advogy</a>.
             </p>
         </div>
 

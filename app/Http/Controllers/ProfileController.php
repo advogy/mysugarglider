@@ -12,6 +12,9 @@ use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\UpdateAvatarRequest;
+use App\Enums\PointType;
+use App\Services\OtpService;
+use App\Services\PointService;
 
 class ProfileController extends Controller
 {
@@ -30,40 +33,49 @@ class ProfileController extends Controller
         $profile = ProfileModel::where('user_id', Auth::id())->first();
 
         $fields = [
-            'user_id'   => Auth::id(),
-            'alamat'    => $request->alamat,
-            'kota'      => $request->kota,
-            'provinsi'  => $request->provinsi,
-            'telepon'   => $request->telepon,
-            'bio'       => $request->bio,
-            'instagram' => $request->instagram,
-            'website'   => $request->website,
+            'user_id'     => Auth::id(),
+            'kode_profil' => strtoupper($request->kode_profil),
+            'alamat'      => $request->alamat,
+            'kota'        => $request->kota,
+            'provinsi'    => $request->provinsi,
+            'telepon'     => $request->telepon,
+            'bio'         => $request->bio,
+            'instagram'   => $request->instagram,
+            'website'     => $request->website,
         ];
 
         if (is_null($profile)) {
-            ProfileModel::create($fields);
-            return redirect()->route('profile')->with('pesan', 'Data berhasil ditambahkan.');
+            $profile = ProfileModel::create($fields);
         } else {
             $profile->fill($fields)->save();
-            return redirect()->route('profile')->with('pesan', 'Data berhasil diperbaharui.');
         }
+
+        if (!empty($fields['telepon']) && !empty($fields['alamat'])) {
+            app(PointService::class)->earn(Auth::user(), PointType::PROFILE_COMPLETE, $profile);
+        }
+
+        return redirect()->route('profile')->with('pesan', 'Data berhasil diperbaharui.');
     }
 
     function update_user(UpdateUserRequest $request)
     {
-        $user = User::find(Auth::id());
+        $user         = User::find(Auth::id());
+        $emailChanged = $user->email !== $request->email;
 
-        $oldEmail = $user->email;
+        $user->name  = $request->name;
+        $user->email = $request->email;
 
-        $user->name     = $request->name;
-        $user->email    = $request->email;
-
-        if ($oldEmail != $user->email) {
+        if ($emailChanged) {
             $user->email_verified_at = null;
-            $user->sendEmailVerificationNotification();
         }
 
         $user->save();
+
+        if ($emailChanged) {
+            app(OtpService::class)->generate($user);
+            return redirect()->route('verification.notice')
+                ->with('pesan', 'Email diubah. Masukkan kode verifikasi yang dikirim ke email baru Anda.');
+        }
 
         return redirect()->route('profile')->with('pesan', 'Data berhasil diperbaharui.');
     }

@@ -14,6 +14,8 @@ use App\Models\AdoptionModel;
 use App\Models\AdoptionRequestModel;
 use App\Enums\AdoptionStatus;
 use App\Enums\AdoptionRequestStatus;
+use App\Enums\PointType;
+use App\Services\PointService;
 use Carbon\Carbon;
 
 class SugargliderController extends Controller
@@ -27,7 +29,7 @@ class SugargliderController extends Controller
         return view('sugargliders.v_sugarglider', $data);
     }
 
-    function backend_sugarglider_index()
+    function backend_sugarglider_index(Request $request)
     {
         $profile = ProfileModel::where('user_id', Auth::id())->first();
 
@@ -35,8 +37,9 @@ class SugargliderController extends Controller
             return view('profiles.v_profile_no');
         }
 
-        $data = [
-            'sugargliders' => SugargliderModel::leftJoin('collections', function ($join) {
+        $q = trim($request->get('q', ''));
+
+        $sugargliders = SugargliderModel::leftJoin('collections', function ($join) {
                 $join->on('collections.sugarglider_id', '=', 'sugargliders.id')
                      ->whereNull('collections.deleted_at')
                      ->where('collections.status', '!=', \App\Enums\CollectionStatus::SELESAI->value);
@@ -48,10 +51,15 @@ class SugargliderController extends Controller
             ->select('sugargliders.*', 'shelters.nama as kandang_nama', 'collections.status as cl_status')
             ->where('sugargliders.user_id', Auth::id())
             ->whereNull('sugargliders.deleted_at')
-            ->paginate(20),
-        ];
+            ->when($q, fn($query) => $query->where(function ($sub) use ($q) {
+                $sub->where('sugargliders.nama', 'like', "%$q%")
+                    ->orWhere('sugargliders.kode', 'like', "%$q%")
+                    ->orWhere('sugargliders.jenis', 'like', "%$q%");
+            }))
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('sugargliders.v_backend_sugarglider_index', $data);
+        return view('sugargliders.v_backend_sugarglider_index', compact('sugargliders', 'q'));
     }
 
     function backend_show($id)
@@ -146,7 +154,13 @@ class SugargliderController extends Controller
 
     function create()
     {
-        return view('sugargliders.v_backend_sugarglider_create');
+        $profile  = ProfileModel::where('user_id', Auth::id())->first();
+        $prefix   = $profile?->kode_profil;
+        $count    = SugargliderModel::where('user_id', Auth::id())->withTrashed()->count();
+        $nextKode = $prefix ? $this->nextKode($prefix, Auth::id(), $count + 1) : null;
+        $nextNumber = $nextKode ? substr($nextKode, strrpos($nextKode, '-') + 1) : str_pad($count + 1, 4, '0', STR_PAD_LEFT);
+
+        return view('sugargliders.v_backend_sugarglider_create', compact('prefix', 'nextKode', 'nextNumber'));
     }
 
     function parents(\Illuminate\Http\Request $request)
@@ -205,17 +219,24 @@ class SugargliderController extends Controller
 
     function store(SugargliderRequest $request)
     {
+        $profile = ProfileModel::where('user_id', Auth::id())->first();
+        $prefix  = $profile?->kode_profil
+                   ?? strtoupper(preg_replace('/[^A-Za-z]/', '', $request->input('kode_prefix', '')));
+
+        $count = SugargliderModel::where('user_id', Auth::id())->withTrashed()->count();
+        $kode  = $prefix ? $this->nextKode($prefix, Auth::id(), $count + 1) : null;
+
         if ($request->hasFile('gambar')) {
             $image = $request->file('gambar');
-            $imagename = 'sg-' . $request->kode . '.' . $image->extension();
+            $imagename = 'sg-' . ($kode ?? 'nocode') . '.' . $image->extension();
 
             ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/sugargliders/' . $imagename));
         } else {
             $imagename = null;
         }
 
-        SugargliderModel::create([
-            'kode'              => $request->kode,
+        $sugarglider = SugargliderModel::create([
+            'kode'              => $kode,
             'nama'              => $request->nama,
             'kelamin'           => $request->kelamin,
             'tgl_lahir'         => $request->tgl_lahir,
@@ -229,6 +250,16 @@ class SugargliderController extends Controller
             'keterangan'        => $request->keterangan,
             'user_id'           => Auth::id(),
         ]);
+
+        $svc = app(PointService::class);
+        $user = Auth::user();
+        $svc->earn($user, PointType::SG_CREATE, $sugarglider);
+        if ($imagename) {
+            $svc->earn($user, PointType::SG_PHOTO, $sugarglider);
+        }
+        if ($request->indukan_jantan && $request->indukan_betina) {
+            $svc->earn($user, PointType::SG_PEDIGREE, $sugarglider);
+        }
 
         return redirect()->route('sugarglider.index')->with('pesan', 'Data berhasil ditambahkan.');
     }
@@ -334,14 +365,33 @@ class SugargliderController extends Controller
             ? SugargliderModel::select('id', 'nama', 'jenis')->find($sugarglider->indukan_betina)
             : null;
 
-        return view('sugargliders.v_backend_sugarglider_edit', compact('sugarglider', 'indukanJantan', 'indukanBetina'));
+        $profile      = ProfileModel::where('user_id', Auth::id())->first();
+        $ownerPrefix  = $profile?->kode_profil;
+        $kodeMismatch = $ownerPrefix && !str_starts_with($sugarglider->kode ?? '', $ownerPrefix . '-');
+        $newKode      = null;
+        if ($kodeMismatch) {
+            $count   = SugargliderModel::where('user_id', Auth::id())->withTrashed()->count();
+            $newKode = $this->nextKode($ownerPrefix, Auth::id(), $count, $sugarglider->id);
+        }
+
+        return view('sugargliders.v_backend_sugarglider_edit', compact('sugarglider', 'indukanJantan', 'indukanBetina', 'newKode'));
     }
 
     function update(SugargliderRequest $request)
     {
         $sugarglider = SugargliderModel::find($request->id);
 
-        $sugarglider->kode              = $request->kode;
+        $kode = $sugarglider->kode;
+        if ($request->input('regenerate_kode')) {
+            $profile = ProfileModel::where('user_id', Auth::id())->first();
+            $prefix  = $profile?->kode_profil;
+            if ($prefix) {
+                $count = SugargliderModel::where('user_id', Auth::id())->withTrashed()->count();
+                $kode  = $this->nextKode($prefix, Auth::id(), $count, $sugarglider->id);
+            }
+        }
+
+        $sugarglider->kode              = $kode;
         $sugarglider->nama              = $request->nama;
         $sugarglider->kelamin           = $request->kelamin;
         $sugarglider->tgl_lahir         = $request->tgl_lahir;
@@ -364,6 +414,15 @@ class SugargliderController extends Controller
 
         $sugarglider->save();
 
+        $svc = app(PointService::class);
+        $user = Auth::user();
+        if ($sugarglider->gambar) {
+            $svc->earn($user, PointType::SG_PHOTO, $sugarglider);
+        }
+        if ($sugarglider->indukan_jantan && $sugarglider->indukan_betina) {
+            $svc->earn($user, PointType::SG_PEDIGREE, $sugarglider);
+        }
+
         return redirect()->route('sugarglider.index')->with('pesan', 'Data berhasil diperbaharui.');
     }
 
@@ -374,5 +433,27 @@ class SugargliderController extends Controller
         $sugarglider->delete();
 
         return redirect()->route('sugarglider.index')->with('pesan', 'Data berhasil dihapus.');
+    }
+
+    /**
+     * Find the next available kode slot for a user, skipping any already taken.
+     * Handles race conditions: if two tabs submit simultaneously, the later one
+     * gets the next free number instead of colliding.
+     *
+     * @param int|null $excludeId  Exclude this SG's own kode when regenerating (edit flow)
+     */
+    private function nextKode(string $prefix, int $userId, int $startNum, ?int $excludeId = null): string
+    {
+        $num = $startNum;
+        while (
+            SugargliderModel::withTrashed()
+                ->where('user_id', $userId)
+                ->where('kode', $prefix . '-' . str_pad($num, 4, '0', STR_PAD_LEFT))
+                ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
+                ->exists()
+        ) {
+            $num++;
+        }
+        return $prefix . '-' . str_pad($num, 4, '0', STR_PAD_LEFT);
     }
 }

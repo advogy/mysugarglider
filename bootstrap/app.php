@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CheckBanned;
 use App\Http\Middleware\DisableBackBtn;
+use App\Http\Middleware\EnsureAdmin;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Alias middleware kustom
         $middleware->alias([
             'DisableBackBtn' => DisableBackBtn::class,
+            'admin'          => EnsureAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

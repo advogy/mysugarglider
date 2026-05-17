@@ -25,12 +25,7 @@
     :backRoute="route('sugarglider.index')"
 />
 
-@if ($errors->any())
-    <div class="alert-danger mb-5">
-        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
-        <div>@foreach ($errors->all() as $err)<p>{{ $err }}</p>@endforeach</div>
-    </div>
-@endif
+<x-alert type="danger" :errors="$errors" />
 
 <div class="be-card max-w-2xl">
     <div class="p-6 sm:p-8">
@@ -44,7 +39,32 @@
                     </div>
                     <div>
                         <label class="form-label">{{ __('text.code') }}</label>
-                        <input type="text" name="kode" value="{{ old('kode') }}" class="input-field" required>
+                        <div class="flex items-center gap-2">
+                            @if ($prefix)
+                                <div class="w-20 px-3 py-2.5 rounded-xl border border-cream-dark bg-cream text-sm font-mono font-bold text-sage text-center select-none tracking-widest">
+                                    {{ $prefix }}
+                                </div>
+                            @else
+                                <input type="text" name="kode_prefix" id="kode-prefix"
+                                       maxlength="3" placeholder="ASG"
+                                       pattern="[A-Z]{3}" required
+                                       autocomplete="off"
+                                       class="w-20 input-field font-mono uppercase tracking-widest text-center text-sage font-bold"
+                                       oninput="this.value=this.value.toUpperCase().replace(/[^A-Z]/g,''); onPrefixInput(this.value)">
+                            @endif
+                            <span class="text-bark-muted font-bold font-mono">—</span>
+                            <div id="kode-number" class="w-20 px-3 py-2.5 rounded-xl border border-cream-dark bg-cream text-sm font-mono font-bold text-bark text-center select-none transition-opacity {{ $prefix ? '' : 'opacity-30' }}">
+                                {{ $nextNumber }}
+                            </div>
+                        </div>
+                        @if ($prefix)
+                            <p class="form-hint">Kode otomatis dari profil Anda • Nomor urut dari semua SG Anda</p>
+                        @else
+                            <p class="form-hint text-amber-600 mt-1">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                Kode profil belum diatur. <a href="{{ route('profile') }}" class="underline font-bold">Lengkapi profil</a> untuk kode otomatis.
+                            </p>
+                        @endif
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -149,5 +169,12 @@ function makeTomSelect(elId, kelamin) {
 }
 makeTomSelect('ts-indukan-jantan', 1);
 makeTomSelect('ts-indukan-betina', 0);
+
+@unless ($prefix)
+function onPrefixInput(val) {
+    const numEl = document.getElementById('kode-number');
+    numEl.classList.toggle('opacity-30', val.length < 3);
+}
+@endunless
 </script>
 @endpush

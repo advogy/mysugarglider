@@ -25,12 +25,7 @@
     :backRoute="route('sugarglider.index')"
 />
 
-@if ($errors->any())
-    <div class="alert-danger mb-5">
-        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
-        <div>@foreach ($errors->all() as $err)<p>{{ $err }}</p>@endforeach</div>
-    </div>
-@endif
+<x-alert type="danger" :errors="$errors" />
 
 <div class="be-card max-w-2xl">
     <div class="p-6 sm:p-8">
@@ -45,7 +40,29 @@
                     </div>
                     <div>
                         <label class="form-label">{{ __('text.code') }}</label>
-                        <input type="text" name="kode" value="{{ $sugarglider->kode }}" class="input-field" required>
+                        <input type="hidden" name="kode" value="{{ $sugarglider->kode }}">
+                        @php
+                            $kodeParts = explode('-', $sugarglider->kode ?? '', 2);
+                        @endphp
+                        <div class="flex items-center gap-0.5 px-3 py-2.5 rounded-xl border border-cream-dark bg-cream text-sm font-mono select-none">
+                            <span class="font-bold text-sage">{{ $kodeParts[0] ?? '' }}</span>
+                            @if (isset($kodeParts[1]))
+                                <span class="text-bark-muted">-</span>
+                                <span class="font-bold text-bark">{{ $kodeParts[1] }}</span>
+                            @endif
+                        </div>
+                        @if ($newKode)
+                            <div class="mt-2 p-3 rounded-xl bg-amber-50 border border-amber-200">
+                                <label class="flex items-start gap-2 cursor-pointer">
+                                    <input type="checkbox" name="regenerate_kode" value="1" class="mt-0.5 rounded">
+                                    <span class="text-sm text-amber-800">
+                                        Perbarui ke kode profil saya:
+                                        <span class="font-mono font-bold">{{ $newKode }}</span>
+                                        <span class="block text-xs mt-0.5 text-amber-700">Berguna setelah SG ini berpindah kepemilikan (adopsi)</span>
+                                    </span>
+                                </label>
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">

@@ -5,6 +5,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Middleware\Authenticate;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Admin\AdminPointController;
+use App\Http\Controllers\Admin\AdminDataController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminConfigController;
+use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SugargliderController;
@@ -18,6 +23,7 @@ use App\Http\Controllers\AdoptionController;
 use App\Http\Controllers\AdoptionRequestController;
 use App\Http\Controllers\PointController;
 use App\Http\Controllers\TestimonialController;
+use App\Http\Controllers\BreedingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,11 +59,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     /**
-     * Verification Routes
+     * Email OTP Verification Routes
      */
-    Route::get('/email/verify', [VerificationController::class, 'show'])->name('verification.notice');
-    Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
-    Route::post('/email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
+    Route::get('/email/verify', [OtpController::class, 'show'])->name('verification.notice');
+    Route::post('/email/verify', [OtpController::class, 'verify'])->name('verification.otp.verify')->middleware('throttle:5,1');
+    Route::post('/email/resend', [OtpController::class, 'resend'])->name('verification.resend')->middleware('throttle:3,5');
 
     //only verified account can access with this group
     Route::group(['middleware' => ['verified']], function () {
@@ -135,16 +141,77 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/my/adoptions/{id}/shipping', [AdoptionRequestController::class, 'backend_adoption_shipping'])->name('adoptionrequest.shipping');
         Route::post('/my/adoptions/{id}/finalize', [AdoptionRequestController::class, 'backend_adoption_finalize'])->name('adoptionrequest.finalize');
 
+        /**
+         * Breeding Calculator Routes
+         */
+        Route::get('/my/breeding/inbreeding', [BreedingController::class, 'inbreeding'])->name('breeding.inbreeding');
+        Route::post('/my/breeding/inbreeding', [BreedingController::class, 'calculateInbreeding'])->name('breeding.inbreeding.calculate');
+        Route::get('/my/breeding/morph', [BreedingController::class, 'morph'])->name('breeding.morph');
+        Route::post('/my/breeding/morph', [BreedingController::class, 'calculateMorph'])->name('breeding.morph.calculate');
+
         Route::get('/my/points', [PointController::class, 'index'])->name('points.index');
         Route::post('/my/points/redeem', [PointController::class, 'redeem'])->name('points.redeem');
         Route::get('/my/points/history', [PointController::class, 'history'])->name('points.history');
 
         Route::post('/my/testimonial', [TestimonialController::class, 'store'])->name('testimonial.store');
         Route::delete('/my/testimonial/{testimonial}', [TestimonialController::class, 'destroy'])->name('testimonial.destroy');
+    });
 
-        Route::get('/admin/testimonials', [TestimonialController::class, 'adminIndex'])->name('testimonial.admin');
-        Route::post('/admin/testimonials/{testimonial}/approve', [TestimonialController::class, 'approve'])->name('testimonial.approve');
-        Route::post('/admin/testimonials/{testimonial}/reject', [TestimonialController::class, 'reject'])->name('testimonial.reject');
+    /**
+     * Admin Routes — hanya bisa diakses oleh user dengan role 'admin'
+     */
+    Route::group(['middleware' => ['verified', 'admin'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
+
+        // Testimoni
+        Route::get('/testimonials', [TestimonialController::class, 'adminIndex'])->name('testimonial.admin');
+        Route::post('/testimonials/{testimonial}/approve', [TestimonialController::class, 'approve'])->name('testimonial.approve');
+        Route::post('/testimonials/{testimonial}/reject', [TestimonialController::class, 'reject'])->name('testimonial.reject');
+        Route::put('/testimonials/{testimonial}', [TestimonialController::class, 'update'])->name('testimonial.update');
+
+        // Manajemen Poin
+        Route::get('/points/users', [AdminPointController::class, 'users'])->name('points.users');
+        Route::get('/points/users/{user}', [AdminPointController::class, 'userDetail'])->name('points.user.detail');
+
+        Route::get('/points/redemptions', [AdminPointController::class, 'redemptions'])->name('points.redemptions');
+        Route::post('/points/redemptions/{redemption}/approve', [AdminPointController::class, 'approveRedemption'])->name('points.redemptions.approve');
+        Route::post('/points/redemptions/{redemption}/cancel', [AdminPointController::class, 'cancelRedemption'])->name('points.redemptions.cancel');
+
+        Route::get('/points/rewards', [AdminPointController::class, 'rewards'])->name('points.rewards');
+        Route::get('/points/rewards/create', [AdminPointController::class, 'createReward'])->name('points.rewards.create');
+        Route::post('/points/rewards', [AdminPointController::class, 'storeReward'])->name('points.rewards.store');
+        Route::get('/points/rewards/{reward}/edit', [AdminPointController::class, 'editReward'])->name('points.rewards.edit');
+        Route::put('/points/rewards/{reward}', [AdminPointController::class, 'updateReward'])->name('points.rewards.update');
+        Route::delete('/points/rewards/{reward}', [AdminPointController::class, 'destroyReward'])->name('points.rewards.destroy');
+
+        Route::get('/points/configs', [AdminPointController::class, 'configs'])->name('points.configs');
+        Route::post('/points/configs', [AdminPointController::class, 'updateConfigs'])->name('points.configs.update');
+
+        // Data Semua Pengguna
+        Route::get('/data/shelters',                    [AdminDataController::class, 'shelters'])->name('data.shelters');
+        Route::get('/data/shelters/{shelter}/edit',     [AdminDataController::class, 'editShelter'])->name('data.shelters.edit');
+        Route::put('/data/shelters/{shelter}',          [AdminDataController::class, 'updateShelter'])->name('data.shelters.update');
+        Route::delete('/data/shelters/{shelter}',       [AdminDataController::class, 'destroyShelter'])->name('data.shelters.destroy');
+
+        Route::get('/data/sugargliders',                       [AdminDataController::class, 'sugargliders'])->name('data.sugargliders');
+        Route::get('/data/sugargliders/{sugarglider}/edit',    [AdminDataController::class, 'editSugarglider'])->name('data.sugargliders.edit');
+        Route::put('/data/sugargliders/{sugarglider}',         [AdminDataController::class, 'updateSugarglider'])->name('data.sugargliders.update');
+        Route::delete('/data/sugargliders/{sugarglider}',      [AdminDataController::class, 'destroySugarglider'])->name('data.sugargliders.destroy');
+
+        Route::get('/data/collections',                        [AdminDataController::class, 'collections'])->name('data.collections');
+        Route::patch('/data/collections/{collection}/status',  [AdminDataController::class, 'updateCollectionStatus'])->name('data.collections.status');
+        Route::delete('/data/collections/{collection}',        [AdminDataController::class, 'destroyCollection'])->name('data.collections.destroy');
+
+        // Manajemen User
+        Route::get('/users',                      [AdminUserController::class, 'index'])->name('users.index');
+        Route::post('/users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
+        Route::post('/users/{user}/toggle-role',   [AdminUserController::class, 'toggleRole'])->name('users.toggle-role');
+        Route::delete('/users/{user}',             [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Sistem Konfigurasi & Halaman Publik
+        Route::get('/configs/site',          [AdminConfigController::class, 'site'])->name('configs.site');
+        Route::post('/configs/site',         [AdminConfigController::class, 'updateSite'])->name('configs.site.update');
+        Route::get('/configs/halaman',       [AdminConfigController::class, 'halaman'])->name('configs.halaman');
+        Route::post('/configs/halaman',      [AdminConfigController::class, 'updateHalaman'])->name('configs.halaman.update');
     });
 });
 

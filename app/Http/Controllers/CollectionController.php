@@ -14,6 +14,8 @@ use App\Models\ShelterModel;
 use App\Models\SugargliderModel;
 use App\Models\AdoptionModel;
 use App\Models\AdoptionRequestModel;
+use App\Enums\PointType;
+use App\Services\PointService;
 
 class CollectionController extends Controller
 {
@@ -76,7 +78,7 @@ class CollectionController extends Controller
         return view('collections.v_collection_index', $data);
     }
 
-    function backend_collection_index()
+    function backend_collection_index(Request $request)
     {
         $profile = ProfileModel::where('user_id', Auth::id())->first();
 
@@ -84,24 +86,28 @@ class CollectionController extends Controller
             return view('profiles.v_profile_no');
         }
 
-        $data = [
-            'collections' =>
-            CollectionModel::join('sugargliders as sg', 'collections.sugarglider_id', '=', 'sg.id')
-                ->join('shelters as st', 'collections.shelter_id', '=', 'st.id')
-                ->select(
-                    'collections.id as id',
-                    'collections.status as status',
-                    'sg.nama as sgNama',
-                    'sg.gambar as sgGambar',
-                    'st.nama as stNama',
-                    'st.gambar as stGambar',
-                )
-                ->where('st.user_id', Auth::id())
-                ->orderBy('collections.updated_at', 'desc')
-                ->paginate(20)
-        ];
+        $q = trim($request->get('q', ''));
 
-        return view('collections.v_backend_collection_index', $data);
+        $collections = CollectionModel::join('sugargliders as sg', 'collections.sugarglider_id', '=', 'sg.id')
+            ->join('shelters as st', 'collections.shelter_id', '=', 'st.id')
+            ->select(
+                'collections.id as id',
+                'collections.status as status',
+                'sg.nama as sgNama',
+                'sg.gambar as sgGambar',
+                'st.nama as stNama',
+                'st.gambar as stGambar',
+            )
+            ->where('st.user_id', Auth::id())
+            ->when($q, fn($query) => $query->where(function ($sub) use ($q) {
+                $sub->where('sg.nama', 'like', "%$q%")
+                    ->orWhere('st.nama', 'like', "%$q%");
+            }))
+            ->orderBy('collections.updated_at', 'desc')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('collections.v_backend_collection_index', compact('collections', 'q'));
     }
 
     function create()
@@ -118,12 +124,14 @@ class CollectionController extends Controller
 
     function store(CollectionRequest $request)
     {
-        CollectionModel::create([
+        $collection = CollectionModel::create([
             'shelter_id'        => $request->shelter_id,
             'sugarglider_id'    => $request->sugarglider_id,
             'status'            => $request->status,
             'user_id'           => Auth::id(),
         ]);
+
+        app(PointService::class)->earn(Auth::user(), PointType::COLLECTION_CREATE, $collection);
 
         return redirect()->route('collection.index')->with('pesan', 'Data berhasil ditambahkan.');
     }

@@ -42,13 +42,6 @@
     </div>
 </div>
 
-@if (session('pesan'))
-    <div class="alert-success mb-5">
-        <i class="bi bi-check-circle-fill text-lg"></i>
-        <p class="font-semibold">{{ session('pesan') }}</p>
-    </div>
-@endif
-
 {{-- Main content grid --}}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
 

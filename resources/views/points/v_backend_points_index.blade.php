@@ -9,19 +9,6 @@
     subtitle="Kumpulkan poin dari setiap aktivitas dan tukarkan dengan hadiah menarik."
 />
 
-@if (session('pesan'))
-    <div class="alert-success mb-5">
-        <i class="bi bi-check-circle-fill text-lg flex-shrink-0"></i>
-        <p class="font-semibold">{{ session('pesan') }}</p>
-    </div>
-@endif
-@if (session('error'))
-    <div class="alert-danger mb-5">
-        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
-        <p class="font-semibold">{{ session('error') }}</p>
-    </div>
-@endif
-
 {{-- Ringkasan Poin --}}
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 
@@ -116,6 +103,7 @@
                 ['Buka adopsi SG', 20, 'bi-journal-check'],
                 ['SG berhasil diadopsi (pemilik)', 100, 'bi-bag-check-fill'],
                 ['Berhasil mengadopsi SG', 75, 'bi-heart-arrow'],
+                ['Menulis testimoni (disetujui)', 50, 'bi-chat-quote-fill'],
             ] as [$label, $pts, $icon])
             <div class="flex items-center gap-3">
                 <i class="bi {{ $icon }} text-sage flex-shrink-0"></i>

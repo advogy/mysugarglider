@@ -10,12 +10,7 @@
     :backRoute="route('collection.index')"
 />
 
-@if ($errors->any())
-    <div class="alert-danger mb-5">
-        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
-        <div>@foreach ($errors->all() as $err)<p>{{ $err }}</p>@endforeach</div>
-    </div>
-@endif
+<x-alert type="danger" :errors="$errors" />
 
 <div class="be-card max-w-2xl">
     <div class="p-6 sm:p-8">

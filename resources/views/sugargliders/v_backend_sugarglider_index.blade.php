@@ -10,12 +10,11 @@
     :createRoute="route('sugarglider.create')"
 />
 
-@if (session('pesan'))
-    <div class="alert-success mb-5">
-        <i class="bi bi-check-circle-fill text-lg"></i>
-        <p class="font-semibold">{{ session('pesan') }}</p>
-    </div>
-@endif
+<x-search-bar
+    placeholder="Cari nama, kode, atau jenis morph..."
+    :resetRoute="route('sugarglider.index')"
+    :q="$q"
+/>
 
 <div class="be-card overflow-hidden">
     <div class="overflow-x-auto scrollbar-thin">

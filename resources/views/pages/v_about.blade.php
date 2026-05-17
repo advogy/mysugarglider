@@ -7,8 +7,8 @@
 <header class="premium-page-header header-about">
     <div class="header-blob-about-1"></div>
     <div class="header-blob-about-2"></div>
-    <h1 class="page-title size-lg">Tentang MySugarGlider</h1>
-    <p class="page-subtitle subtitle-lg">Platform komunitas Sugar Glider terpercaya di Indonesia. Kami hadir untuk memastikan sahabat berbulu Anda mendapatkan perawatan terbaik.</p>
+    <h1 class="page-title size-lg">{{ $about_heading ?: 'Tentang MySugarGlider' }}</h1>
+    <p class="page-subtitle subtitle-lg">{{ $about_intro ?: 'Platform komunitas Sugar Glider terpercaya di Indonesia. Kami hadir untuk memastikan sahabat berbulu Anda mendapatkan perawatan terbaik.' }}</p>
 </header>
 
 <section class="about-section">
@@ -24,6 +24,9 @@
         <p class="about-desc">
             Platform ini hadir sebagai wadah bagi para pencinta, pemilik, dan peternak sugar glider. Dengan silsilah yang akurat, Anda bisa mendapatkan keturunan sugar glider yang berkualitas tinggi, mencegah inbreeding, dan memonitor kesehatan genetik mereka dengan lebih mudah.
         </p>
+        @if ($about_content)
+            <div class="about-desc">{!! nl2br(e($about_content)) !!}</div>
+        @endif
     </div>
 </section>
 

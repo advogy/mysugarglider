@@ -9,18 +9,7 @@
     subtitle="Perbarui data Anda."
 />
 
-@if (session('pesan'))
-    <div class="alert-success mb-5">
-        <i class="bi bi-check-circle-fill text-lg flex-shrink-0"></i>
-        <p class="font-semibold">{{ session('pesan') }}</p>
-    </div>
-@endif
-@if ($errors->any())
-    <div class="alert-danger mb-5">
-        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
-        <div>@foreach ($errors->all() as $err)<p>{{ $err }}</p>@endforeach</div>
-    </div>
-@endif
+<x-alert type="danger" :errors="$errors" />
 
 <div class="max-w-2xl">
 
@@ -81,6 +70,26 @@
                         <input type="text" name="telepon" value="{{ $profile->telepon ?? '' }}"
                                placeholder="{{ __('text.telp') }}"
                                class="input-field" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Kode Profil <span class="text-xs font-normal text-bark-muted">(inisial kode Sugar Glider)</span></label>
+                        <input type="text" name="kode_profil" id="kode-profil-input"
+                               value="{{ old('kode_profil', $profile->kode_profil ?? '') }}"
+                               placeholder="CTH: ASG"
+                               maxlength="3"
+                               class="input-field font-mono uppercase tracking-widest w-32"
+                               oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g,''); updateKodePreview(this.value)"
+                               required>
+                        <p class="form-hint mt-1">
+                            Tepat 3 huruf kapital. Kode SG Anda akan berformat:
+                            <span id="kode-preview" class="font-mono font-bold text-sage">{{ $profile->kode_profil ? $profile->kode_profil . '-0001' : 'ASG-0001' }}</span>
+                        </p>
+                        @if ($profile?->kode_profil)
+                            <p class="text-xs text-amber-600 mt-1">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                Mengubah kode profil tidak akan memperbarui kode Sugar Glider yang sudah ada.
+                            </p>
+                        @endif
                     </div>
                     <div class="flex justify-end">
                         <button type="submit" class="btn-create">
@@ -190,6 +199,12 @@ function switchTab(id) {
     const btn = document.querySelector(`[data-tab="${id}"]`);
     btn.classList.add('border-sage', 'text-sage');
     btn.classList.remove('border-transparent', 'text-bark-muted');
+}
+function updateKodePreview(val) {
+    const preview = document.getElementById('kode-preview');
+    if (preview) {
+        preview.textContent = val.length === 3 ? val + '-0001' : (val || 'ASG') + '-0001';
+    }
 }
 </script>
 @endpush

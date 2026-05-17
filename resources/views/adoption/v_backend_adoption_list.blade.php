@@ -9,18 +9,6 @@
     subtitle="Daftar sugar glider yang dibuka untuk adopsi oleh pemilik lain."
 />
 
-@if (session('pesan'))
-    <div class="alert-success mb-5">
-        <i class="bi bi-check-circle-fill text-lg"></i>
-        <p class="font-semibold">{{ session('pesan') }}</p>
-    </div>
-@endif
-@if (session('error'))
-    <div class="alert-danger mb-5">
-        <i class="bi bi-exclamation-circle-fill text-lg"></i>
-        <p class="font-semibold">{{ session('error') }}</p>
-    </div>
-@endif
 @if ($errors->any())
     <div class="alert-danger mb-5">
         <i class="bi bi-exclamation-circle-fill text-lg"></i>
@@ -310,9 +298,12 @@
 
     {{-- Sidebar --}}
     <div class="lg:w-64 flex-shrink-0">
-        <div class="be-card p-5">
-            <h3 class="font-bold text-bark mb-4">Alur Adopsi</h3>
-            <div class="space-y-3 text-sm">
+        <div class="be-card overflow-hidden">
+            <div class="px-4 py-3 border-b border-cream-dark flex items-center gap-2 bg-sage/5">
+                <i class="bi bi-signpost-2-fill text-sage text-sm flex-shrink-0"></i>
+                <p class="font-ui font-bold text-bark text-sm">Alur Adopsi</p>
+            </div>
+            <div class="p-4 space-y-3 text-sm">
                 <div class="flex items-start gap-3">
                     <span class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <i class="bi bi-clock text-gray-500"></i>

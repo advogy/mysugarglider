@@ -19,6 +19,9 @@ class PointService
      */
     public function earn(User $user, PointType $type, Model $subject = null, string $note = null): ?PointLog
     {
+        // Admin tidak mengumpulkan poin
+        if ($user->isAdmin()) return null;
+
         if ($subject) {
             $exists = PointLog::where('user_id', $user->id)
                 ->where('type', $type->value)
@@ -27,6 +30,15 @@ class PointService
                 ->exists();
 
             if ($exists) return null;
+        }
+
+        // Batasi maks shelter yang dapat poin bonus
+        if ($type === PointType::SHELTER_CREATE) {
+            $maxBonus = (int) $this->config('shelter_max_bonus', 5);
+            $earned = PointLog::where('user_id', $user->id)
+                ->where('type', PointType::SHELTER_CREATE->value)
+                ->count();
+            if ($earned >= $maxBonus) return null;
         }
 
         $log = PointLog::create([
@@ -62,6 +74,11 @@ class PointService
     public function redeem(User $user, RewardItem $item, string $alamat = null): Redemption
     {
         $available = $this->available($user);
+        $minRedeem = (int) $this->config('min_redeem_poin', 0);
+
+        if ($available < $minRedeem) {
+            throw new \Exception('Minimum poin untuk penukaran adalah ' . number_format($minRedeem) . ' poin. Poin Anda: ' . number_format($available));
+        }
 
         if ($available < $item->poin_required) {
             throw new \Exception('Poin tidak mencukupi. Poin tersedia: ' . $available);
@@ -105,6 +122,26 @@ class PointService
             'approved_at'       => $approvedAt,
             'expired_at'        => $expiredAt,
         ]);
+    }
+
+    /**
+     * Refund poin dari redemption yang dibatalkan admin.
+     */
+    public function refund(User $user, Redemption $redemption): PointLog
+    {
+        $log = PointLog::create([
+            'user_id'      => $user->id,
+            'type'         => 'refund',
+            'points'       => $redemption->poin_used,
+            'subject_type' => Redemption::class,
+            'subject_id'   => $redemption->id,
+            'note'         => 'Refund penukaran: ' . ($redemption->rewardItem?->nama ?? '-'),
+            'expired_at'   => now()->addYear(),
+        ]);
+
+        $user->increment('total_points', $redemption->poin_used);
+
+        return $log;
     }
 
     /**

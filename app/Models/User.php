@@ -19,7 +19,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password', 'avatar', 'total_points', 'is_admin'
+        'name', 'email', 'password', 'avatar', 'total_points', 'role', 'status'
     ];
 
     /**
@@ -40,8 +40,22 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password'          => 'hashed',
-        'is_admin'          => 'boolean',
     ];
+
+    public function sendEmailVerificationNotification(): void
+    {
+        // Verifikasi menggunakan OTP — lihat OtpService
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 
     public function profile()
     {

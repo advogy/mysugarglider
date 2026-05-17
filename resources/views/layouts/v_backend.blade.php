@@ -26,18 +26,8 @@
 
     {{-- Page content --}}
     <main class="be-content flex-1 p-4 sm:p-6">
-        @if (session('success'))
-            <div class="alert-success mb-6">
-                <i class="bi bi-check-circle-fill text-lg"></i>
-                <p class="font-semibold">{{ session('success') }}</p>
-            </div>
-        @endif
-        @if (session('error'))
-            <div class="alert-danger mb-6">
-                <i class="bi bi-exclamation-circle-fill text-lg"></i>
-                <p class="font-semibold">{{ session('error') }}</p>
-            </div>
-        @endif
+        <x-alert :message="session('pesan') ?? session('success')" />
+        <x-alert type="danger" :message="session('error')" />
 
         @yield('content')
     </main>

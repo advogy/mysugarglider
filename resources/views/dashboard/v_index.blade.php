@@ -112,7 +112,7 @@
         <div class="space-y-3">
             @php
                 $steps = [
-                    ['num'=>1, 'label'=>'Lengkapi profil Anda',    'route'=>route('profile'),          'done'=>$profile_done],
+                    ['num'=>1, 'label'=>'Lengkapi profil Anda (termasuk kode profil)', 'route'=>route('profile'), 'done'=>$profile_done],
                     ['num'=>2, 'label'=>'Tambahkan kandang',        'route'=>route('shelter.index'),    'done'=>$count_shelters > 0],
                     ['num'=>3, 'label'=>'Input data Sugar Glider',  'route'=>route('sugarglider.index'),'done'=>$count_sugargliders > 0],
                     ['num'=>4, 'label'=>'Tambah penempatan',        'route'=>route('collection.index'), 'done'=>$count_collections > 0],

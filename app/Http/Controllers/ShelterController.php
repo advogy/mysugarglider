@@ -10,6 +10,8 @@ use App\Enums\CollectionStatus;
 use App\Models\ShelterModel;
 use App\Models\ProfileModel;
 use App\Models\SugargliderModel;
+use App\Enums\PointType;
+use App\Services\PointService;
 
 class ShelterController extends Controller
 {
@@ -38,23 +40,29 @@ class ShelterController extends Controller
         return view('shelters.v_shelter', $data);
     }
 
-    function backend_shelters_index()
+    function backend_shelters_index(Request $request)
     {
         $profile = ProfileModel::where('user_id', Auth::id())->first();
 
         if (is_null($profile)) {
             return view('profiles.v_profile_no');
-        } else {
-            $data = [
-                'shelters' => ShelterModel::withCount(['collections as sg_count' => function ($q) {
-                    $q->whereNull('collections.deleted_at');
-                }])
-                ->where('user_id', Auth::id())
-                ->paginate(20)
-            ];
-
-            return view('shelters.v_backend_shelter_index', $data);
         }
+
+        $q = trim($request->get('q', ''));
+
+        $shelters = ShelterModel::withCount(['collections as sg_count' => function ($query) {
+                $query->whereNull('collections.deleted_at');
+            }])
+            ->where('user_id', Auth::id())
+            ->when($q, fn($query) => $query->where(function ($sub) use ($q) {
+                $sub->where('nama', 'like', "%$q%")
+                    ->orWhere('kode', 'like', "%$q%")
+                    ->orWhere('alamat', 'like', "%$q%");
+            }))
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('shelters.v_backend_shelter_index', compact('shelters', 'q'));
     }
 
     function create()
@@ -73,7 +81,7 @@ class ShelterController extends Controller
             $imagename = null;
         }
 
-        ShelterModel::create([
+        $shelter = ShelterModel::create([
             'nama'              => $request->nama,
             'kode'              => $request->kode,
             'alamat'            => $request->alamat,
@@ -83,6 +91,8 @@ class ShelterController extends Controller
             'keterangan'        => $request->keterangan,
             'gmaps'             => $request->gmaps,
         ]);
+
+        app(PointService::class)->earn(Auth::user(), PointType::SHELTER_CREATE, $shelter);
 
         return redirect()->route('shelter.index')->with('pesan', 'Data berhasil ditambahkan.');
     }

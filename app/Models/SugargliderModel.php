@@ -25,6 +25,11 @@ class SugargliderModel extends Model
         });
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     // Many to Many - Shelter Table
     public function shelters()
     {

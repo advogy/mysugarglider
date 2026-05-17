@@ -10,12 +10,7 @@
     :backRoute="route('shelter.index')"
 />
 
-@if ($errors->any())
-    <div class="alert-danger mb-5">
-        <i class="bi bi-exclamation-circle-fill text-lg flex-shrink-0"></i>
-        <div>@foreach ($errors->all() as $err)<p>{{ $err }}</p>@endforeach</div>
-    </div>
-@endif
+<x-alert type="danger" :errors="$errors" />
 
 <div class="be-card max-w-2xl">
     <div class="p-6 sm:p-8">
@@ -39,8 +34,14 @@
                 </div>
                 <div>
                     <label class="form-label">{{ __('text.gmaps') }}</label>
-                    <input type="text" name="gmaps" value="{{ $shelter->gmaps }}" class="input-field">
-                    <p class="form-hint">Masukkan kode embed Google Maps.</p>
+                    <input type="text" id="gmaps-input" name="gmaps" value="{{ $shelter->gmaps }}" class="input-field"
+                           placeholder="Tempel URL embed Google Maps di sini...">
+                    <p class="form-hint">Salin dari Google Maps → Bagikan → Sematkan peta → salin URL src iframe.</p>
+                    <div id="maps-preview" class="{{ $shelter->gmaps ? '' : 'hidden' }} mt-3 rounded-2xl overflow-hidden border border-cream-dark" style="height:220px;">
+                        <iframe id="maps-preview-frame" class="w-full h-full border-0"
+                                src="{{ $shelter->gmaps ? (str_starts_with($shelter->gmaps, 'http') ? $shelter->gmaps : 'https://www.google.com/maps/embed?pb=' . $shelter->gmaps) : '' }}"
+                                allowfullscreen loading="lazy"></iframe>
+                    </div>
                 </div>
                 <div>
                     <label class="form-label">{{ __('text.status') }}</label>
@@ -74,5 +75,36 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+(function () {
+    const input   = document.getElementById('gmaps-input');
+    const preview = document.getElementById('maps-preview');
+    const frame   = document.getElementById('maps-preview-frame');
+    let timer;
+
+    function toEmbedUrl(val) {
+        val = val.trim();
+        if (!val) return '';
+        return val.startsWith('http') ? val : 'https://www.google.com/maps/embed?pb=' + val;
+    }
+
+    input.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            const url = toEmbedUrl(input.value);
+            if (!url) {
+                preview.classList.add('hidden');
+                frame.src = '';
+            } else {
+                frame.src = url;
+                preview.classList.remove('hidden');
+            }
+        }, 700);
+    });
+})();
+</script>
+@endpush
 
 @endsection

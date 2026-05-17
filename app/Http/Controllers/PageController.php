@@ -9,6 +9,7 @@ use App\Models\ShelterModel;
 use App\Models\AdoptionModel;
 use App\Models\CollectionModel;
 use App\Models\Testimonial;
+use App\Models\AppConfig;
 use App\Enums\CollectionStatus;
 use App\Enums\AdoptionStatus;
 use Carbon\Carbon;
@@ -84,7 +85,10 @@ class PageController extends Controller
     function about()
     {
         $data = [
-            'shelters' => ShelterModel::where('status', '1')->get(),
+            'shelters'      => ShelterModel::where('status', '1')->get(),
+            'about_heading' => AppConfig::get('about_heading'),
+            'about_intro'   => AppConfig::get('about_intro'),
+            'about_content' => AppConfig::get('about_content'),
         ];
         return view('pages/v_about', $data);
     }
