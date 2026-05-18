@@ -4,10 +4,32 @@
 
 @section('form')
 
+@php $maintenanceOn = \App\Models\AppConfig::get('maintenance_mode') === '1'; @endphp
+
+@if ($maintenanceOn)
+<div class="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-4 flex items-start gap-3">
+    <i class="bi bi-cone-striped text-amber-500 text-xl flex-shrink-0 mt-0.5"></i>
+    <div>
+        <p class="font-bold text-amber-800 text-sm">Sedang Maintenance</p>
+        <p class="text-amber-700 text-sm mt-0.5">{{ \App\Models\AppConfig::get('maintenance_message', 'Sistem sedang dalam pemeliharaan. Silakan coba beberapa saat lagi.') }}</p>
+    </div>
+</div>
+@endif
+
 <div class="mb-8">
-    <h1 class="text-3xl font-display font-bold text-bark mb-2">Selamat Datang!</h1>
+    <h1 class="text-3xl font-number font-bold text-bark mb-2">Selamat Datang!</h1>
     <p class="text-bark-muted text-sm">Masuk ke akun MySugarGlider Anda.</p>
 </div>
+
+@if (session('maintenance_blocked'))
+    <div class="alert-danger mb-5">
+        <i class="bi bi-cone-striped text-lg flex-shrink-0"></i>
+        <div>
+            <p class="font-bold">Login Tidak Tersedia</p>
+            <p class="text-xs mt-0.5">Sistem sedang maintenance. Hanya administrator yang dapat masuk saat ini.</p>
+        </div>
+    </div>
+@endif
 
 @if (session('error'))
     <div class="alert-danger mb-5">

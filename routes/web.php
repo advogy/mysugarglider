@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AdminPointController;
 use App\Http\Controllers\Admin\AdminDataController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminConfigController;
+use App\Http\Controllers\Admin\AdminAdoptionController;
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\PageController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\AdoptionRequestController;
 use App\Http\Controllers\PointController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\BreedingController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +82,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/my/profile/user', [ProfileController::class, 'update_user'])->name('profile.update.user');
         Route::post('/my/password', [ProfileController::class, 'password_change'])->name('profile.password.change');
         Route::post('/my/profile/avatar', [ProfileController::class, 'update_avatar'])->name('profile.update.avatar');
+        Route::post('/my/profile/bank', [ProfileController::class, 'update_bank'])->name('profile.update.bank');
 
         /**
          * Shelter Routes
@@ -129,6 +132,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/my/adoptions/{id}/request', [AdoptionController::class, 'backend_adoption_request'])->name('adoption.request');
         Route::get('/my/adoptions/{id}/edit', [AdoptionController::class, 'edit'])->name('adoption.edit');
         Route::put('/my/adoptions/{id}', [AdoptionController::class, 'update'])->name('adoption.update');
+        Route::delete('/my/adoptions/{id}', [AdoptionController::class, 'destroy'])->name('adoption.destroy');
 
         /**
          * Adoption Request Routes
@@ -136,8 +140,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/my/adoptions/{id}/request', [AdoptionRequestController::class, 'store'])->name('adoptionrequest.store');
         Route::post('/my/adoptions/select', [AdoptionRequestController::class, 'backend_adoption_select'])->name('adoptionrequest.select');
         Route::post('/my/adoptionrequests/{id}/upload-payment', [AdoptionRequestController::class, 'upload_payment'])->name('adoptionrequest.upload-payment');
+        Route::post('/my/adoptionrequests/{id}/cancel', [AdoptionRequestController::class, 'cancel_selection'])->name('adoptionrequest.cancel');
         Route::post('/my/adoptionrequests/{id}/confirm-free', [AdoptionRequestController::class, 'confirm_free'])->name('adoptionrequest.confirm-free');
-        Route::post('/my/adoptionrequests/{id}/confirm-payment', [AdoptionRequestController::class, 'confirm_payment'])->name('adoptionrequest.confirm-payment');
         Route::post('/my/adoptions/{id}/shipping', [AdoptionRequestController::class, 'backend_adoption_shipping'])->name('adoptionrequest.shipping');
         Route::post('/my/adoptions/{id}/finalize', [AdoptionRequestController::class, 'backend_adoption_finalize'])->name('adoptionrequest.finalize');
 
@@ -155,6 +159,13 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::post('/my/testimonial', [TestimonialController::class, 'store'])->name('testimonial.store');
         Route::delete('/my/testimonial/{testimonial}', [TestimonialController::class, 'destroy'])->name('testimonial.destroy');
+
+        /**
+         * Notification Routes
+         */
+        Route::get('/my/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/my/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+        Route::post('/my/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
     });
 
     /**
@@ -207,9 +218,16 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/users/{user}/toggle-role',   [AdminUserController::class, 'toggleRole'])->name('users.toggle-role');
         Route::delete('/users/{user}',             [AdminUserController::class, 'destroy'])->name('users.destroy');
 
+        // Manajemen Adopsi (Escrow)
+        Route::get('/adoptions',                              [AdminAdoptionController::class, 'index'])->name('adoptions.index');
+        Route::get('/adoptions/{id}/requests',               [AdminAdoptionController::class, 'showRequests'])->name('adoptions.requests');
+        Route::post('/adoptions/{id}/confirm-payment',       [AdminAdoptionController::class, 'confirmPayment'])->name('adoptions.confirm-payment');
+        Route::post('/adoptions/{id}/disburse',              [AdminAdoptionController::class, 'disburse'])->name('adoptions.disburse');
+
         // Sistem Konfigurasi & Halaman Publik
         Route::get('/configs/site',          [AdminConfigController::class, 'site'])->name('configs.site');
         Route::post('/configs/site',         [AdminConfigController::class, 'updateSite'])->name('configs.site.update');
+        Route::post('/configs/maintenance',  [AdminConfigController::class, 'updateMaintenance'])->name('configs.maintenance.update');
         Route::get('/configs/halaman',       [AdminConfigController::class, 'halaman'])->name('configs.halaman');
         Route::post('/configs/halaman',      [AdminConfigController::class, 'updateHalaman'])->name('configs.halaman.update');
     });
@@ -224,6 +242,7 @@ Route::get('/sugargliders/{id}', [SugargliderController::class, 'show'])->name('
 Route::get('/collections', [CollectionController::class, 'index'])->name('collections');
 
 Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/adopsi/panduan', [PageController::class, 'adoptionGuide'])->name('adoption.guide');
 Route::post('/contact', [ContactController::class, 'contactPost'])->name('contact.post');
 
 Route::get('/pedigree', [PedigreeController::class, 'index'])->name('pedigree');

@@ -63,15 +63,17 @@
                         </td>
                         <td class="text-right">
                             <div class="table-actions">
-                                <a href="{{ route('collection.edit', $collection->id) }}" class="btn-edit">
-                                    <i class="bi bi-pencil"></i>
-                                    <span class="hidden sm:inline">Edit</span>
-                                </a>
-                                <button type="button"
-                                        onclick="confirmDelete('{{ route('collection.destroy', $collection->id) }}', '{{ $collection->sgNama }}')"
-                                        class="btn-delete">
-                                    <i class="bi bi-trash"></i>
-                                </button>
+                                @if ($collection->status != 5)
+                                    <a href="{{ route('collection.edit', $collection->id) }}" class="btn-edit">
+                                        <i class="bi bi-pencil"></i>
+                                        <span class="hidden sm:inline">Edit</span>
+                                    </a>
+                                    <button type="button"
+                                            onclick="confirmDelete('{{ route('collection.destroy', $collection->id) }}', '{{ $collection->sgNama }}')"
+                                            class="btn-delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                @endif
                             </div>
                         </td>
                     </tr>

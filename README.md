@@ -22,6 +22,10 @@ Platform manajemen Sugar Glider berbasis web — catat, kelola, dan bagikan data
 - **Poin & Level** — kumpulkan poin dari setiap aktivitas (tambah SG, lengkapi profil, foto, silsilah, dll)
 - **Penukaran Poin** — tukarkan poin dengan reward yang tersedia
 
+### Breeding Tools
+- **Inbreeding Calculator** — hitung koefisien inbreeding (Wright's Path Coefficient) dari dua calon indukan; mendukung mode database (pilih SG terdaftar) dan mode manual (input pohon silsilah sendiri); searchable dropdown dengan data milik sendiri maupun pengguna lain
+- **Morph Predictor** — prediksi morph keturunan berdasarkan Hukum Mendel; mendukung morph dominan, resesif, dan kombinasi (Platinum Mosaic / TPM); pilih morph utama yang diekspresikan dan gen het carrier dari setiap indukan
+
 ### Publik
 - Direktori kandang dan Sugar Glider yang dipublikasikan
 - Halaman detail kandang dengan pratinjau peta Google Maps (bisa diperbesar)
@@ -85,12 +89,29 @@ php artisan serve
 
 ## Dependensi Utama
 
+**Backend (Composer)**
+
 | Package | Kegunaan |
 |---|---|
 | `laravel/framework ^12.0` | Framework utama |
 | `intervention/image ^3.0` | Resize dan crop foto avatar, kandang, SG |
 | `laravel/ui ^4.5` | Scaffolding autentikasi |
 | `laravel/sanctum ^4.0` | API token authentication |
+
+**Frontend (NPM)**
+
+| Package | Kegunaan |
+|---|---|
+| `tailwindcss ^3.4` | Utility-first CSS framework |
+| `vite ^5.0` | Asset bundler |
+| `@tailwindcss/forms ^0.5` | Reset style untuk form elements |
+
+**CDN (di-load via Blade)**
+
+| Library | Kegunaan |
+|---|---|
+| Bootstrap Icons | Icon set |
+| Tom Select v2 | Searchable dropdown (Inbreeding Calculator) |
 
 ---
 
@@ -106,3 +127,5 @@ Tertarik berkontribusi? Hubungi [mr.fightto@gmail.com](mailto:mr.fightto@gmail.c
 - [ ] Artikel / Blog
 - [ ] Notifikasi real-time
 - [ ] Ekspor data silsilah (PDF)
+- [ ] Ekspor hasil prediksi morph (PDF / gambar)
+- [ ] Analitik breeding (riwayat perkawinan & hasil keturunan)

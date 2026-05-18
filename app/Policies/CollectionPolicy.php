@@ -53,12 +53,20 @@ class CollectionPolicy
      */
     public function update(User $user, CollectionModel $collectionModel)
     {
+        if ($collectionModel->status === \App\Enums\CollectionStatus::SELESAI->value) {
+            return false;
+        }
+
         return $user->id === $collectionModel->user_id
             || ($collectionModel->shelter && $user->id === $collectionModel->shelter->user_id);
     }
 
     public function delete(User $user, CollectionModel $collectionModel)
     {
+        if ($collectionModel->status === \App\Enums\CollectionStatus::SELESAI->value) {
+            return false;
+        }
+
         return $user->id === $collectionModel->user_id
             || ($collectionModel->shelter && $user->id === $collectionModel->shelter->user_id);
     }

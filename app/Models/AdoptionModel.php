@@ -15,4 +15,19 @@ class AdoptionModel extends Model
     protected $fillable = [
         'collection_id', 'user_id', 'harga', 'status', 'keterangan'
     ];
+
+    public function owner()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
+    }
+
+    public function collection()
+    {
+        return $this->belongsTo(CollectionModel::class, 'collection_id')->withTrashed();
+    }
+
+    public function requests()
+    {
+        return $this->hasMany(AdoptionRequestModel::class, 'adoption_id');
+    }
 }

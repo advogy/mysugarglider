@@ -10,8 +10,9 @@ class AdminConfigController extends Controller
 {
     public function site()
     {
-        $configs = AppConfig::byGroup('site');
-        return view('admin.configs.v_site', compact('configs'));
+        $configs     = AppConfig::byGroup('site');
+        $maintenance = AppConfig::byGroup('maintenance');
+        return view('admin.configs.v_site', compact('configs', 'maintenance'));
     }
 
     public function updateSite(Request $request)
@@ -21,6 +22,27 @@ class AdminConfigController extends Controller
         }
 
         return back()->with('pesan', 'Konfigurasi sistem berhasil disimpan.');
+    }
+
+    public function updateMaintenance(Request $request)
+    {
+        $defaults = [
+            'maintenance_mode' => [
+                'label' => 'Mode Maintenance', 'group' => 'maintenance', 'type' => 'toggle',
+                'keterangan' => 'Aktifkan untuk memblokir login pengguna biasa. Hanya admin yang bisa masuk.',
+            ],
+            'maintenance_message' => [
+                'label' => 'Pesan Maintenance', 'group' => 'maintenance', 'type' => 'textarea',
+                'keterangan' => 'Pesan yang ditampilkan di halaman login saat maintenance aktif.',
+            ],
+        ];
+
+        foreach ($defaults as $key => $meta) {
+            $value = $request->input("configs.{$key}", $key === 'maintenance_mode' ? '0' : '');
+            AppConfig::updateOrCreate(['key' => $key], array_merge(['value' => $value], $meta));
+        }
+
+        return back()->with('pesan', 'Konfigurasi maintenance berhasil disimpan.');
     }
 
     public function halaman()

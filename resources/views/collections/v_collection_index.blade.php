@@ -5,12 +5,18 @@
 @section('content')
 <div class="page-collections">
 
-<header class="premium-page-header">
+<header class="premium-page-header {{ request('status') == 'adopsi' ? 'pb-adoption' : '' }}">
     <div class="header-blob-1"></div>
     <h1 class="page-title">{{ request('status') == 'adopsi' ? 'Koleksi Adopsi' : 'Semua Koleksi' }}</h1>
     <p class="page-subtitle">
         {{ request('status') == 'adopsi' ? 'Temukan teman baru untuk melengkapi kebahagiaan Anda dari peternak terpercaya kami.' : 'Jelajahi seluruh database sugar glider yang terdaftar di komunitas MySugarGlider.' }}
     </p>
+    @if (request('status') == 'adopsi')
+    <a href="{{ route('adoption.guide') }}" class="inline-flex items-center gap-2 mt-5 px-5 py-2 rounded-full bg-white/80 border border-sage/30 text-sage text-sm font-bold hover:bg-white transition-colors relative z-10">
+        <i class="bi bi-signpost-2-fill"></i> Baca Panduan Adopsi
+        <i class="bi bi-arrow-right text-xs"></i>
+    </a>
+    @endif
 </header>
 
 {{-- Search bar --}}

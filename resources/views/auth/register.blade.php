@@ -5,7 +5,7 @@
 @section('form')
 
 <div class="mb-8">
-    <h1 class="text-3xl font-display font-bold text-bark mb-2">Buat Akun Baru</h1>
+    <h1 class="text-3xl font-number font-bold text-bark mb-2">Buat Akun Baru</h1>
     <p class="text-bark-muted text-sm">Bergabung dan mulai catat data sugar glider Anda.</p>
 </div>
 

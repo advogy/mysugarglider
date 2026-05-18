@@ -51,7 +51,11 @@ class ShelterController extends Controller
         $q = trim($request->get('q', ''));
 
         $shelters = ShelterModel::withCount(['collections as sg_count' => function ($query) {
-                $query->whereNull('collections.deleted_at');
+                $query->whereIn('status', [
+                    CollectionStatus::PRIVAT->value,
+                    CollectionStatus::PUBLIK->value,
+                    CollectionStatus::ADOPSI->value,
+                ]);
             }])
             ->where('user_id', Auth::id())
             ->when($q, fn($query) => $query->where(function ($sub) use ($q) {

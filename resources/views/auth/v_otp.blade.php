@@ -8,7 +8,7 @@
     <div class="w-14 h-14 rounded-2xl bg-sage/10 flex items-center justify-center mb-5">
         <i class="bi bi-envelope-check text-3xl text-sage"></i>
     </div>
-    <h1 class="text-3xl font-display font-bold text-bark mb-2">Cek Email Anda</h1>
+    <h1 class="text-3xl font-number font-bold text-bark mb-2">Cek Email Anda</h1>
     <p class="text-bark-muted text-sm leading-relaxed">
         Kode verifikasi 6 digit telah dikirim ke<br>
         <span class="font-bold text-bark">{{ $email }}</span>

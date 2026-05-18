@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppConfig;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -53,6 +54,14 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $rememberme)) {
             $request->session()->regenerate();
+
+            if (AppConfig::get('maintenance_mode') === '1' && !Auth::user()->isAdmin()) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->with('maintenance_blocked', true)->onlyInput('email');
+            }
+
             return redirect()->intended('/my');
         }
 

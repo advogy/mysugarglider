@@ -12,7 +12,7 @@ class AppConfig extends Model
     public static function get(string $key, mixed $default = null): mixed
     {
         $row = static::where('key', $key)->first();
-        return $row ? $row->value : $default;
+        return ($row && $row->value !== null && $row->value !== '') ? $row->value : $default;
     }
 
     public static function byGroup(string $group)

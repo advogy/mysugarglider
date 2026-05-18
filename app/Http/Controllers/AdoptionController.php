@@ -30,6 +30,7 @@ class AdoptionController extends Controller
 
         $collection = CollectionModel::whereIn('status', [
             CollectionStatus::PRIVAT->value,
+            CollectionStatus::PUBLIK->value,
             CollectionStatus::ADOPSI->value,
         ])->where('user_id', Auth::id())->first();
 
@@ -37,7 +38,20 @@ class AdoptionController extends Controller
             return view('collections.v_backend_collection_no_adoption');
         }
 
+        $lockedAdoptionIds = AdoptionRequestModel::whereIn('status', [
+                AdoptionRequestStatus::DIBAYAR->value,
+                AdoptionRequestStatus::DIKIRIM->value,
+            ])->pluck('adoption_id')->all();
+
+        $lockedEditIds = AdoptionRequestModel::whereIn('status', [
+                AdoptionRequestStatus::DIPILIH->value,
+                AdoptionRequestStatus::DIBAYAR->value,
+                AdoptionRequestStatus::DIKIRIM->value,
+            ])->pluck('adoption_id')->all();
+
         $data = [
+            'lockedAdoptionIds' => $lockedAdoptionIds,
+            'lockedEditIds'     => $lockedEditIds,
             'adoptions' => AdoptionModel::select(
                     'adoptions.id as id',
                     'adoptions.harga as harga',
@@ -69,7 +83,7 @@ class AdoptionController extends Controller
         $data = [
             'collections' => CollectionModel::select('collections.id', 'sugargliders.nama as nama')
                 ->leftJoin('sugargliders', 'collections.sugarglider_id', '=', 'sugargliders.id')
-                ->where('collections.status', CollectionStatus::ADOPSI->value)
+                ->whereIn('collections.status', [CollectionStatus::PRIVAT->value, CollectionStatus::PUBLIK->value])
                 ->where('collections.user_id', Auth::id())
                 ->whereNotIn('collections.id', $adoption)
                 ->orderBy('nama', 'asc')
@@ -93,6 +107,9 @@ class AdoptionController extends Controller
             'user_id'       => Auth::id(),
         ]);
 
+        $collection->status = CollectionStatus::ADOPSI->value;
+        $collection->save();
+
         app(PointService::class)->earn(Auth::user(), PointType::ADOPTION_OPEN, $adoption);
 
         return redirect()->route('adoption.index')->with('pesan', 'Adopsi berhasil dibuka.');
@@ -101,6 +118,18 @@ class AdoptionController extends Controller
     function edit($id)
     {
         $adoption = AdoptionModel::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+
+        $hasActive = AdoptionRequestModel::where('adoption_id', $id)
+            ->whereIn('status', [
+                AdoptionRequestStatus::DIPILIH->value,
+                AdoptionRequestStatus::DIBAYAR->value,
+                AdoptionRequestStatus::DIKIRIM->value,
+            ])->exists();
+
+        if ($hasActive) {
+            return redirect()->route('adoption.index')
+                ->with('error', 'Tidak dapat mengedit adopsi yang sedang dalam proses pemilihan atau transfer.');
+        }
 
         $activeAdoptions = AdoptionModel::where('status', AdoptionStatus::AKTIF->value)
             ->where('id', '!=', $id)
@@ -120,7 +149,7 @@ class AdoptionController extends Controller
 
             'collections' => CollectionModel::select('collections.id', 'sugargliders.nama as nama')
                 ->leftJoin('sugargliders', 'collections.sugarglider_id', '=', 'sugargliders.id')
-                ->where('collections.status', CollectionStatus::ADOPSI->value)
+                ->whereIn('collections.status', [CollectionStatus::PRIVAT->value, CollectionStatus::PUBLIK->value, CollectionStatus::ADOPSI->value])
                 ->where('collections.user_id', Auth::id())
                 ->whereNotIn('collections.id', $activeAdoptions)
                 ->orderBy('nama', 'asc')
@@ -141,6 +170,34 @@ class AdoptionController extends Controller
         return redirect()->route('adoption.index')->with('pesan', 'Data berhasil diperbaharui.');
     }
 
+    function destroy($id)
+    {
+        $adoption = AdoptionModel::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+
+        $hasActive = AdoptionRequestModel::where('adoption_id', $id)
+            ->whereIn('status', [
+                AdoptionRequestStatus::DIPILIH->value,
+                AdoptionRequestStatus::DIBAYAR->value,
+                AdoptionRequestStatus::DIKIRIM->value,
+            ])->exists();
+
+        if ($hasActive) {
+            return redirect()->route('adoption.index')
+                ->with('error', 'Tidak dapat menutup adopsi yang sedang dalam proses.');
+        }
+
+        $collection = CollectionModel::find($adoption->collection_id);
+        if ($collection) {
+            $collection->status = CollectionStatus::PRIVAT->value;
+            $collection->save();
+        }
+
+        $adoption->status = AdoptionStatus::NONAKTIF->value;
+        $adoption->save();
+
+        return redirect()->route('adoption.index')->with('pesan', 'Listing adopsi berhasil ditutup.');
+    }
+
     function backend_adoption_list()
     {
         $profile = ProfileModel::where('user_id', Auth::id())->first();
@@ -154,9 +211,16 @@ class AdoptionController extends Controller
             return view('shelters.v_backend_shelter_no');
         }
 
+        $hiddenByOthers = AdoptionRequestModel::whereIn('status', [
+                AdoptionRequestStatus::DIPILIH->value,
+                AdoptionRequestStatus::DIBAYAR->value,
+                AdoptionRequestStatus::DIKIRIM->value,
+            ])->where('user_id', '!=', Auth::id())->pluck('adoption_id');
+
         $data = [
             'adoptions' => AdoptionModel::select(
                     'adoptions.id as id',
+                    'adoptions.user_id as ownerUserId',
                     'adoptions.harga as harga',
                     'adoptions.keterangan as keterangan',
                     'sugargliders.nama as sgNama',
@@ -169,7 +233,8 @@ class AdoptionController extends Controller
                     'adoption_requests.harga as arHarga',
                     'adoption_requests.bukti_transfer as arBukti',
                     'collections.id as cId',
-                    'adoption_requests.shelter_id as arShelterId'
+                    'adoption_requests.shelter_id as arShelterId',
+                    'owner_profiles.telepon as ownerTelp',
                 )
                 ->leftJoin('collections', 'collections.id', '=', 'adoptions.collection_id')
                 ->leftJoin('sugargliders', 'sugargliders.id', '=', 'collections.sugarglider_id')
@@ -178,13 +243,17 @@ class AdoptionController extends Controller
                     $join->on('adoption_requests.adoption_id', '=', 'adoptions.id')
                          ->where('adoption_requests.user_id', '=', Auth::id());
                 })
-                ->where('adoptions.status', AdoptionStatus::AKTIF->value)
+                ->leftJoin('profiles as owner_profiles', 'owner_profiles.user_id', '=', 'adoptions.user_id')
                 ->where('adoptions.user_id', '!=', Auth::id())
-                ->whereNotIn('adoptions.id', AdoptionRequestModel::whereIn('status', [
-                    AdoptionRequestStatus::DIPILIH->value,
-                    AdoptionRequestStatus::DIBAYAR->value,
-                    AdoptionRequestStatus::DIKIRIM->value,
-                ])->pluck('adoption_id'))
+                ->where(function ($q) use ($hiddenByOthers) {
+                    // Adopsi aktif yang belum diambil orang lain
+                    $q->where(function ($q2) use ($hiddenByOthers) {
+                        $q2->where('adoptions.status', AdoptionStatus::AKTIF->value)
+                           ->whereNotIn('adoptions.id', $hiddenByOthers);
+                    })
+                    // Atau: permohonan user ditolak (tampilkan sebagai riwayat)
+                    ->orWhere('adoption_requests.status', AdoptionRequestStatus::DITOLAK->value);
+                })
                 ->orderBy('adoptions.updated_at', 'desc')
                 ->paginate(10),
 
@@ -215,17 +284,23 @@ class AdoptionController extends Controller
                     'shelters.id as kandang_id',
                     'shelters.nama as kandang',
                     'adoption_requests.id as id',
+                    'adoption_requests.user_id as userId',
                     'adoption_requests.harga as harga',
                     'adoption_requests.status as status',
                     'adoption_requests.keterangan as keterangan',
                     'adoption_requests.bukti_transfer as bukti_transfer',
+                    'adoption_requests.nama_ekspedisi as nama_ekspedisi',
+                    'adoption_requests.resi_pengiriman as resi_pengiriman',
+                    'adoption_requests.bukti_pengiriman as bukti_pengiriman',
                     'adoption_requests.paid_at as paid_at',
                     'adoption_requests.confirmed_at as confirmed_at',
-                    'adoption_requests.created_at as created_at'
+                    'adoption_requests.created_at as created_at',
+                    'applicant_profiles.telepon as applicantTelp',
                 )
                 ->where('adoption_id', $request->id)
                 ->leftJoin('users', 'users.id', '=', 'adoption_requests.user_id')
                 ->leftJoin('shelters', 'shelters.id', '=', 'adoption_requests.shelter_id')
+                ->leftJoin('profiles as applicant_profiles', 'applicant_profiles.user_id', '=', 'adoption_requests.user_id')
                 ->paginate(10),
         ];
 

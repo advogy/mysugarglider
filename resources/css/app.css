@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes cs-ping {
+    75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+.cs-ping { animation: cs-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
 @layer base {
     html { scroll-behavior: smooth; }
 
@@ -10,7 +15,7 @@
     }
 
     h1, h2, h3 {
-        @apply font-display;
+        @apply font-number;
     }
 }
 
@@ -99,7 +104,7 @@
 
     /* Section */
     .section-title {
-        @apply text-3xl md:text-4xl font-display text-bark leading-tight;
+        @apply text-3xl md:text-4xl font-number text-bark leading-tight;
     }
     .section-subtitle {
         @apply text-bark-muted text-base leading-relaxed;
@@ -187,16 +192,13 @@
     .be-content {
         @apply font-ui;
     }
-    /* Override the base h1/h2/h3 DM-Serif rule within admin content.
-       Utilities (e.g. font-display on the dashboard greeting) still win
-       because the @layer utilities cascade is higher than @layer components. */
     .be-content h1, .be-content h2, .be-content h3 {
         @apply font-ui;
     }
 
     /* Backend Topbar */
     .topbar {
-        @apply bg-white border-b border-cream-dark px-4 sm:px-6 py-3 sm:py-4 flex items-center
+        @apply bg-white border-b border-cream-dark px-4 sm:px-6 h-14 sm:h-16 flex items-center
                justify-between sticky top-0 z-30 shadow-soft;
     }
 
@@ -339,7 +341,6 @@
     }
 
     /* ── AUTH ───────────────────────────────────────────── */
-    body.auth-page .font-display,
     body.auth-page h1,
     body.auth-page h2,
     body.auth-page h3 { @apply font-number; }
@@ -457,6 +458,7 @@
     overflow: hidden;
 }
 .premium-page-header.header-about { padding-top: 160px; padding-bottom: 100px; }
+.premium-page-header.pb-adoption { padding-bottom: 20px; }
 .page-title {
     font-family: 'Outfit', sans-serif;
     font-size: 3.5rem;

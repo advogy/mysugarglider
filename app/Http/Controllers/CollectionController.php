@@ -33,6 +33,10 @@ class CollectionController extends Controller
             ])->pluck('adoption_id')
         )->pluck('collection_id');
 
+        // Collection IDs that have an active adoption listing
+        $activeAdoptionCollections = AdoptionModel::where('status', AdoptionStatus::AKTIF->value)
+            ->pluck('collection_id');
+
         $query = CollectionModel::join('sugargliders as sg', 'collections.sugarglider_id', '=', 'sg.id')
             ->join('shelters as st', 'collections.shelter_id', '=', 'st.id')
             ->select(
@@ -47,10 +51,11 @@ class CollectionController extends Controller
                 'sg.gambar as sgGambar',
                 'st.nama as stNama',
             )
-            ->where(function ($q) use ($statusFilter, $inProgressCollections) {
+            ->where(function ($q) use ($statusFilter, $inProgressCollections, $activeAdoptionCollections) {
                 if ($statusFilter === 'adopsi') {
-                    // Hanya tampilkan adopsi yg belum ada pemohon terpilih
+                    // Hanya tampilkan adopsi yg pemilik sudah buka listing & belum ada pemohon terpilih
                     $q->where('collections.status', CollectionStatus::ADOPSI->value)
+                      ->whereIn('collections.id', $activeAdoptionCollections)
                       ->whereNotIn('collections.id', $inProgressCollections);
                 } else {
                     // Tampilkan semua publik + adopsi yg masih terbuka
@@ -160,15 +165,20 @@ class CollectionController extends Controller
         $collection = CollectionModel::find($request->id);
         $collection->shelter_id     = $request->shelter_id;
         $collection->sugarglider_id = $request->sugarglider_id;
-        $collection->status         = $request->status;
 
-        if ($collection->status != CollectionStatus::ADOPSI->value) {
-            $adoption = AdoptionModel::where('collection_id', $request->id)
-                ->where('status', AdoptionStatus::AKTIF->value)
-                ->first();
-            if ($adoption) {
-                $adoption->status = AdoptionStatus::NONAKTIF->value;
-                $adoption->save();
+        // Status ADOPSI hanya boleh diset oleh sistem adopsi, bukan form ini
+        if ($request->status != CollectionStatus::ADOPSI->value) {
+            $collection->status = $request->status;
+
+            // Jika status diubah dari ADOPSI ke lain, nonaktifkan adoption aktif
+            if ($collection->getOriginal('status') == CollectionStatus::ADOPSI->value) {
+                $adoption = AdoptionModel::where('collection_id', $request->id)
+                    ->where('status', AdoptionStatus::AKTIF->value)
+                    ->first();
+                if ($adoption) {
+                    $adoption->status = AdoptionStatus::NONAKTIF->value;
+                    $adoption->save();
+                }
             }
         }
 

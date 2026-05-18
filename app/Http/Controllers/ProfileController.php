@@ -90,6 +90,31 @@ class ProfileController extends Controller
         return redirect()->route('login')->with('pesan', 'Password berhasil diubah. Silakan masuk kembali.');
     }
 
+    function update_bank(Request $request)
+    {
+        $request->validate([
+            'bank_name'           => 'required|string|max:100',
+            'bank_account_number' => 'required|string|max:50',
+            'bank_account_name'   => 'required|string|max:100',
+        ]);
+
+        $profile = ProfileModel::where('user_id', Auth::id())->first();
+        $fields  = [
+            'user_id'             => Auth::id(),
+            'bank_name'           => $request->bank_name,
+            'bank_account_number' => $request->bank_account_number,
+            'bank_account_name'   => $request->bank_account_name,
+        ];
+
+        if (is_null($profile)) {
+            ProfileModel::create($fields);
+        } else {
+            $profile->fill($fields)->save();
+        }
+
+        return redirect()->route('profile', ['#tab-bank'])->with('pesan_bank', 'Rekening bank berhasil diperbaharui.');
+    }
+
     function update_avatar(UpdateAvatarRequest $request)
     {
         if ($request->hasFile('avatar')) {

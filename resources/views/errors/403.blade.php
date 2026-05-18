@@ -19,7 +19,7 @@
            style="color: #06D6A0; letter-spacing: -4px;">403</p>
 
         {{-- Title --}}
-        <h1 class="font-display text-2xl sm:text-3xl font-bold text-bark mb-3">
+        <h1 class="font-number text-2xl sm:text-3xl font-bold text-bark mb-3">
             Akses Ditolak
         </h1>
 

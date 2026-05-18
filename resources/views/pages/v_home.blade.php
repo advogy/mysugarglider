@@ -282,17 +282,30 @@
         </svg>
     </div>
 
+    @php
+        $fShelter   = $featured_shelter ?? null;
+        $fSgPhotos  = $fShelter ? $fShelter->sugargliders : collect();
+        $staticImgs = [
+            asset('assets/images/pets/sg_card1_1778842695259.png'),
+            asset('assets/images/pets/sg_hero_1778842679372.png'),
+            asset('assets/images/pets/sg_card2_1778842710532.png'),
+        ];
+        $mainImg = $fSgPhotos->isNotEmpty()
+            ? asset('/upload/sugargliders/' . $fSgPhotos->first()->gambar)
+            : asset('assets/images/pets/sg_card2_1778842710532.png');
+    @endphp
+
     <div class="home-inner">
         <div class="home-visual">
             <div class="home-blob"></div>
-            <img src="{{ asset('assets/images/pets/sg_card2_1778842710532.png') }}" alt="Sugar Glider Home" class="home-img">
+            <img src="{{ $mainImg }}" alt="{{ $fShelter->nama ?? 'Sugar Glider Home' }}" class="home-img">
 
             {{-- Floating location badge --}}
             <div class="home-location-badge">
                 <i class="bi bi-house-heart-fill"></i>
                 <div>
-                    <div class="loc-name">Kandang Bahagia</div>
-                    <div class="loc-sub">Jakarta Selatan</div>
+                    <div class="loc-name">{{ $fShelter->nama ?? 'Kandang Bahagia' }}</div>
+                    <div class="loc-sub">{{ $fShelter->alamat ?? 'Indonesia' }}</div>
                 </div>
             </div>
         </div>
@@ -305,24 +318,17 @@
 
             {{-- 6-photo gallery (2 rows × 3 cols) --}}
             <div class="home-gallery">
-                <div class="home-gallery-item">
-                    <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}" alt="">
-                </div>
-                <div class="home-gallery-item">
-                    <img src="{{ asset('assets/images/pets/sg_hero_1778842679372.png') }}" alt="">
-                </div>
-                <div class="home-gallery-item">
-                    <img src="{{ asset('assets/images/pets/sg_card2_1778842710532.png') }}" alt="">
-                </div>
-                <div class="home-gallery-item">
-                    <img src="{{ asset('assets/images/pets/sg_hero_1778842679372.png') }}" alt="">
-                </div>
-                <div class="home-gallery-item">
-                    <img src="{{ asset('assets/images/pets/sg_card2_1778842710532.png') }}" alt="">
-                </div>
-                <div class="home-gallery-item">
-                    <img src="{{ asset('assets/images/pets/sg_card1_1778842695259.png') }}" alt="">
-                </div>
+                @for ($gi = 0; $gi < 6; $gi++)
+                    @php
+                        $sg  = $fSgPhotos->get($gi);
+                        $src = $sg
+                            ? asset('/upload/sugargliders/' . $sg->gambar)
+                            : $staticImgs[$gi % count($staticImgs)];
+                    @endphp
+                    <div class="home-gallery-item">
+                        <img src="{{ $src }}" alt="{{ $sg->nama ?? '' }}">
+                    </div>
+                @endfor
             </div>
         </div>
     </div>

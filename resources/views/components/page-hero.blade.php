@@ -26,7 +26,7 @@
             </nav>
         @endif
 
-        <h1 class="text-3xl sm:text-4xl font-display text-white leading-tight mb-3">{{ $title }}</h1>
+        <h1 class="text-3xl sm:text-4xl font-number text-white leading-tight mb-3">{{ $title }}</h1>
 
         @if ($subtitle)
             <p class="text-white/70 text-base max-w-xl">{{ $subtitle }}</p>

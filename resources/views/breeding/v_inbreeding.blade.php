@@ -156,55 +156,55 @@
                         <h3 class="font-ui font-bold text-bark text-sm">Indukan Jantan</h3>
                     </div>
                     <div>
-                        <label class="form-label text-xs">Nama Jantan <span class="text-red-500">*</span></label>
+                        <label class="text-sm font-semibold text-bark-light block mb-1.5">Nama Jantan <span class="text-red-500">*</span></label>
                         <input type="text" name="sire_name" value="{{ old('sire_name') }}"
                                placeholder="cth: Buddy" class="input-field" autocomplete="off">
                     </div>
 
                     <div class="border-t border-cream-dark pt-4">
-                        <p class="text-xs font-bold text-bark-muted mb-3 uppercase tracking-wide">Generasi 1 — Orang Tua</p>
+                        <p class="text-sm font-semibold text-bark-muted mb-3">Generasi 1 — Orang Tua</p>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Ayah</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Ayah</label>
                                 <input type="text" name="sire_sire_name" value="{{ old('sire_sire_name') }}"
-                                       placeholder="Nama ayah" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama ayah" class="input-field" autocomplete="off">
                             </div>
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Ibu</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Ibu</label>
                                 <input type="text" name="sire_dam_name" value="{{ old('sire_dam_name') }}"
-                                       placeholder="Nama ibu" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama ibu" class="input-field" autocomplete="off">
                             </div>
                         </div>
                     </div>
 
                     <div class="border-t border-cream-dark pt-4">
-                        <p class="text-xs font-bold text-bark-muted mb-3 uppercase tracking-wide">Generasi 2 — Kakek & Nenek</p>
+                        <p class="text-sm font-semibold text-bark-muted mb-3">Generasi 2 — Kakek & Nenek</p>
                         <div class="grid grid-cols-2 gap-x-3 gap-y-3">
                             <div class="col-span-2">
                                 <p class="text-xs text-bark-muted/70 mb-1.5">via Ayah</p>
                             </div>
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Kakek</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Kakek</label>
                                 <input type="text" name="sire_sire_sire_name" value="{{ old('sire_sire_sire_name') }}"
-                                       placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama" class="input-field" autocomplete="off">
                             </div>
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Nenek</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Nenek</label>
                                 <input type="text" name="sire_sire_dam_name" value="{{ old('sire_sire_dam_name') }}"
-                                       placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama" class="input-field" autocomplete="off">
                             </div>
                             <div class="col-span-2 mt-1">
                                 <p class="text-xs text-bark-muted/70 mb-1.5">via Ibu</p>
                             </div>
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Kakek</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Kakek</label>
                                 <input type="text" name="sire_dam_sire_name" value="{{ old('sire_dam_sire_name') }}"
-                                       placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama" class="input-field" autocomplete="off">
                             </div>
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Nenek</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Nenek</label>
                                 <input type="text" name="sire_dam_dam_name" value="{{ old('sire_dam_dam_name') }}"
-                                       placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama" class="input-field" autocomplete="off">
                             </div>
                         </div>
                     </div>
@@ -212,7 +212,7 @@
                     {{-- Gen 3 collapsible --}}
                     <div class="border-t border-cream-dark pt-3">
                         <button type="button" onclick="toggleGen3('sire')"
-                                class="flex items-center gap-1.5 text-xs text-bark-muted hover:text-bark transition-colors">
+                                class="flex items-center gap-1.5 text-sm text-bark-muted hover:text-bark transition-colors">
                             <i id="sire-gen3-icon" class="bi bi-chevron-right text-xs transition-transform"></i>
                             <span class="font-semibold">Generasi 3 — Buyut (Opsional)</span>
                         </button>
@@ -230,14 +230,14 @@
                                     <p class="text-xs text-bark-muted/70 mb-1.5">via {{ $g['label_via'] }}</p>
                                     <div class="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label class="form-label text-xs"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Buyut ♂</label>
+                                            <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Buyut ♂</label>
                                             <input type="text" name="{{ $g['prefix'] }}_sire_name" value="{{ old($g['prefix'] . '_sire_name') }}"
-                                                   placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                                   placeholder="Nama" class="input-field" autocomplete="off">
                                         </div>
                                         <div>
-                                            <label class="form-label text-xs"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Buyut ♀</label>
+                                            <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Buyut ♀</label>
                                             <input type="text" name="{{ $g['prefix'] }}_dam_name" value="{{ old($g['prefix'] . '_dam_name') }}"
-                                                   placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                                   placeholder="Nama" class="input-field" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
@@ -253,62 +253,62 @@
                         <h3 class="font-ui font-bold text-bark text-sm">Indukan Betina</h3>
                     </div>
                     <div>
-                        <label class="form-label text-xs">Nama Betina <span class="text-red-500">*</span></label>
+                        <label class="text-sm font-semibold text-bark-light block mb-1.5">Nama Betina <span class="text-red-500">*</span></label>
                         <input type="text" name="dam_name" value="{{ old('dam_name') }}"
                                placeholder="cth: Luna" class="input-field" autocomplete="off">
                     </div>
 
                     <div class="border-t border-cream-dark pt-4">
-                        <p class="text-xs font-bold text-bark-muted mb-3 uppercase tracking-wide">Generasi 1 — Orang Tua</p>
+                        <p class="text-sm font-semibold text-bark-muted mb-3">Generasi 1 — Orang Tua</p>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Ayah</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Ayah</label>
                                 <input type="text" name="dam_sire_name" value="{{ old('dam_sire_name') }}"
-                                       placeholder="Nama ayah" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama ayah" class="input-field" autocomplete="off">
                             </div>
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Ibu</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Ibu</label>
                                 <input type="text" name="dam_dam_name" value="{{ old('dam_dam_name') }}"
-                                       placeholder="Nama ibu" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama ibu" class="input-field" autocomplete="off">
                             </div>
                         </div>
                     </div>
 
                     <div class="border-t border-cream-dark pt-4">
-                        <p class="text-xs font-bold text-bark-muted mb-3 uppercase tracking-wide">Generasi 2 — Kakek & Nenek</p>
+                        <p class="text-sm font-semibold text-bark-muted mb-3">Generasi 2 — Kakek & Nenek</p>
                         <div class="grid grid-cols-2 gap-x-3 gap-y-3">
                             <div class="col-span-2">
                                 <p class="text-xs text-bark-muted/70 mb-1.5">via Ayah</p>
                             </div>
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Kakek</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Kakek</label>
                                 <input type="text" name="dam_sire_sire_name" value="{{ old('dam_sire_sire_name') }}"
-                                       placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama" class="input-field" autocomplete="off">
                             </div>
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Nenek</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Nenek</label>
                                 <input type="text" name="dam_sire_dam_name" value="{{ old('dam_sire_dam_name') }}"
-                                       placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama" class="input-field" autocomplete="off">
                             </div>
                             <div class="col-span-2 mt-1">
                                 <p class="text-xs text-bark-muted/70 mb-1.5">via Ibu</p>
                             </div>
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Kakek</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Kakek</label>
                                 <input type="text" name="dam_dam_sire_name" value="{{ old('dam_dam_sire_name') }}"
-                                       placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama" class="input-field" autocomplete="off">
                             </div>
                             <div>
-                                <label class="form-label text-xs"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Nenek</label>
+                                <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Nenek</label>
                                 <input type="text" name="dam_dam_dam_name" value="{{ old('dam_dam_dam_name') }}"
-                                       placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                       placeholder="Nama" class="input-field" autocomplete="off">
                             </div>
                         </div>
                     </div>
 
                     <div class="border-t border-cream-dark pt-3">
                         <button type="button" onclick="toggleGen3('dam')"
-                                class="flex items-center gap-1.5 text-xs text-bark-muted hover:text-bark transition-colors">
+                                class="flex items-center gap-1.5 text-sm text-bark-muted hover:text-bark transition-colors">
                             <i id="dam-gen3-icon" class="bi bi-chevron-right text-xs transition-transform"></i>
                             <span class="font-semibold">Generasi 3 — Buyut (Opsional)</span>
                         </button>
@@ -326,14 +326,14 @@
                                     <p class="text-xs text-bark-muted/70 mb-1.5">via {{ $g['label_via'] }}</p>
                                     <div class="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label class="form-label text-xs"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Buyut ♂</label>
+                                            <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-male text-blue-400 text-xs"></i> Buyut ♂</label>
                                             <input type="text" name="{{ $g['prefix'] }}_sire_name" value="{{ old($g['prefix'] . '_sire_name') }}"
-                                                   placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                                   placeholder="Nama" class="input-field" autocomplete="off">
                                         </div>
                                         <div>
-                                            <label class="form-label text-xs"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Buyut ♀</label>
+                                            <label class="text-sm font-semibold text-bark-light block mb-1.5"><i class="bi bi-gender-female text-pink-400 text-xs"></i> Buyut ♀</label>
                                             <input type="text" name="{{ $g['prefix'] }}_dam_name" value="{{ old($g['prefix'] . '_dam_name') }}"
-                                                   placeholder="Nama" class="input-field text-sm" autocomplete="off">
+                                                   placeholder="Nama" class="input-field" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
@@ -459,8 +459,8 @@
 
     {{-- Reference table --}}
     <div class="be-card p-5">
-        <p class="text-xs font-bold text-bark-muted uppercase tracking-wide mb-3">Referensi Nilai F</p>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+        <p class="text-sm font-semibold text-bark-muted mb-3">Referensi Nilai F</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
             @foreach([
                 ['label' => 'Full Sibling / Parent×Anak', 'f' => '25%', 'risk' => 'Sangat Berisiko', 'color' => 'text-red-600'],
                 ['label' => 'Half-Sibling',                'f' => '12.5%','risk' => 'Berisiko',       'color' => 'text-orange-600'],

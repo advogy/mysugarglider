@@ -4,11 +4,11 @@
 
 @section('content')
 
-<header class="premium-page-header header-about">
+<header class="premium-page-header">
     <div class="header-blob-about-1"></div>
     <div class="header-blob-about-2"></div>
-    <h1 class="page-title size-lg">{{ $about_heading ?: 'Tentang MySugarGlider' }}</h1>
-    <p class="page-subtitle subtitle-lg">{{ $about_intro ?: 'Platform komunitas Sugar Glider terpercaya di Indonesia. Kami hadir untuk memastikan sahabat berbulu Anda mendapatkan perawatan terbaik.' }}</p>
+    <h1 class="page-title">{{ $about_heading ?: 'Tentang MySugarGlider' }}</h1>
+    <p class="page-subtitle">{{ $about_intro ?: 'Platform komunitas Sugar Glider terpercaya di Indonesia. Kami hadir untuk memastikan sahabat berbulu Anda mendapatkan perawatan terbaik.' }}</p>
 </header>
 
 <section class="about-section">

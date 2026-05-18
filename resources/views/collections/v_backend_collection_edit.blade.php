@@ -59,13 +59,17 @@
                             <span class="badge-done">Selesai</span>
                             <span class="text-xs">Status ini tidak dapat diubah.</span>
                         </div>
+                    @elseif ($collection->status == '3')
+                        <input type="hidden" name="status" value="3">
+                        <div class="input-field bg-gray-50 text-bark-muted cursor-not-allowed flex items-center gap-2">
+                            <i class="bi bi-heart-fill text-sage text-xs"></i>
+                            <span class="text-sm font-semibold text-bark">Adopsi</span>
+                            <span class="text-xs">— Dikelola melalui menu <a href="{{ route('adoption.index') }}" class="text-sage font-bold hover:underline">Adopsi Saya</a>.</span>
+                        </div>
                     @else
                         <select name="status" class="input-field" required>
                             <option value="1" @selected($collection->status == '1')>Privat — Tidak ditampilkan ke publik</option>
                             <option value="2" @selected($collection->status == '2')>Publik — Ditampilkan ke publik</option>
-                            @if ($collection->status != '4')
-                                <option value="3" @selected($collection->status == '3')>Adopsi — Terbuka untuk diadopsi</option>
-                            @endif
                             <option value="4" @selected($collection->status == '4')>Mati — Data tersimpan untuk history</option>
                         </select>
                         @if ($collection->status == '4')

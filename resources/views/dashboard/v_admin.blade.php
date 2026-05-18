@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="mb-8">
-    <h2 class="text-2xl font-display font-bold text-bark">Halo, {{ $user->name }}!</h2>
+    <h2 class="text-2xl font-number font-bold text-bark">Halo, {{ $user->name }}!</h2>
     <p class="text-bark-muted text-sm mt-1">Ringkasan keseluruhan data platform MySugarGlider.id.</p>
 </div>
 

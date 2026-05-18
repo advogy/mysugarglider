@@ -5,7 +5,7 @@
 @section('form')
 
 <div class="mb-8">
-    <h1 class="text-3xl font-display font-bold text-bark mb-2">
+    <h1 class="text-3xl font-number font-bold text-bark mb-2">
         Halo, {{ Auth::user()->name }}!
     </h1>
     <p class="text-bark-muted text-sm">{{ __('text.verification_cek') }}</p>

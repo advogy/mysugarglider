@@ -13,7 +13,7 @@ $s = (int) $status;
 @elseif ($s === 4)
     <span class="inline-flex items-center bg-gray-800 text-gray-100 text-xs font-bold px-2 py-1 rounded-full">Mati</span>
 @elseif ($s === 5)
-    <span class="badge-done">Selesai</span>
+    <span class="badge-done">Selesai - Diadopsi</span>
 @else
     <span class="text-bark-muted">—</span>
 @endif

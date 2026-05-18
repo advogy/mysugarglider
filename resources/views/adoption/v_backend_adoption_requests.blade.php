@@ -69,22 +69,25 @@
                                     @elseif ($adoptionrequest->status == 4)
                                         {{-- DITOLAK --}}
                                         <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-red-50 text-red-500 border border-red-200">
-                                            <i class="bi bi-file-earmark-excel"></i> Tidak Terpilih
+                                            <i class="bi bi-x-circle"></i> Tidak Terpilih
                                         </span>
 
                                     @elseif ($adoptionrequest->status == 5)
-                                        {{-- DIPILIH: menunggu respons pemohon (gratis=konfirmasi / berbayar=upload bukti) --}}
-                                        <button type="button" onclick="openModal('waiting-{{ $adoptionrequest->id }}')"
+                                        {{-- DIPILIH: buka modal hub WA + batalkan --}}
+                                        <button type="button" onclick="openModal('dipilih-{{ $adoptionrequest->id }}')"
                                                 class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-honey-50 text-honey-dark border border-honey/30 hover:bg-honey/20 transition-all">
                                             <i class="bi bi-hourglass-split"></i> Menunggu Pemohon
                                         </button>
+                                    @elseif ($adoptionrequest->status == \App\Enums\AdoptionRequestStatus::DIBATALKAN->value)
+                                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200">
+                                            <i class="bi bi-x-circle"></i> Dibatalkan
+                                        </span>
 
                                     @elseif ($adoptionrequest->status == 6 && is_null($adoptionrequest->confirmed_at))
-                                        {{-- DIBAYAR tapi belum dikonfirmasi pemilik: perlu konfirmasi pembayaran --}}
-                                        <button type="button" onclick="openModal('confirm-pay-{{ $adoptionrequest->id }}')"
-                                                class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-all">
-                                            <i class="bi bi-check2-square"></i> Konfirmasi Pembayaran
-                                        </button>
+                                        {{-- DIBAYAR: menunggu admin konfirmasi pembayaran --}}
+                                        <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
+                                            <i class="bi bi-shield-check"></i> Menunggu Admin
+                                        </span>
 
                                     @elseif ($adoptionrequest->status == 6 && !is_null($adoptionrequest->confirmed_at))
                                         {{-- DIBAYAR & dikonfirmasi: siap dikirim --}}
@@ -114,83 +117,63 @@
                                 </td>
                             </tr>
 
-                            {{-- MODAL: Status 5 — menunggu respons pemohon --}}
+                            {{-- MODAL: Status 5 — hub WA + batalkan --}}
                             @if ($adoptionrequest->status == 5)
-                            <div id="waiting-{{ $adoptionrequest->id }}" class="be-modal hidden"
-
-                                 onclick="if(event.target===this)closeModal('waiting-{{ $adoptionrequest->id }}')">
+                            @php
+                                $rawApplicantTelp = $adoptionrequest->applicantTelp ?? '';
+                                $waApplicantPhone = preg_replace('/[^0-9]/', '', $rawApplicantTelp);
+                                if (str_starts_with($waApplicantPhone, '0')) $waApplicantPhone = '62' . substr($waApplicantPhone, 1);
+                                $waApplicantLink = $waApplicantPhone ? 'https://wa.me/' . $waApplicantPhone . '?text=' . urlencode('Halo ' . $adoptionrequest->nama . ', saya pemilik ' . $sugarglider->nama . ' di MySugarGlider.id. Saya ingin mendiskusikan proses adopsi lebih lanjut.') : null;
+                            @endphp
+                            <div id="dipilih-{{ $adoptionrequest->id }}" class="be-modal hidden"
+                                 onclick="if(event.target===this)closeModal('dipilih-{{ $adoptionrequest->id }}')">
                                 <div class="bg-white rounded-3xl shadow-hover max-w-md w-full p-6">
                                     <div class="flex items-start justify-between mb-4">
                                         <div>
                                             <span class="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-honey-50 text-honey-dark border border-honey/30">
-                                                <i class="bi bi-hourglass-split"></i> Menunggu Pemohon
+                                                <i class="bi bi-hourglass-split"></i> Pemohon Dipilih
                                             </span>
                                             <h3 class="font-bold text-bark text-lg mt-2">{{ $adoptionrequest->nama }}</h3>
                                         </div>
-                                        <button onclick="closeModal('waiting-{{ $adoptionrequest->id }}')" class="text-bark-muted hover:text-bark">
+                                        <button onclick="closeModal('dipilih-{{ $adoptionrequest->id }}')" class="text-bark-muted hover:text-bark">
                                             <i class="bi bi-x-lg"></i>
                                         </button>
                                     </div>
+
                                     <div class="bg-cream rounded-2xl p-4 space-y-2 text-sm mb-4">
                                         <div class="flex justify-between"><span class="text-bark-muted">Kandang</span><span class="font-bold text-bark">{{ $adoptionrequest->kandang }}</span></div>
                                         <div class="flex justify-between"><span class="text-bark-muted">Penawaran</span><span class="font-bold text-honey-dark">Rp {{ number_format($adoptionrequest->harga, 0, ',', '.') }}</span></div>
                                         @if ($adoptionrequest->keterangan)
-                                            <div class="flex justify-between"><span class="text-bark-muted">Keterangan</span><span class="text-bark text-right max-w-[60%]">{{ $adoptionrequest->keterangan }}</span></div>
+                                        <div><span class="text-bark-muted block mb-0.5">Keterangan</span><span class="text-bark text-sm">{{ $adoptionrequest->keterangan }}</span></div>
                                         @endif
                                     </div>
-                                    <div class="text-center bg-honey-50 border border-honey/30 rounded-2xl p-4 text-sm font-semibold text-honey-dark mb-4">
+
+                                    <div class="text-center bg-honey-50 border border-honey/30 rounded-2xl p-3 text-xs font-semibold text-honey-dark mb-4">
                                         @if ($sugarglider->harga > 0)
-                                            Menunggu pemohon mengunggah bukti transfer
+                                            Menunggu pemohon mengunggah bukti transfer ke rekening admin
                                         @else
                                             Menunggu pemohon mengkonfirmasi penerimaan
                                         @endif
                                     </div>
-                                    <button onclick="closeModal('waiting-{{ $adoptionrequest->id }}')" class="btn-secondary w-full justify-center">Tutup</button>
-                                </div>
-                            </div>
-                            @endif
 
-                            {{-- MODAL: Status 6 + confirmed_at NULL — konfirmasi pembayaran --}}
-                            @if ($adoptionrequest->status == 6 && is_null($adoptionrequest->confirmed_at))
-                            <div id="confirm-pay-{{ $adoptionrequest->id }}" class="be-modal hidden"
-
-                                 onclick="if(event.target===this)closeModal('confirm-pay-{{ $adoptionrequest->id }}')">
-                                <div class="bg-white rounded-3xl shadow-hover max-w-md w-full p-6">
-                                    <div class="flex items-start justify-between mb-4">
-                                        <div>
-                                            <span class="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                <i class="bi bi-receipt"></i> Bukti Transfer
-                                            </span>
-                                            <h3 class="font-bold text-bark text-lg mt-2">{{ $adoptionrequest->nama }}</h3>
-                                        </div>
-                                        <button onclick="closeModal('confirm-pay-{{ $adoptionrequest->id }}')" class="text-bark-muted hover:text-bark">
-                                            <i class="bi bi-x-lg"></i>
-                                        </button>
-                                    </div>
-                                    <div class="bg-cream rounded-2xl p-4 space-y-2 text-sm mb-4">
-                                        <div class="flex justify-between"><span class="text-bark-muted">Pemohon</span><span class="font-bold text-bark">{{ $adoptionrequest->nama }}</span></div>
-                                        <div class="flex justify-between"><span class="text-bark-muted">Kandang</span><span class="font-bold text-bark">{{ $adoptionrequest->kandang }}</span></div>
-                                        <div class="flex justify-between"><span class="text-bark-muted">Jumlah Bayar</span><span class="font-bold text-honey-dark">Rp {{ number_format($adoptionrequest->harga, 0, ',', '.') }}</span></div>
-                                        @if ($adoptionrequest->paid_at)
-                                            <div class="flex justify-between"><span class="text-bark-muted">Waktu Transfer</span><span class="font-semibold text-bark">{{ $adoptionrequest->paid_at->format('d/m/Y H:i') }}</span></div>
-                                        @endif
-                                    </div>
-                                    @if ($adoptionrequest->bukti_transfer)
-                                        <div class="rounded-2xl overflow-hidden mb-4 border border-cream-dark">
-                                            <img src="{{ Storage::url($adoptionrequest->bukti_transfer) }}"
-                                                 alt="Bukti Transfer"
-                                                 class="w-full max-h-64 object-contain bg-cream">
-                                        </div>
+                                    {{-- WA ke pemohon --}}
+                                    @if ($waApplicantLink)
+                                    <a href="{{ $waApplicantLink }}" target="_blank" rel="noopener"
+                                       class="flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl bg-[#25D366]/10 border border-[#25D366]/30 text-[#25D366] font-bold text-sm hover:bg-[#25D366] hover:text-white transition-all mb-3">
+                                        <i class="bi bi-whatsapp text-lg"></i> Chat dengan Pemohon via WhatsApp
+                                    </a>
+                                    @else
+                                    <div class="text-xs text-bark-muted text-center mb-3 p-2 bg-gray-50 rounded-xl">Pemohon belum mengisi nomor WhatsApp</div>
                                     @endif
-                                    <form action="{{ route('adoptionrequest.confirm-payment', $adoptionrequest->id) }}" method="POST">
+
+                                    {{-- Batalkan --}}
+                                    <form action="{{ route('adoptionrequest.cancel', $adoptionrequest->id) }}" method="POST"
+                                          onsubmit="return confirm('Batalkan pilihan ini? Semua pemohon lain yang ditolak akan dikembalikan ke status menunggu dan Anda bisa memilih ulang.')">
                                         @csrf
-                                        <div class="flex gap-3">
-                                            <button type="button" onclick="closeModal('confirm-pay-{{ $adoptionrequest->id }}')"
-                                                    class="btn-secondary flex-1 justify-center">Batal</button>
-                                            <button type="submit" class="btn-create flex-1 justify-center">
-                                                <i class="bi bi-check2-square"></i> Konfirmasi
-                                            </button>
-                                        </div>
+                                        <button type="submit"
+                                                class="flex items-center justify-center gap-2 w-full py-2 rounded-2xl border border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 transition-all">
+                                            <i class="bi bi-x-circle"></i> Batalkan Pilihan Ini
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -219,12 +202,26 @@
                                         <div class="flex justify-between"><span class="text-bark-muted">Sugar Glider</span><span class="font-bold text-bark">{{ $sugarglider->nama }}</span></div>
                                         <div class="flex justify-between"><span class="text-bark-muted">Morph</span><span class="font-bold text-bark">{{ $sugarglider->jenis }}</span></div>
                                     </div>
-                                    <div class="text-center bg-sky-50 border border-sky-200 rounded-2xl p-3 text-xs font-semibold text-sky-700 mb-5">
-                                        Pastikan sugar glider sudah dikirim sebelum menekan tombol ini.
-                                    </div>
-                                    <form action="{{ route('adoptionrequest.shipping', $adoptionrequest->id) }}" method="POST">
+                                                    <form action="{{ route('adoptionrequest.shipping', $adoptionrequest->id) }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <input type="hidden" name="adoption_id" value="{{ $sugarglider->id }}">
+                                        <div class="space-y-4 mb-5">
+                                            <div>
+                                                <label class="form-label">Nama Ekspedisi <span class="text-red-400">*</span></label>
+                                                <input type="text" name="nama_ekspedisi" class="input-field"
+                                                       placeholder="Contoh: JNE, J&T, SiCepat, Wahana..." required>
+                                            </div>
+                                            <div>
+                                                <label class="form-label">Nomor Resi / Pelacakan <span class="text-red-400">*</span></label>
+                                                <input type="text" name="resi_pengiriman" class="input-field font-mono"
+                                                       placeholder="Contoh: JX123456789ID" required>
+                                            </div>
+                                            <div>
+                                                <label class="form-label">Bukti Pengiriman <span class="text-bark-muted font-normal">(Opsional)</span></label>
+                                                <input type="file" name="bukti_pengiriman" accept="image/*" class="input-field">
+                                                <p class="text-xs text-bark-muted mt-1">Foto label pengiriman atau struk ekspedisi. Maks 2MB.</p>
+                                            </div>
+                                        </div>
                                         <div class="flex gap-3">
                                             <button type="button" onclick="closeModal('shipping-{{ $adoptionrequest->id }}')"
                                                     class="btn-secondary flex-1 justify-center">Batal</button>
@@ -252,7 +249,36 @@
                                         <div class="flex justify-between"><span class="text-bark-muted">Penerima</span><span class="font-bold text-bark">{{ $adoptionrequest->nama }}</span></div>
                                         <div class="flex justify-between"><span class="text-bark-muted">Kandang</span><span class="font-bold text-bark">{{ $adoptionrequest->kandang }}</span></div>
                                         <div class="flex justify-between"><span class="text-bark-muted">Sugar Glider</span><span class="font-bold text-bark">{{ $sugarglider->nama }}</span></div>
+                                        @if ($adoptionrequest->nama_ekspedisi || $adoptionrequest->resi_pengiriman)
+                                        <div class="border-t border-cream-dark pt-2 mt-1 space-y-1">
+                                            @if ($adoptionrequest->nama_ekspedisi)
+                                            <div class="flex justify-between">
+                                                <span class="text-bark-muted">Ekspedisi</span>
+                                                <span class="font-semibold text-bark">{{ $adoptionrequest->nama_ekspedisi }}</span>
+                                            </div>
+                                            @endif
+                                            @if ($adoptionrequest->resi_pengiriman)
+                                            <div class="flex justify-between">
+                                                <span class="text-bark-muted">No. Resi</span>
+                                                <span class="font-mono font-bold text-bark">{{ $adoptionrequest->resi_pengiriman }}</span>
+                                            </div>
+                                            @endif
+                                        </div>
+                                        @endif
                                     </div>
+                                    @if ($adoptionrequest->bukti_pengiriman)
+                                    <button type="button"
+                                            onclick="previewPhoto('{{ asset('storage/' . $adoptionrequest->bukti_pengiriman) }}', 'Bukti Pengiriman — {{ $sugarglider->nama }}')"
+                                            class="w-full group relative rounded-xl overflow-hidden border border-cream-dark bg-gray-50 hover:border-sky-300 transition-colors mb-4 block">
+                                        <img src="{{ asset('storage/' . $adoptionrequest->bukti_pengiriman) }}"
+                                             alt="Bukti Pengiriman" class="w-full max-h-40 object-contain">
+                                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all">
+                                            <span class="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 text-bark text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                                                <i class="bi bi-zoom-in"></i> Lihat Bukti
+                                            </span>
+                                        </div>
+                                    </button>
+                                    @endif
                                     <button onclick="closeModal('shipped-{{ $adoptionrequest->id }}')" class="btn-secondary w-full justify-center">Tutup</button>
                                 </div>
                             </div>
@@ -272,56 +298,81 @@
 
     {{-- Sidebar: Process guide --}}
     <div class="lg:w-64 flex-shrink-0">
-        <div class="be-card p-5">
-            <h3 class="font-bold text-bark mb-4">Alur Proses</h3>
-            <div class="space-y-3 text-sm">
-                <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <i class="bi bi-file-earmark-text text-gray-500"></i>
+        <div class="be-card overflow-hidden">
+            <div class="px-4 py-3 border-b border-cream-dark bg-cream/40 flex items-center gap-2">
+                <i class="bi bi-signpost-2-fill text-sage text-sm"></i>
+                <p class="font-ui font-bold text-bark text-sm">Alur Proses (Pemilik)</p>
+            </div>
+            <div class="p-4 space-y-3 text-sm">
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i class="bi bi-people-fill text-gray-500"></i>
                     </span>
-                    <span class="text-bark-light">Menunggu pilihan Anda</span>
+                    <div>
+                        <p class="font-bold text-bark text-xs">Pilih Pemohon</p>
+                        <p class="text-bark-muted text-xs">Pilih dari daftar yang mengajukan</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-xl bg-honey-50 flex items-center justify-center flex-shrink-0">
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-honey-50 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <i class="bi bi-hourglass-split text-honey-dark"></i>
                     </span>
-                    <span class="text-bark-light">Menunggu respons pemohon</span>
+                    <div>
+                        <p class="font-bold text-bark text-xs">Menunggu Pemohon</p>
+                        <p class="text-bark-muted text-xs">Transfer ke rekening admin</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                        <i class="bi bi-check2-square text-emerald-600"></i>
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i class="bi bi-shield-check text-blue-600"></i>
                     </span>
-                    <span class="text-bark-light">Konfirmasi pembayaran</span>
+                    <div>
+                        <p class="font-bold text-bark text-xs">Menunggu Admin</p>
+                        <p class="text-bark-muted text-xs">Admin mengkonfirmasi pembayaran diterima</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-xl bg-sky-50 flex items-center justify-center flex-shrink-0">
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-sky-50 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <i class="bi bi-truck text-sky-500"></i>
                     </span>
-                    <span class="text-bark-light">Kirim sugar glider</span>
+                    <div>
+                        <p class="font-bold text-bark text-xs">Tandai Terkirim</p>
+                        <p class="text-bark-muted text-xs">Kirim sugar glider ke pemohon</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
-                        <i class="bi bi-house-heart text-purple-500"></i>
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i class="bi bi-house-heart text-purple-600"></i>
                     </span>
-                    <span class="text-bark-light">Menunggu konfirmasi terima</span>
+                    <div>
+                        <p class="font-bold text-bark text-xs">Menunggu Terima</p>
+                        <p class="text-bark-muted text-xs">Pemohon konfirmasi penerimaan fisik</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-xl bg-sage/10 flex items-center justify-center flex-shrink-0">
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i class="bi bi-send-check text-emerald-600"></i>
+                    </span>
+                    <div>
+                        <p class="font-bold text-bark text-xs">Pencairan Dana</p>
+                        <p class="text-bark-muted text-xs">Admin cairkan dana ke rekening Anda</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-sage/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <i class="bi bi-check-circle text-sage"></i>
                     </span>
-                    <span class="text-bark-light">Selesai</span>
-                </div>
-                <div class="border-t border-cream-dark pt-3 flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
-                        <i class="bi bi-file-earmark-excel text-red-500"></i>
-                    </span>
-                    <span class="text-bark-light">Tidak terpilih</span>
+                    <div>
+                        <p class="font-bold text-bark text-xs">Selesai</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
 </div>
+
+<x-photo-preview-modal />
 
 @push('scripts')
 <script>

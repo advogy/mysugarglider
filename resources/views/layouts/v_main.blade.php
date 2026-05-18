@@ -10,7 +10,7 @@
     <link rel="icon" href="{{ asset('assets/images/favicon.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -51,9 +51,9 @@
                 </a>
 
                 <a href="{{ route('collections', ['status' => 'adopsi']) }}"
-                   class="font-ui relative font-bold text-[0.95rem] transition-colors {{ request()->routeIs('collections') && request('status') === 'adopsi' ? 'text-bark' : 'text-bark-muted hover:text-bark' }}">
+                   class="font-ui relative font-bold text-[0.95rem] transition-colors {{ (request()->routeIs('collections') && request('status') === 'adopsi') || request()->routeIs('adoption.guide') ? 'text-bark' : 'text-bark-muted hover:text-bark' }}">
                     Adopsi
-                    @if(request()->routeIs('collections') && request('status') === 'adopsi')
+                    @if((request()->routeIs('collections') && request('status') === 'adopsi') || request()->routeIs('adoption.guide'))
                     <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-4 h-1.5 rounded-full" style="background-color: #FFD166;"></span>
                     @endif
                 </a>
@@ -205,9 +205,24 @@
     </div>
 </footer>
 
+{{-- WhatsApp Chat --}}
+@php $waNumber = \App\Models\AppConfig::get('contact_whatsapp'); @endphp
+@if ($waNumber)
+<div class="fixed bottom-6 right-6 z-40">
+    <span class="absolute inset-0 rounded-full bg-sage/50 cs-ping"></span>
+    <a href="https://wa.me/{{ $waNumber }}?text={{ urlencode('Halo admin MySugarGlider.id, saya ingin bertanya...') }}"
+       target="_blank" rel="noopener"
+       class="relative w-11 h-11 bg-sage text-white rounded-full shadow-hover
+              flex items-center justify-center hover:bg-sage-dark transition-all duration-300"
+       title="Chat dengan Admin">
+        <i class="bi bi-headset text-lg"></i>
+    </a>
+</div>
+@endif
+
 {{-- Back to top --}}
 <button id="back-to-top"
-        class="fixed bottom-6 right-6 w-11 h-11 bg-sage text-white rounded-full shadow-hover
+        class="fixed {{ $waNumber ? 'bottom-20' : 'bottom-6' }} right-6 w-11 h-11 bg-sage text-white rounded-full shadow-hover
                flex items-center justify-center z-40 opacity-0 pointer-events-none
                hover:bg-sage-dark transition-all duration-300"
         onclick="window.scrollTo({top:0,behavior:'smooth'})">

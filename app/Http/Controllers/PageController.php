@@ -47,6 +47,12 @@ class PageController extends Controller
             ->limit(4)
             ->get();
 
+        $featuredShelter = ShelterModel::where('status', '1')
+            ->whereHas('sugargliders', fn ($q) => $q->whereNotNull('gambar')->where('gambar', '!=', ''))
+            ->with(['sugargliders' => fn ($q) => $q->whereNotNull('gambar')->where('gambar', '!=', '')->inRandomOrder()->limit(6)])
+            ->inRandomOrder()
+            ->first();
+
         $data = [
             'count_sugargliders'    => SugargliderModel::count(),
             'count_shelters'        => ShelterModel::count(),
@@ -59,6 +65,7 @@ class PageController extends Controller
             'hero_items'            => $heroItems,
             'testimonials'          => $testimonials,
             'sg_avatars'            => $sgAvatars,
+            'featured_shelter'      => $featuredShelter,
         ];
 
         return view('pages/v_home', $data);
@@ -80,6 +87,11 @@ class PageController extends Controller
     }
     function destroy()
     {
+    }
+
+    function adoptionGuide()
+    {
+        return view('pages.v_adoption_guide');
     }
 
     function about()

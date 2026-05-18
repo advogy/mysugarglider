@@ -14,7 +14,8 @@ class ProfileModel extends Model
     protected $table = "profiles";
     protected $primaryKey = 'id';
     protected $fillable = [
-        'user_id', 'kode_profil', 'alamat', 'kota', 'provinsi', 'telepon', 'bio', 'instagram', 'website'
+        'user_id', 'kode_profil', 'alamat', 'kota', 'provinsi', 'telepon', 'bio', 'instagram', 'website',
+        'bank_name', 'bank_account_number', 'bank_account_name',
     ];
 
     public function user()

@@ -1,6 +1,6 @@
 <aside id="sidebar" class="sidebar scrollbar-thin overflow-y-auto">
 
-    <div class="flex items-center justify-between px-5 py-[18px] border-b border-cream-dark flex-shrink-0">
+    <div class="flex items-center justify-between px-5 h-14 sm:h-16 border-b border-cream-dark flex-shrink-0">
         <a href="{{ route('index') }}" class="flex-shrink-0 no-underline hover:opacity-80 transition-opacity">
             <span class="site-logo font-number font-extrabold text-bark text-2xl">
                 My<span class="logo-sg">SugarGlider</span><span class="logo-id">.id</span>
@@ -63,6 +63,9 @@
         <a href="{{ route('adoption.list') }}" class="sidebar-link {{ request()->routeIs('adoption.list') ? 'active' : '' }}">
             <i class="bi bi-heart-arrow text-base"></i><span>Cari Adopsi</span>
         </a>
+        <a href="{{ route('adoption.guide') }}" class="sidebar-link {{ request()->routeIs('adoption.guide') ? 'active' : '' }}">
+            <i class="bi bi-signpost-2-fill text-base"></i><span>Panduan Adopsi</span>
+        </a>
         @endif
 
         @if (Auth::user()->isAdmin())
@@ -72,6 +75,15 @@
         </a>
         <a href="{{ route('admin.configs.halaman') }}" class="sidebar-link {{ request()->routeIs('admin.configs.halaman*') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-text-fill text-base"></i><span>Halaman Publik</span>
+        </a>
+
+        <p class="sidebar-title">Admin — Adopsi</p>
+        <a href="{{ route('admin.adoptions.index') }}" class="sidebar-link {{ request()->routeIs('admin.adoptions*') ? 'active' : '' }}">
+            <i class="bi bi-bank text-base"></i><span>Manajemen Adopsi</span>
+            @php $pendingCount = \App\Models\AdoptionRequestModel::where('status', \App\Enums\AdoptionRequestStatus::DIBAYAR->value)->whereNull('confirmed_at')->count(); @endphp
+            @if ($pendingCount > 0)
+                <span class="ml-auto inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold">{{ $pendingCount }}</span>
+            @endif
         </a>
 
         <p class="sidebar-title">Admin — Data</p>
