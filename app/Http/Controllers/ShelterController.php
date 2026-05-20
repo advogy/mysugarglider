@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use App\Http\Requests\ShelterRequest;
 use App\Enums\CollectionStatus;
@@ -78,7 +79,7 @@ class ShelterController extends Controller
     {
         if ($request->hasFile('gambar')) {
             $image = $request->file('gambar');
-            $imagename = 'shelter-' . $request->kode . '.' . $image->extension();
+            $imagename = 'shelter-' . Str::uuid() . '.' . $image->extension();
 
             ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/shelters/' . $imagename));
         } else {
@@ -138,7 +139,8 @@ class ShelterController extends Controller
 
     function update(ShelterRequest $request)
     {
-        $shelter = ShelterModel::find($request->id);
+        $shelter = ShelterModel::findOrFail($request->id);
+        $this->authorize('update', $shelter);
         $shelter->nama        = $request->nama;
         $shelter->kode        = $request->kode;
         $shelter->alamat      = $request->alamat;
@@ -149,7 +151,7 @@ class ShelterController extends Controller
 
         if ($request->hasFile('gambar')) {
             $image = $request->file('gambar');
-            $imagename = 'shelter-' . $shelter->kode . '.' . $image->extension();
+            $imagename = 'shelter-' . Str::uuid() . '.' . $image->extension();
 
             ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/shelters/' . $imagename));
 

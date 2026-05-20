@@ -162,7 +162,8 @@ class CollectionController extends Controller
 
     function update(CollectionRequest $request)
     {
-        $collection = CollectionModel::find($request->id);
+        $collection = CollectionModel::findOrFail($request->id);
+        $this->authorize('update', $collection);
         $collection->shelter_id     = $request->shelter_id;
         $collection->sugarglider_id = $request->sugarglider_id;
 

@@ -9,6 +9,7 @@ use App\Models\CollectionModel;
 use App\Models\ShelterModel;
 use App\Models\SugargliderModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 
 class AdminDataController extends Controller
@@ -48,7 +49,7 @@ class AdminDataController extends Controller
 
         if ($request->hasFile('gambar')) {
             $image     = $request->file('gambar');
-            $imagename = 'shelter-' . $shelter->kode . '.' . $image->extension();
+            $imagename = 'shelter-' . Str::uuid() . '.' . $image->extension();
             ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/shelters/' . $imagename));
             $shelter->gambar = $imagename;
         }
@@ -111,7 +112,7 @@ class AdminDataController extends Controller
 
         if ($request->hasFile('gambar')) {
             $image     = $request->file('gambar');
-            $imagename = 'sg-' . $request->kode . '.' . $image->extension();
+            $imagename = 'sg-' . Str::uuid() . '.' . $image->extension();
             ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/sugargliders/' . $imagename));
             $sugarglider->gambar = $imagename;
         }

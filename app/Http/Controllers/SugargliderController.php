@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use App\Http\Requests\SugargliderRequest;
 use App\Models\SugargliderModel;
@@ -228,7 +229,7 @@ class SugargliderController extends Controller
 
         if ($request->hasFile('gambar')) {
             $image = $request->file('gambar');
-            $imagename = 'sg-' . ($kode ?? 'nocode') . '.' . $image->extension();
+            $imagename = 'sg-' . Str::uuid() . '.' . $image->extension();
 
             ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/sugargliders/' . $imagename));
         } else {
@@ -379,7 +380,8 @@ class SugargliderController extends Controller
 
     function update(SugargliderRequest $request)
     {
-        $sugarglider = SugargliderModel::find($request->id);
+        $sugarglider = SugargliderModel::findOrFail($request->id);
+        $this->authorize('update', $sugarglider);
 
         $kode = $sugarglider->kode;
         if ($request->input('regenerate_kode')) {
@@ -405,7 +407,7 @@ class SugargliderController extends Controller
 
         if ($request->hasFile('gambar')) {
             $image = $request->file('gambar');
-            $imagename = 'sg-' . $request->kode . '.' . $image->extension();
+            $imagename = 'sg-' . Str::uuid() . '.' . $image->extension();
 
             ImageManager::gd()->read($image)->coverDown(500, 500)->save(public_path('upload/sugargliders/' . $imagename));
 

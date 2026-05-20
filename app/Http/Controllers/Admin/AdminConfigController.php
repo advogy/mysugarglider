@@ -17,8 +17,17 @@ class AdminConfigController extends Controller
 
     public function updateSite(Request $request)
     {
+        $allowed = [
+            'site_name', 'site_tagline',
+            'contact_email', 'contact_whatsapp', 'contact_address',
+            'admin_bank_name', 'admin_bank_number', 'admin_bank_holder',
+            'admin_platform_fee',
+        ];
+
         foreach ($request->input('configs', []) as $key => $value) {
-            AppConfig::where('key', $key)->update(['value' => $value]);
+            if (in_array($key, $allowed, true)) {
+                AppConfig::where('key', $key)->update(['value' => $value]);
+            }
         }
 
         return back()->with('pesan', 'Konfigurasi sistem berhasil disimpan.');
@@ -53,8 +62,12 @@ class AdminConfigController extends Controller
 
     public function updateHalaman(Request $request)
     {
+        $allowed = ['home_intro', 'about_heading', 'about_intro', 'about_content'];
+
         foreach ($request->input('configs', []) as $key => $value) {
-            AppConfig::where('key', $key)->update(['value' => $value]);
+            if (in_array($key, $allowed, true)) {
+                AppConfig::where('key', $key)->update(['value' => $value]);
+            }
         }
 
         return back()->with('pesan', 'Konten halaman publik berhasil disimpan.');
