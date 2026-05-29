@@ -55,16 +55,16 @@ jobs:
             --exclude 'storage/framework/sessions/*' \
             --exclude 'storage/framework/views/*' \
             -e "ssh -p ${{ secrets.SSH_PORT }}" \
-            ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USERNAME }}/domains/malangan.com/public_html/
+            ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USERNAME }}/domains/mysugarglider.id/public_html/
 
       - name: Post-deploy commands
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'ENDSSH'
-            cd /home/${{ secrets.SSH_USERNAME }}/domains/malangan.com/public_html
+            cd /home/${{ secrets.SSH_USERNAME }}/domains/mysugarglider.id/public_html
             PHP=$(find /usr/bin /usr/local/bin -name 'php8*' -o -name 'php' 2>/dev/null | sort -r | head -1)
             $PHP artisan migrate --force
             $PHP artisan config:cache
             $PHP artisan route:cache
             $PHP artisan view:cache
-            ln -sfn /home/${{ secrets.SSH_USERNAME }}/domains/sugarglider.id/public_html/storage/app/public /home/${{ secrets.SSH_USERNAME }}/domains/malangan.com/public_html/public/storage
+            ln -sfn /home/${{ secrets.SSH_USERNAME }}/domains/mysugarglider.id/public_html/storage/app/public /home/${{ secrets.SSH_USERNAME }}/domains/mysugarglider.id/public_html/public/storage
           ENDSSH
