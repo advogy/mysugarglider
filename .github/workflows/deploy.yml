@@ -66,5 +66,5 @@ jobs:
             $PHP artisan config:cache
             $PHP artisan route:cache
             $PHP artisan view:cache
-            ln -sfn /home/${{ secrets.SSH_USERNAME }}/domains/malangan.com/public_html/storage/app/public /home/${{ secrets.SSH_USERNAME }}/domains/malangan.com/public_html/public/storage
+            ln -sfn /home/${{ secrets.SSH_USERNAME }}/domains/sugarglider.id/public_html/storage/app/public /home/${{ secrets.SSH_USERNAME }}/domains/malangan.com/public_html/public/storage
           ENDSSH
