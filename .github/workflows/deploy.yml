@@ -1,4 +1,4 @@
-name: Deploy Malangan
+name: Deploy MySugarGlider
 
 on:
   push:
